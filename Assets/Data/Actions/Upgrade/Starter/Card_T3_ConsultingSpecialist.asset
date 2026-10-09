@@ -1,0 +1,61 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a19c702a9b380a64ba00656724a44857, type: 3}
+  m_Name: Card_T3_ConsultingSpecialist
+  m_EditorClassIdentifier: Assembly-CSharp::ActionCardSO
+  cardName: Consulting Specialist
+  cardType: 1
+  tags: 
+  rulesText: 'Unmask 1 hidden symptom (up to Tier-3).
+
+    Gain 1 AP.'
+  flavorText: They charge by the hour, but they rarely need more than five minutes
+    to pinpoint the exact problem.
+  isPlayable: 1
+  successChance: 1
+  apCost: 1
+  cardsToDraw: 0
+  powerTier: 3
+  exhaustsOnUse: 0
+  exhaustsAtShiftEnd: 0
+  effects:
+  - {fileID: 2535059109492470556}
+  - {fileID: 4547301687933328964}
+  directDraftUpgrade: {fileID: 0}
+  draftUpgradeCost: 5
+  cardArt: {fileID: 0}
+--- !u!114 &2535059109492470556
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 796baca7075bc8944a9f932635245f0e, type: 3}
+  m_Name: DiagnoseEffect
+  m_EditorClassIdentifier: GameScripts::ChiefComplaint.Cards.Effects.DiagnoseEffectSO
+  diagnosesSymptomTier: 3
+--- !u!114 &4547301687933328964
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a41db4da226e5c646a06511d8a1409ea, type: 3}
+  m_Name: GainAPEffect
+  m_EditorClassIdentifier: GameScripts:ChiefComplaint.Cards.Effects:GainAPEffectSO
+  apGenerated: 1

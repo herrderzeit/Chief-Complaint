@@ -1,0 +1,146 @@
+using UnityEngine;
+using System.Collections.Generic;
+using ChiefComplaint.Board;
+using ChiefComplaint.Cards.Data;
+using ChiefComplaint.Cards.Interaction;
+using ChiefComplaint.Cards.Views;
+using ChiefComplaint.Core;
+using ChiefComplaint.Drafting;
+using ChiefComplaint.UI;
+using ChiefComplaint.Utils;
+
+namespace ChiefComplaint.Board
+{
+    /// <summary>
+    /// Manages the physical board: triage slots, ward slots, and department slots.
+    /// Responsible for spawning patients, advancing turn decay, and resetting
+    /// department zone availability at the start of each shift.
+    /// </summary>
+    [UnityEngine.Scripting.APIUpdating.MovedFrom(true, null, null, null)]
+    public class BoardManager : MonoBehaviour
+    {
+        /// <summary>Raised with the number of patients currently in critical condition (Code Blue).</summary>
+        public event System.Action<int> OnCodeBlueCountChanged;
+
+        // Board slots and Prefabs have been moved to BoardView.
+
+        /// <summary>
+        /// Every live patient on the board, wherever they currently sit (triage, ward or department).
+        /// Patients remove themselves when destroyed. Ward ghosts are never registered.
+        /// </summary>
+        private readonly List<PatientCardView> activePatients = new List<PatientCardView>();
+
+        /// <summary>
+        /// Read-only registry of live patients. Prefer this over <c>FindObjectsByType</c>,
+        /// which allocates and scans the whole scene.
+        /// </summary>
+        public IReadOnlyList<PatientCardView> ActivePatients => activePatients;
+
+        // -------------------------------------------------------------------------
+        // Shift Loop
+        // -------------------------------------------------------------------------
+
+        /// <summary>
+        /// Called by <see cref="GameManager.StartNewShift"/> to advance the board state:
+        /// applies stability decay to every patient on the board and resets department
+        /// zone indicators. Spawning is a separate step (<see cref="SpawnPatient"/>) so
+        /// <see cref="GameManager"/> controls the order relative to AP and hand setup.
+        /// </summary>
+        public void AdvanceShift()
+        {
+            // Removal happens in OnDestroy (end of frame), so the list is stable while we iterate.
+            for (int i = 0; i < activePatients.Count; i++)
+            {
+                PatientCardView patient = activePatients[i];
+                if (patient != null && !patient.isRemoved) patient.AdvanceShiftDecay();
+            }
+
+            if (BoardView.Instance != null)
+            {
+                BoardView.Instance.ResetDepartmentZones();
+            }
+
+            NotifyCodeBlueStatus();
+        }
+
+        /// <summary>Broadcasts the number of Code Blues (patients in critical stability) currently on the board.</summary>
+        public void NotifyCodeBlueStatus()
+        {
+            int codeBlueCount = 0;
+            for (int i = 0; i < activePatients.Count; i++)
+            {
+                if (activePatients[i] != null && !activePatients[i].isRemoved && activePatients[i].currentStability <= PatientCardView.LowStabilityThreshold)
+                {
+                    codeBlueCount++;
+                }
+            }
+            OnCodeBlueCountChanged?.Invoke(codeBlueCount);
+        }
+
+        private void HandlePatientDied(PatientCardView patient)
+        {
+            NotifyCodeBlueStatus(); // Update count since they are no longer alive
+        }
+
+        private void HandleStabilityChanged(PatientCardView patient)
+        {
+            NotifyCodeBlueStatus(); // A heal may have lifted the patient out of Code Blue
+        }
+
+        private void HandlePatientRemoved(PatientCardView patient)
+        {
+            activePatients.Remove(patient);
+            patient.OnDied -= HandlePatientDied;
+            patient.OnRemoved -= HandlePatientRemoved;
+            patient.OnStabilityChanged -= HandleStabilityChanged;
+            NotifyCodeBlueStatus(); // Keep UI perfectly in sync if a critical patient is cured/removed
+        }
+
+        // -------------------------------------------------------------------------
+        // Patient Spawning
+        // -------------------------------------------------------------------------
+
+        /// <summary>
+        /// A triage slot is occupied while a live patient is parented to it.
+        /// Moving a patient to a ward or department therefore frees their triage slot.
+        /// </summary>
+        public void SpawnPatient()
+        {
+            if (BoardView.Instance == null) return;
+            
+            Transform emptySlot = BoardView.Instance.GetEmptyTriageSlot(activePatients);
+            if (emptySlot == null)
+            {
+                GameLog.Warn("Triage River is full!");
+                return;
+            }
+
+            if (PatientDeckManager.Instance == null) return;
+
+            PatientCardSO randomPatient = PatientDeckManager.Instance.DrawRandomPatient();
+            if (randomPatient == null) return;
+
+            List<GeneratedSymptom> generated = PatientDeckManager.Instance.GenerateSymptomsForPatient(randomPatient);
+            List<SymptomCardSO> drawnSymptoms = new List<SymptomCardSO>();
+            List<SymptomTier> drawnTiers = new List<SymptomTier>();
+            foreach (var sym in generated)
+            {
+                drawnSymptoms.Add(sym.Card);
+                drawnTiers.Add(sym.Tier);
+            }
+
+            PatientCardView view = BoardView.Instance.GetPatientCard();
+            view.transform.position = emptySlot.position;
+            view.transform.rotation = Quaternion.identity;
+            view.transform.SetParent(emptySlot);
+            view.transform.localPosition = new Vector3(0, 0, -1f);
+
+            activePatients.Add(view);
+            view.OnDied += HandlePatientDied;
+            view.OnRemoved += HandlePatientRemoved;
+            view.OnStabilityChanged += HandleStabilityChanged;
+
+            view.InitialiseCard(randomPatient, drawnSymptoms, drawnTiers, null); // Prefab logic handled in BoardView
+        }
+    }
+}

@@ -1,0 +1,24 @@
+﻿%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2248ab8703a527649a77b47129bb4d9d, type: 3}
+  m_Name: Trauma_Eye_Abrasion
+  m_EditorClassIdentifier: Assembly-CSharp::SymptomCardSO
+  specialtyCategory: 0
+  clinicalTags:
+  - Laceration
+  - ENT
+  tier1Name: Eye Abrasion
+  tier1Description: Scratch on the surface of the eye.
+  tier2Name: Corneal Ulcer
+  tier2Description: Deep sore on the cornea threatening vision.
+  tier3Name: Globe Rupture
+  tier3Description: Eyeball has been punctured. Immediate ophthalmic surgery required.

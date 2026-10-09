@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a19c702a9b380a64ba00656724a44857, type: 3}
+  m_Name: Card_StrikeAction
+  m_EditorClassIdentifier: Assembly-CSharp::ActionCardSO
+  cardName: Strike Action
+  cardType: 4
+  tags: 05000000
+  rulesText: Card exhausts on use.
+  flavorText: The nurses' union is furious about the new overtime policy. Operations
+    have ground to a halt.
+  isPlayable: 1
+  successChance: 1
+  apCost: 3
+  apGenerated: 0
+  reputationGenerated: 0
+  isEitherOr: 0
+  altApGenerated: 0
+  isDiagnostic: 0
+  diagnosesSymptomTier: 0
+  pausesStabilityClock: 0
+  stabilisationHeal: 0
+  curesSymptomTier: 0
+  cardsToDraw: 0
+  cleansesRedTape: 0
+  repBonusPerRedTapeCleansed: 0
+  powerTier: 1
+  isTrashCard: 0
+  exhaustsOnUse: 1
+  exhaustsAtShiftEnd: 0
+  effects: []
+  directDraftUpgrade: {fileID: 0}
+  draftUpgradeCost: 5
+  cardArt: {fileID: 0}

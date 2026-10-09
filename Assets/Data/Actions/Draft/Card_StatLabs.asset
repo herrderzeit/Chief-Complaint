@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-5925222582827463614
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 796baca7075bc8944a9f932635245f0e, type: 3}
+  m_Name: DiagnoseEffect
+  m_EditorClassIdentifier: GameScripts::ChiefComplaint.Cards.Effects.DiagnoseEffectSO
+  diagnosesSymptomTier: 3
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a19c702a9b380a64ba00656724a44857, type: 3}
+  m_Name: Card_StatLabs
+  m_EditorClassIdentifier: Assembly-CSharp::ActionCardSO
+  cardName: Stat Labs
+  cardType: 1
+  tags: 
+  rulesText: '50% chance to: Unmask 1 hidden symptom (up to Tier-3).'
+  flavorText: '"I don''t care if the centrifuge is acting up, spin the samples by
+    hand if you have to!"'
+  isPlayable: 1
+  successChance: 0.5
+  apCost: 0
+  apGenerated: 0
+  reputationGenerated: 0
+  isEitherOr: 0
+  altApGenerated: 0
+  isDiagnostic: 1
+  diagnosesSymptomTier: 3
+  pausesStabilityClock: 0
+  stabilisationHeal: 0
+  curesSymptomTier: 0
+  cardsToDraw: 0
+  cleansesRedTape: 0
+  repBonusPerRedTapeCleansed: 0
+  powerTier: 2
+  isTrashCard: 0
+  exhaustsOnUse: 0
+  exhaustsAtShiftEnd: 0
+  effects:
+  - {fileID: -5925222582827463614}
+  directDraftUpgrade: {fileID: 0}
+  draftUpgradeCost: 5
+  cardArt: {fileID: 0}

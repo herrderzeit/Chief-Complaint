@@ -1,0 +1,24 @@
+﻿%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2248ab8703a527649a77b47129bb4d9d, type: 3}
+  m_Name: Trauma_Minor_Bleeding
+  m_EditorClassIdentifier: Assembly-CSharp::SymptomCardSO
+  specialtyCategory: 0
+  clinicalTags:
+  - Haemorrhage
+  - Laceration
+  tier1Name: Minor Bleeding
+  tier1Description: Slow venous bleed easily controlled.
+  tier2Name: Venous Hemorrhage
+  tier2Description: Rapid bleeding requiring pressure dressing and packing.
+  tier3Name: Internal Hemorrhage
+  tier3Description: Massive internal bleeding from ruptured spleen or liver.

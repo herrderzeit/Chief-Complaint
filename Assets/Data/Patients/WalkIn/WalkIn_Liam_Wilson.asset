@@ -1,0 +1,33 @@
+﻿%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8462b54d3fdb6654fa66b1edc186270d, type: 3}
+  m_Name: WalkIn_Liam_Wilson
+  m_EditorClassIdentifier: Assembly-CSharp::PatientCardSO
+  patientName: Liam Wilson
+  chiefComplaint: Mild Dizziness
+  age: 61
+  clinicalTags:
+  - Neurological
+  - Vestibular
+  - Minor
+  escalationPhase: 0
+  triageLevel: 5
+  incomingCategories: 01000000
+  startingStability: 10
+  stabilityDecayPerTurn: 1
+  reputationReward: 1
+  triggers:
+  - condition: 4
+    effect: 1
+    effectValue: 1
+    cardReference: {fileID: 0}
+  portraitSprite: {fileID: 0}

@@ -1,0 +1,25 @@
+﻿%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2248ab8703a527649a77b47129bb4d9d, type: 3}
+  m_Name: Infectious_Skin_Rash
+  m_EditorClassIdentifier: Assembly-CSharp::SymptomCardSO
+  specialtyCategory: 2
+  clinicalTags:
+  - Dermatological
+  - Skin
+  - Allergic
+  tier1Name: Skin Rash
+  tier1Description: Localized red, itchy skin.
+  tier2Name: Cellulitis
+  tier2Description: Spreading bacterial skin infection.
+  tier3Name: Necrotizing Fasciitis
+  tier3Description: Flesh-eating bacteria rapidly destroying tissue. Needs amputation/debridement.

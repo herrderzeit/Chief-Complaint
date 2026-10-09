@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-1037246990224821645
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 285d06662b2183f41aad8562cf290cd5, type: 3}
+  m_Name: CureSymptomEffect
+  m_EditorClassIdentifier: GameScripts:ChiefComplaint.Cards.Effects:CureSymptomEffectSO
+  curesSymptomTier: 2
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a19c702a9b380a64ba00656724a44857, type: 3}
+  m_Name: Card_T2_SpecialisedCare
+  m_EditorClassIdentifier: Assembly-CSharp::ActionCardSO
+  cardName: Specialised Care
+  cardType: 2
+  tags: 
+  rulesText: Cure 1 symptom (up to Tier-2).
+  flavorText: Targeted therapies for complex ailments. When standard rest and saline
+    just won't cut it.
+  isPlayable: 1
+  successChance: 1
+  apCost: 2
+  apGenerated: 0
+  reputationGenerated: 0
+  isEitherOr: 0
+  altApGenerated: 0
+  isDiagnostic: 0
+  diagnosesSymptomTier: 3
+  pausesStabilityClock: 0
+  stabilisationHeal: 0
+  curesSymptomTier: 2
+  cardsToDraw: 0
+  cleansesRedTape: 0
+  repBonusPerRedTapeCleansed: 0
+  powerTier: 2
+  isTrashCard: 0
+  exhaustsOnUse: 0
+  exhaustsAtShiftEnd: 0
+  effects:
+  - {fileID: -1037246990224821645}
+  directDraftUpgrade: {fileID: 11400000, guid: f151b4f7d47ae1c42b011149ebd7f91c, type: 2}
+  draftUpgradeCost: 10
+  cardArt: {fileID: 0}

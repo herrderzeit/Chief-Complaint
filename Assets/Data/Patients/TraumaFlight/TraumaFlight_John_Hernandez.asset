@@ -1,0 +1,33 @@
+﻿%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8462b54d3fdb6654fa66b1edc186270d, type: 3}
+  m_Name: TraumaFlight_John_Hernandez
+  m_EditorClassIdentifier: Assembly-CSharp::PatientCardSO
+  patientName: John Hernandez
+  chiefComplaint: Third Degree Burns
+  age: 45
+  clinicalTags:
+  - Burns
+  - Skin
+  - Critical
+  escalationPhase: 2
+  triageLevel: 1
+  incomingCategories: 00000000000000000200000003000000
+  startingStability: 3
+  stabilityDecayPerTurn: 3
+  reputationReward: 6
+  triggers:
+  - condition: 2
+    effect: 4
+    effectValue: 4
+    cardReference: {fileID: 0}
+  portraitSprite: {fileID: 0}

@@ -1,0 +1,72 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 3
+  tags:
+  - WardSlot
+  - TriageSlot
+  - TraumaBay
+  - Cardiology
+  - Isolation
+  - InternalMedicine
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: Background
+    uniqueID: 980942021
+    locked: 0
+  - name: Board Slots
+    uniqueID: 1540351763
+    locked: 0
+  - name: River Patients
+    uniqueID: 229560157
+    locked: 0
+  - name: River Symptoms
+    uniqueID: 1586514143
+    locked: 0
+  - name: Player Hand
+    uniqueID: 3314388077
+    locked: 0
+  - name: UI
+    uniqueID: 1647986245
+    locked: 0
+  - name: Dragging
+    uniqueID: 3336452099
+    locked: 0
+  m_RenderingLayers:
+  - Default

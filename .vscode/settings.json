@@ -1,0 +1,22 @@
+{
+    "dotnet.defaultSolution": "Chief Complaint.slnx",
+    "dotnet.dotnetPath": "C:/Program Files/dotnet/dotnet.exe",
+    "dotrush.roslyn.dotnetSdkDirectory": "C:/Program Files/dotnet/sdk/10.0.401",
+    "dotrush.msbuildProperties": {
+        "DefineConstants": "UNITY_EDITOR"
+    },
+    "dotrush.roslyn.projectOrSolutionFiles": [
+        "E:/Games Development/Chief Complaint/Chief Complaint.sln"
+    ],
+    "dotrush.roslyn.restoreProjectsBeforeLoading": false,
+    "files.exclude": {
+        "**/.git": true,
+        "**/.DS_Store": true,
+        "**/Library": true,
+        "**/Temp": true,
+        "**/Logs": true,
+        "**/UserSettings": true,
+        "**/obj": true,
+        "**/*.meta": true
+    }
+}

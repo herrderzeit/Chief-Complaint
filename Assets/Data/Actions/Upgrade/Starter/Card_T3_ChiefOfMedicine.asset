@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a19c702a9b380a64ba00656724a44857, type: 3}
+  m_Name: Card_T3_ChiefOfMedicine
+  m_EditorClassIdentifier: Assembly-CSharp::ActionCardSO
+  cardName: Chief of Medicine
+  cardType: 0
+  tags: 
+  rulesText: 'Gain 3 AP.
+
+    Draw 1 card(s).'
+  flavorText: Years of experience and unquestionable authority. When they speak,
+    the entire department moves.
+  isPlayable: 1
+  successChance: 1
+  apCost: 0
+  cardsToDraw: 1
+  powerTier: 3
+  exhaustsOnUse: 0
+  exhaustsAtShiftEnd: 0
+  effects:
+  - {fileID: 1651345130545593563}
+  directDraftUpgrade: {fileID: 0}
+  draftUpgradeCost: 5
+  cardArt: {fileID: 0}
+--- !u!114 &1651345130545593563
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a41db4da226e5c646a06511d8a1409ea, type: 3}
+  m_Name: GainAPEffect
+  m_EditorClassIdentifier: GameScripts:ChiefComplaint.Cards.Effects:GainAPEffectSO
+  apGenerated: 3

@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-4731915793086483505
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b4a2311a544226649ab22636d522df49, type: 3}
+  m_Name: EitherOrEffect
+  m_EditorClassIdentifier: GameScripts:ChiefComplaint.Cards.Effects:EitherOrEffectSO
+  cardName: Compassionate Care
+  reputationGenerated: 4
+  altApGenerated: 2
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a19c702a9b380a64ba00656724a44857, type: 3}
+  m_Name: Card_T2_ReassuringPresence
+  m_EditorClassIdentifier: GameScripts::ActionCardSO
+  cardName: Reassuring Presence
+  cardType: 3
+  tags: 
+  rulesText: 'Choose: Gain 4 Rep OR Gain 2 AP.'
+  flavorText: A heated blanket and a proper cup of tea. Sometimes humanity is the
+    best medicine we have in the trolley.
+  isPlayable: 1
+  successChance: 1
+  apCost: 0
+  cardsToDraw: 0
+  powerTier: 2
+  exhaustsOnUse: 0
+  exhaustsAtShiftEnd: 0
+  effects:
+  - {fileID: -4731915793086483505}
+  directDraftUpgrade: {fileID: 11400000, guid: 387533e8005b73e4a8ff73bec66fac78, type: 2}
+  draftUpgradeCost: 10
+  cardArt: {fileID: 0}

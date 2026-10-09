@@ -1,0 +1,26 @@
+﻿%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2248ab8703a527649a77b47129bb4d9d, type: 3}
+  m_Name: Trauma_Puncture_Wound
+  m_EditorClassIdentifier: Assembly-CSharp::SymptomCardSO
+  specialtyCategory: 0
+  clinicalTags:
+  - Penetrating
+  - Laceration
+  - Ballistic
+  tier1Name: Puncture Wound
+  tier1Description: Small deep wound from a sharp object.
+  tier2Name: Impaled Object
+  tier2Description: Object still stuck in the patient. Requires careful surgical
+    removal.
+  tier3Name: Penetrating Chest Trauma
+  tier3Description: Stab or gunshot wound to the chest threatening the heart.

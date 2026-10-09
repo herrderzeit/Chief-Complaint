@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a19c702a9b380a64ba00656724a44857, type: 3}
+  m_Name: Card_CrashCart
+  m_EditorClassIdentifier: Assembly-CSharp::ActionCardSO
+  cardName: Crash Cart
+  cardType: 3
+  tags: 
+  rulesText: 'Pause patient''s stability decay.
+
+    Restore 8 Stability.'
+  flavorText: CLEAR! The sound nobody wants to hear, but the one that saves the most
+    lives.
+  isPlayable: 1
+  successChance: 1
+  apCost: 2
+  cardsToDraw: 0
+  powerTier: 3
+  exhaustsOnUse: 0
+  exhaustsAtShiftEnd: 0
+  effects:
+  - {fileID: 8878741963522917254}
+  - {fileID: 1211027201697578380}
+  directDraftUpgrade: {fileID: 0}
+  draftUpgradeCost: 5
+  cardArt: {fileID: 0}
+--- !u!114 &1211027201697578380
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39cce9e5a0feac84aad5fd12da2c3bd5, type: 3}
+  m_Name: StabilisationHealEffect
+  m_EditorClassIdentifier: GameScripts:ChiefComplaint.Cards.Effects:StabilisationHealEffectSO
+  healAmount: 8
+--- !u!114 &8878741963522917254
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 543d84c2e991b1f4a88a90f4df143aac, type: 3}
+  m_Name: PauseStabilityEffect
+  m_EditorClassIdentifier: GameScripts:ChiefComplaint.Cards.Effects:PauseStabilityEffectSO

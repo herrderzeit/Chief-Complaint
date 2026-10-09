@@ -1,0 +1,56 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-4032010818685097237
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 796baca7075bc8944a9f932635245f0e, type: 3}
+  m_Name: DiagnoseEffect
+  m_EditorClassIdentifier: GameScripts::ChiefComplaint.Cards.Effects.DiagnoseEffectSO
+  diagnosesSymptomTier: 2
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a19c702a9b380a64ba00656724a44857, type: 3}
+  m_Name: Card_T2_ComprehensiveWorkup
+  m_EditorClassIdentifier: Assembly-CSharp::ActionCardSO
+  cardName: Comprehensive Workup
+  cardType: 1
+  tags: 
+  rulesText: Unmask 1 hidden symptom (up to Tier-2).
+  flavorText: Advanced labs and imaging provide a much clearer clinical picture.
+  isPlayable: 1
+  successChance: 1
+  apCost: 1
+  apGenerated: 0
+  reputationGenerated: 0
+  isEitherOr: 0
+  altApGenerated: 0
+  isDiagnostic: 1
+  diagnosesSymptomTier: 2
+  pausesStabilityClock: 0
+  stabilisationHeal: 0
+  curesSymptomTier: 0
+  cardsToDraw: 0
+  cleansesRedTape: 0
+  repBonusPerRedTapeCleansed: 0
+  powerTier: 2
+  isTrashCard: 0
+  exhaustsOnUse: 0
+  exhaustsAtShiftEnd: 0
+  effects:
+  - {fileID: -4032010818685097237}
+  directDraftUpgrade: {fileID: 11400000, guid: 71c5c0cd3e58661428ebaf1bf63f4f11, type: 2}
+  draftUpgradeCost: 10
+  cardArt: {fileID: 0}

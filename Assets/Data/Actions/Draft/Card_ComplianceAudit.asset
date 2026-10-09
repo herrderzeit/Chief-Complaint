@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-6225806383752869896
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 83f37a742b2df3b49ac2f8b9d980e85b, type: 3}
+  m_Name: CleanseRedTapeEffect
+  m_EditorClassIdentifier: GameScripts:ChiefComplaint.Cards.Effects:CleanseRedTapeEffectSO
+  repBonusPerRedTapeCleansed: 1
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a19c702a9b380a64ba00656724a44857, type: 3}
+  m_Name: Card_ComplianceAudit
+  m_EditorClassIdentifier: Assembly-CSharp::ActionCardSO
+  cardName: Compliance Audit
+  cardType: 5
+  tags: 05000000
+  rulesText: 'Exhaust all Red Tape cards in hand/discard (+1 Rep per card).
+
+    Card
+    exhausts on use.'
+  flavorText: It's amazing how quickly missing paperwork materializes when the state
+    auditors show up in the lobby.
+  isPlayable: 1
+  successChance: 1
+  apCost: 2
+  cardsToDraw: 0
+  powerTier: 3
+  exhaustsOnUse: 1
+  exhaustsAtShiftEnd: 0
+  effects:
+  - {fileID: -6225806383752869896}
+  directDraftUpgrade: {fileID: 0}
+  draftUpgradeCost: 5
+  cardArt: {fileID: 0}

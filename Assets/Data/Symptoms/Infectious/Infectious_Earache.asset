@@ -1,0 +1,24 @@
+﻿%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2248ab8703a527649a77b47129bb4d9d, type: 3}
+  m_Name: Infectious_Earache
+  m_EditorClassIdentifier: Assembly-CSharp::SymptomCardSO
+  specialtyCategory: 2
+  clinicalTags:
+  - ENT
+  - Otitis
+  tier1Name: Earache
+  tier1Description: Otitis media.
+  tier2Name: Mastoiditis
+  tier2Description: Infection spreading to the bone behind the ear.
+  tier3Name: Bacterial Meningitis
+  tier3Description: Infection of the brain lining. Highly contagious and deadly.
