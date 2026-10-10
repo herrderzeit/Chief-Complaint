@@ -1,6 +1,5 @@
 {
     "dotnet.defaultSolution": "Chief Complaint.slnx",
-    "dotnet.dotnetPath": "C:/Program Files/dotnet/dotnet.exe",
     "dotrush.roslyn.dotnetSdkDirectory": "C:/Program Files/dotnet/sdk/10.0.401",
     "dotrush.msbuildProperties": {
         "DefineConstants": "UNITY_EDITOR"

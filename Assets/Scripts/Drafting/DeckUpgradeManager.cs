@@ -110,11 +110,29 @@ namespace ChiefComplaint.Drafting
 
             FillAllCardsInDeck(cardBuffer);
             cardBuffer.RemoveAll(c => c.directDraftUpgrade == null);
-            cardBuffer.Sort((a, b) => string.Compare(a.cardName, b.cardName));
-
+            
+            cardCounts.Clear();
+            uniqueCardBuffer.Clear();
             for (int i = 0; i < cardBuffer.Count; i++)
             {
-                SpawnCardRow(cardBuffer[i], upgradesContentTransform, true);
+                ActionCardSO card = cardBuffer[i];
+                if (cardCounts.TryGetValue(card.cardName, out int count))
+                {
+                    cardCounts[card.cardName] = count + 1;
+                }
+                else
+                {
+                    cardCounts[card.cardName] = 1;
+                    uniqueCardBuffer.Add(card);
+                }
+            }
+
+            uniqueCardBuffer.Sort((a, b) => string.Compare(a.cardName, b.cardName));
+
+            for (int i = 0; i < uniqueCardBuffer.Count; i++)
+            {
+                ActionCardSO card = uniqueCardBuffer[i];
+                SpawnCardRow(card, upgradesContentTransform, true, cardCounts[card.cardName]);
             }
         }
 

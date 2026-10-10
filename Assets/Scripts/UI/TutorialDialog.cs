@@ -93,7 +93,7 @@ namespace ChiefComplaint.UI
             // Body text
             bodyText = RuntimeUIBuilder.MakeText(box, "Body", 42, new Vector2(0, 50), new Vector2(1700, 600), "", FontStyles.Normal, Color.white);
             bodyText.textWrappingMode = TextWrappingModes.Normal;
-            bodyText.alignment = TextAlignmentOptions.TopLeft;
+            bodyText.alignment = TextAlignmentOptions.Center;
 
             // Next Button
             var buttonSize = new Vector2(400, 100);

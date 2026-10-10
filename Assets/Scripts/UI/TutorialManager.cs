@@ -9,7 +9,7 @@ namespace ChiefComplaint.UI
         private static readonly string[] TutorialSteps = new string[]
         {
             "Welcome to the Emergency Department, Chief.\n\nYour goal is to treat Patients arriving in Triage before their Stability drops to 0.",
-            "Every Patient arrives with hidden Symptoms. If left untreated, Symptoms drain Patient Stability at the end of every Shift.\n\nIf a Patient's Stability hits 0, they die. You lose Reputation equal to their severity. Lose all Reputation, and it's Game Over.",
+            "Every Patient arrives with hidden Symptoms. At the end of every Shift, the Patient's Stability decays.\n\nIf a Patient's Stability hits 0, they die. You will suffer a severe Reputation penalty. Lose all Reputation, and it's Game Over.",
             "You have 3 Action Points (AP) per Shift. You spend AP by playing Action Cards from your hand (bottom) to interact with Patients. You must carefully manage your AP to save as many patients as possible.",
             "First, you must Diagnose a Patient. Drag a Diagnostics card onto a Patient to reveal their Symptoms. Without a diagnosis, you can't treat them or move them to a Specialty Department. Some symptoms are more severe (Tier II or III) and require stronger diagnostic cards.",
             "Once diagnosed, the Patient's required Medical Specialties (e.g., Trauma, Internal) are revealed.\n\nYou can now drag the Patient's card from Triage into a matching Specialty Department (the large central zones).",

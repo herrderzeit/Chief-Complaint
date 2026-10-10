@@ -24,6 +24,9 @@ namespace ChiefComplaint.Cards.Interaction
     [UnityEngine.Scripting.APIUpdating.MovedFrom(true, null, null, null)]
     public class DraggableCard : MonoBehaviour
     {
+        public static event System.Action<ActionCardSO> OnCardDragStarted;
+        public static event System.Action OnCardDragEnded;
+
         private bool isDragging = false;
         private Vector3 offset;
         private Vector3 originalLocalPosition;
@@ -33,6 +36,7 @@ namespace ChiefComplaint.Cards.Interaction
         [Header("Hover Settings")]
         private PatientCardView hoveredPatient;
         private ActionCardView hoveredCard;
+        private PlayZoneView hoveredPlayZone;
         public float scaleSpeed = 15f;
         private Vector3 originalScale;
         private Vector3 targetScale;
@@ -63,6 +67,7 @@ namespace ChiefComplaint.Cards.Interaction
             isHovering = false;
             hoveredPatient = null;
             hoveredCard = null;
+            hoveredPlayZone = null;
             targetScale = originalScale == Vector3.zero ? Vector3.one : originalScale;
         }
 
@@ -113,6 +118,11 @@ namespace ChiefComplaint.Cards.Interaction
             offset = Vector3.zero; // Center on mouse cursor
             targetScale = originalScale; // Shrink back to original size
             if (sortingGroup != null) sortingGroup.sortingOrder = originalSortingOrder + 100;
+
+            if (actionView != null && actionView.currentCardData != null)
+            {
+                OnCardDragStarted?.Invoke(actionView.currentCardData);
+            }
         }
 
         void OnMouseDrag()
@@ -133,9 +143,14 @@ namespace ChiefComplaint.Cards.Interaction
             Collider2D[] hits = Physics2D.OverlapPointAll(GetMouseWorldPosition());
             PatientCardView foundPatient = null;
             ActionCardView foundCard = null;
+            PlayZoneView foundPlayZone = null;
 
             foreach (Collider2D hit in hits)
             {
+                if (foundPlayZone == null)
+                {
+                    foundPlayZone = hit.GetComponentInParent<PlayZoneView>();
+                }
                 // Patient target: check the hit collider and its parent for a PatientCardView,
                 // or walk up through a SymptomSubCardView to find the owning patient.
                 if (foundPatient == null)
@@ -178,12 +193,21 @@ namespace ChiefComplaint.Cards.Interaction
                 hoveredCard = foundCard;
                 if (hoveredCard != null) hoveredCard.SetHighlight(true);
             }
+
+            if (foundPlayZone != hoveredPlayZone)
+            {
+                if (hoveredPlayZone != null) hoveredPlayZone.SetHighlight(false);
+                hoveredPlayZone = foundPlayZone;
+                if (hoveredPlayZone != null) hoveredPlayZone.SetHighlight(true);
+            }
         }
 
         void OnMouseUp()
         {
             if (!isDragging) return;
             isDragging = false;
+            OnCardDragEnded?.Invoke();
+            
             if (HandView.Instance != null) HandView.Instance.isDraggingCard = false;
             if (sortingGroup != null) sortingGroup.sortingOrder = isHovering ? (originalSortingOrder + 100) : originalSortingOrder;
 
@@ -212,7 +236,7 @@ namespace ChiefComplaint.Cards.Interaction
                 }
 
                 bool effectApplied = false;
-                bool rngFailed = Random.value > cardData.successChance;
+                bool rngFailed = UnityEngine.Random.value > cardData.successChance;
 
                 // Validate targeting requirements
                 bool requiresPatient = false;
@@ -223,7 +247,9 @@ namespace ChiefComplaint.Cards.Interaction
                     if (effect.RequiresCardTarget) requiresCard = true;
                 }
 
-                if ((requiresPatient && hoveredPatient == null) || (requiresCard && hoveredCard == null))
+                if ((requiresPatient && hoveredPatient == null) || 
+                    (requiresCard && hoveredCard == null) || 
+                    (!requiresPatient && !requiresCard && hoveredPlayZone == null))
                 {
                     ClearHighlights();
                     transform.localPosition = originalLocalPosition;
@@ -280,6 +306,11 @@ namespace ChiefComplaint.Cards.Interaction
             {
                 hoveredCard.SetHighlight(false);
                 hoveredCard = null;
+            }
+            if (hoveredPlayZone != null)
+            {
+                hoveredPlayZone.SetHighlight(false);
+                hoveredPlayZone = null;
             }
         }
 
