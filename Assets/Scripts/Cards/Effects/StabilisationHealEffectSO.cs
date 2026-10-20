@@ -14,7 +14,9 @@ public int healAmount = 1;
         public override bool RequiresPatientTarget => true;
         public override bool RequiresCardTarget => false;
 
-        public override bool CanApply(PatientCardView targetPatient, ActionCardView targetCard) => targetPatient != null;
+        // Healing a patient already at full Stability would waste the card.
+        public override bool CanApply(PatientCardView targetPatient, ActionCardView targetCard) =>
+            targetPatient != null && targetPatient.currentStability < targetPatient.maxStability;
 
         public override bool Apply(PatientCardView targetPatient, ActionCardView targetCard, bool rngFailed, Vector3 mousePos)
         {

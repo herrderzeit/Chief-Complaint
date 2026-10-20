@@ -83,9 +83,9 @@ namespace ChiefComplaint.Cards.Data
     public System.Collections.Generic.List<ChiefComplaint.Cards.Effects.CardEffectSO> effects = new System.Collections.Generic.List<ChiefComplaint.Cards.Effects.CardEffectSO>();
 
     [Header("Draft Phase Upgrades")]
-    [Tooltip("The card this automatically upgrades into when paying Reputation in the Draft screen.")]
+    [Tooltip("The card this upgrades into when paying Funding in the Draft screen.")]
     public ActionCardSO directDraftUpgrade;
-    [Tooltip("The Reputation cost to upgrade to the directDraftUpgrade card.")]
+    [Tooltip("The Funding cost to upgrade to the directDraftUpgrade card.")]
     public int draftUpgradeCost = 5;
 
     [Header("Visuals")]
@@ -96,7 +96,7 @@ namespace ChiefComplaint.Cards.Data
     // -------------------------------------------------------------------------
 
     /// <summary>
-    /// Calculates a dynamic Reputation cost for the draft market based on the card's
+    /// Calculates a dynamic Funding cost for the draft market based on the card's
     /// type, power tier, AP cost, and card-draw value.
     /// <list type="bullet">
     ///   <item><description>Base cost by card type (Staff = 4, Utility/Diagnostic/Treatment = 3, RedTape = 0).</description></item>
@@ -106,7 +106,7 @@ namespace ChiefComplaint.Cards.Data
     /// </list>
     /// RedTape cards always return 0. All other results are clamped to a minimum of 2.
     /// </summary>
-    /// <returns>The Reputation cost to purchase this card during a draft phase.</returns>
+    /// <returns>The Funding cost to purchase this card during a draft phase.</returns>
     public int CalculateDraftValue()
     {
         int cost = cardType switch

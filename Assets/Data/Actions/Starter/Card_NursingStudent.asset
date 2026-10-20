@@ -28,7 +28,7 @@ MonoBehaviour:
   cardName: Nursing Student
   cardType: 0
   tags: 
-  rulesText: 'Choose: Restore 2 Stability to a patient OR draw 1 card.'
+  rulesText: 'Choose one: restore 2 Stability, or draw 1 card.'
   flavorText: First to the bedside, last to the break room. A kind word goes a long
     way when the waiting room has been full since Tuesday.
   isPlayable: 1

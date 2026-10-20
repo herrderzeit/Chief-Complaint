@@ -11226,10 +11226,10 @@ MonoBehaviour:
   startingDeck:
   - {fileID: 11400000, guid: 9e9a33c8463359f42b1c9f5fc0c560ee, type: 2}
   - {fileID: 11400000, guid: 9e9a33c8463359f42b1c9f5fc0c560ee, type: 2}
-  - {fileID: 11400000, guid: 9e9a33c8463359f42b1c9f5fc0c560ee, type: 2}
   - {fileID: 11400000, guid: 5211e20c587aa394f85c23a478f4cc77, type: 2}
   - {fileID: 11400000, guid: 5211e20c587aa394f85c23a478f4cc77, type: 2}
   - {fileID: 11400000, guid: 5211e20c587aa394f85c23a478f4cc77, type: 2}
+  - {fileID: 11400000, guid: ce8af4e421b715f4e8ae69fe2c603e27, type: 2}
   - {fileID: 11400000, guid: ce8af4e421b715f4e8ae69fe2c603e27, type: 2}
   - {fileID: 11400000, guid: ce8af4e421b715f4e8ae69fe2c603e27, type: 2}
   - {fileID: 11400000, guid: 2d8dace8bcf4e384ea6b6846e1c157b3, type: 2}

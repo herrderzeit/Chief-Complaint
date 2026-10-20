@@ -243,15 +243,20 @@ namespace ChiefComplaint.Cards.Interaction
                 // Validate targeting requirements
                 bool requiresPatient = false;
                 bool requiresCard = false;
+                bool canTargetPatient = false;
                 foreach (var effect in cardData.effects)
                 {
                     if (effect.RequiresPatientTarget) requiresPatient = true;
                     if (effect.RequiresCardTarget) requiresCard = true;
+                    if (effect.CanTargetPatient) canTargetPatient = true;
                 }
+
+                // Untargeted cards go on the play zone; cards with an optional patient effect may also go on a patient.
+                bool untargetedDropOk = hoveredPlayZone != null || (canTargetPatient && hoveredPatient != null);
 
                 if ((requiresPatient && hoveredPatient == null) || 
                     (requiresCard && hoveredCard == null) || 
-                    (!requiresPatient && !requiresCard && hoveredPlayZone == null))
+                    (!requiresPatient && !requiresCard && !untargetedDropOk))
                 {
                     ClearHighlights();
                     transform.localPosition = originalLocalPosition;

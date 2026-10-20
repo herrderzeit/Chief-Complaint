@@ -28,26 +28,14 @@ MonoBehaviour:
   cardName: Standard Care
   cardType: 2
   tags: 
-  rulesText: Cure 1 symptom (up to Tier-1).
+  rulesText: Cure 1 diagnosed Tier 1 symptom in its department.
   flavorText: Fluids, rest, and standard painkillers. The holy trinity of the triage
     ward.
   isPlayable: 1
   successChance: 1
   apCost: 1
-  apGenerated: 0
-  reputationGenerated: 0
-  isEitherOr: 0
-  altApGenerated: 0
-  isDiagnostic: 0
-  diagnosesSymptomTier: 3
-  pausesStabilityClock: 0
-  stabilisationHeal: 0
-  curesSymptomTier: 1
   cardsToDraw: 0
-  cleansesRedTape: 0
-  repBonusPerRedTapeCleansed: 0
   powerTier: 1
-  isTrashCard: 0
   exhaustsOnUse: 0
   exhaustsAtShiftEnd: 0
   effects:

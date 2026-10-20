@@ -25,32 +25,34 @@ MonoBehaviour:
   m_Name: Card_IVSaline
   m_EditorClassIdentifier: Assembly-CSharp::ActionCardSO
   cardName: IV Saline
-  cardType: 3
+  cardType: 2
   tags: 
-  rulesText: Pause patient's stability decay.
+  rulesText: Patient skips their next Stability loss and restores 1 Stability.
   flavorText: The universal hospital duct tape. It doesn't fix the underlying problem,
     but it buys you precious time.
   isPlayable: 1
   successChance: 1
   apCost: 1
-  apGenerated: 0
-  reputationGenerated: 0
-  isEitherOr: 0
-  altApGenerated: 0
-  isDiagnostic: 0
-  diagnosesSymptomTier: 3
-  pausesStabilityClock: 1
-  stabilisationHeal: 0
-  curesSymptomTier: 0
   cardsToDraw: 0
-  cleansesRedTape: 0
-  repBonusPerRedTapeCleansed: 0
   powerTier: 1
-  isTrashCard: 0
   exhaustsOnUse: 0
   exhaustsAtShiftEnd: 0
   effects:
   - {fileID: -7050927635845791435}
+  - {fileID: 2195140639630190864}
   directDraftUpgrade: {fileID: 11400000, guid: 8a1dd651da4b7b24eb4b423a3d22001f, type: 2}
   draftUpgradeCost: 5
   cardArt: {fileID: 0}
+--- !u!114 &2195140639630190864
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39cce9e5a0feac84aad5fd12da2c3bd5, type: 3}
+  m_Name: Heal1
+  m_EditorClassIdentifier: GameScripts::ChiefComplaint.Cards.Effects.StabilisationHealEffectSO
+  healAmount: 1

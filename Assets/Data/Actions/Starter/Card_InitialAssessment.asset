@@ -28,26 +28,14 @@ MonoBehaviour:
   cardName: Initial Assessment
   cardType: 1
   tags: 
-  rulesText: Unmask 1 hidden symptom (up to Tier-1).
+  rulesText: Diagnose 1 hidden Tier 1 symptom. Patient must be in the Ward.
   flavorText: The first step is figuring out what is wrong. The second step is hoping
     it isn't contagious.
   isPlayable: 1
   successChance: 1
   apCost: 1
-  apGenerated: 0
-  reputationGenerated: 0
-  isEitherOr: 0
-  altApGenerated: 0
-  isDiagnostic: 1
-  diagnosesSymptomTier: 1
-  pausesStabilityClock: 0
-  stabilisationHeal: 0
-  curesSymptomTier: 0
   cardsToDraw: 0
-  cleansesRedTape: 0
-  repBonusPerRedTapeCleansed: 0
   powerTier: 1
-  isTrashCard: 0
   exhaustsOnUse: 0
   exhaustsAtShiftEnd: 0
   effects:

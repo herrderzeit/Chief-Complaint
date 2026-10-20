@@ -46,7 +46,7 @@ namespace ChiefComplaint.UI
             // 1. Find the patient in this slot
             currentPatient = departmentSlot.GetComponentInChildren<PatientCardView>();
 
-            if (currentPatient == null || !departmentSlot.isAvailable || !currentPatient.isFullyDiagnosed)
+            if (!GameManager.Instance.CanInteract || currentPatient == null || !departmentSlot.isAvailable || !currentPatient.isFullyDiagnosed)
             {
                 DisableButton("---");
                 return;
@@ -103,6 +103,7 @@ namespace ChiefComplaint.UI
         private void OnMouseDown()
         {
             if (!isInteractable || currentPatient == null || targetTier == null) return;
+            if (!GameManager.Instance.CanInteract) return; // board locked (draft, choice prompt, pause)
 
             if (GameManager.Instance.CurrentAP >= currentAPCost)
             {

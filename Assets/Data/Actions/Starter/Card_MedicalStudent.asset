@@ -16,7 +16,7 @@ MonoBehaviour:
   cardType: 0
   tags: 
   rulesText: Gain 1 AP.
-  flavorText: Eager to help, desperate for sleep, and fueled entirely by cafeteria
+  flavorText: Eager to help, desperate for sleep, and fuelled entirely by cafeteria
     coffee.
   isPlayable: 1
   successChance: 1

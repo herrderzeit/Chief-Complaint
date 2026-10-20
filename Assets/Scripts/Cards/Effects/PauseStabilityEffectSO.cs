@@ -12,7 +12,9 @@ namespace ChiefComplaint.Cards.Effects
 public override bool RequiresPatientTarget => true;
         public override bool RequiresCardTarget => false;
 
-        public override bool CanApply(PatientCardView targetPatient, ActionCardView targetCard) => targetPatient != null && !targetPatient.stabilityClockPaused;
+        // A patient waiting to be discharged at End Shift never decays again, so a pause would be wasted.
+        public override bool CanApply(PatientCardView targetPatient, ActionCardView targetCard) =>
+            targetPatient != null && !targetPatient.stabilityClockPaused && !targetPatient.isAwaitingDischarge;
 
         public override bool Apply(PatientCardView targetPatient, ActionCardView targetCard, bool rngFailed, Vector3 mousePos)
         {

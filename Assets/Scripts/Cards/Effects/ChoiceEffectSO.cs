@@ -20,8 +20,13 @@ namespace ChiefComplaint.Cards.Effects
         public string optionBLabel;
         public CardEffectSO optionB;
 
+        // A patient is only required when neither option can be played without one; otherwise the card
+        // can go on the play zone (using the untargeted option) or on a patient (offering both).
         public override bool RequiresPatientTarget =>
-            (optionA != null && optionA.RequiresPatientTarget) || (optionB != null && optionB.RequiresPatientTarget);
+            (optionA == null || optionA.RequiresPatientTarget) && (optionB == null || optionB.RequiresPatientTarget);
+
+        public override bool CanTargetPatient =>
+            (optionA != null && optionA.CanTargetPatient) || (optionB != null && optionB.CanTargetPatient);
 
         public override bool RequiresCardTarget =>
             (optionA != null && optionA.RequiresCardTarget) || (optionB != null && optionB.RequiresCardTarget);
