@@ -291,6 +291,7 @@ namespace ChiefComplaint.Cards.Interaction
                     if (!rngFailed && cardData.cardsToDraw > 0)
                     {
                         DeckManager.Instance.DrawCards(cardData.cardsToDraw);
+                        GameFeedback.ShowAt(GameFeedback.Cards(cardData.cardsToDraw), GetMouseWorldPosition(), GameFeedback.CardColour);
                     }
 
                     GameManager.Instance.SpendAP(cardData.apCost);

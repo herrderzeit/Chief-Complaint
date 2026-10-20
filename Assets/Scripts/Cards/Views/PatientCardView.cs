@@ -261,6 +261,8 @@ namespace ChiefComplaint.Cards.Views
             }
 
             diagnosedCount++;
+            int revealed = diagnosedCount - 1;
+            GameFeedback.ShowAt($"{SymptomName(revealed)} diagnosed", transform.position, GameFeedback.CareColour);
             ExecuteTriggers(PatientTriggerCondition.OnDiagnosed);
             UpdateVisuals();
             return true;
@@ -340,8 +342,12 @@ namespace ChiefComplaint.Cards.Views
         /// <param name="amount">Stability points to restore.</param>
         public void ApplyStabilisation(int amount)
         {
+            int before = currentStability;
             currentStability = Mathf.Min(currentStability + amount, maxStability);
             UpdateVisuals();
+
+            int gained = currentStability - before;
+            if (gained > 0) GameFeedback.ShowAt($"+{gained} Stability", transform.position, GameFeedback.CareColour);
 
             // BoardManager listens to this so the HUD updates immediately if they are healed out of the red.
             OnStabilityChanged?.Invoke(this);
@@ -355,6 +361,7 @@ namespace ChiefComplaint.Cards.Views
         {
             stabilityClockPaused = true;
             UpdateVisuals();
+            GameFeedback.ShowAt("Decay paused", transform.position, GameFeedback.CareColour);
         }
 
         // -------------------------------------------------------------------------
@@ -426,6 +433,7 @@ namespace ChiefComplaint.Cards.Views
                     return true;
                 }
 
+                string treatedName = SymptomName(targetIndex);
                 assignedSymptoms.RemoveAt(targetIndex);
                 assignedTiers.RemoveAt(targetIndex);
 
@@ -441,6 +449,9 @@ namespace ChiefComplaint.Cards.Views
                 {
                     deptZone.MarkAsUsed();
                 }
+
+                GameFeedback.ShowAt(assignedSymptoms.Count == 0 ? $"{treatedName} treated - ready for discharge" : $"{treatedName} treated",
+                    transform.position, GameFeedback.CareColour);
 
                 // Stay in the department for the rest of the shift. When the shift ends the patient
                 // is discharged (all symptoms treated) or sent back to their bed.
@@ -586,10 +597,14 @@ namespace ChiefComplaint.Cards.Views
                 }
 
                 int reputationReward = Mathf.Min(patientData.reputationReward, GameManager.Instance.cureReputationCap);
-                GameManager.Instance.AddReputation(Mathf.Max(0, reputationReward + modifier));
+                int repGained = Mathf.Max(0, reputationReward + modifier);
+                GameManager.Instance.AddReputation(repGained);
 
                 int fundingReward = GameManager.Instance.GetFundingReward(patientData.escalationPhase);
-                GameManager.Instance.AddFunding(Mathf.Max(0, fundingReward + modifier));
+                int fundingGained = Mathf.Max(0, fundingReward + modifier);
+                GameManager.Instance.AddFunding(fundingGained);
+                GameFeedback.ShowAt($"{patientData.patientName} cured!", transform.position, GameFeedback.RewardColour);
+                GameFeedback.ShowAt($"+{fundingGained} Funding  +{repGained} Rep", transform.position, GameFeedback.RewardColour);
             }
 
             if (PatientDeckManager.Instance != null)
@@ -600,6 +615,13 @@ namespace ChiefComplaint.Cards.Views
             OnRemoved?.Invoke(this);
             if (BoardView.Instance != null) BoardView.Instance.ReleasePatientCard(this);
             else Destroy(gameObject);
+        }
+
+        /// <summary>Display name of the symptom at <paramref name="index"/> at its assigned tier.</summary>
+        private string SymptomName(int index)
+        {
+            if (index < 0 || index >= assignedSymptoms.Count || assignedSymptoms[index] == null) return "Symptom";
+            return assignedSymptoms[index].GetNameByTier(assignedTiers[index]);
         }
 
         /// <summary>Moves <paramref name="count"/> random cards from the hand to the discard pile.</summary>

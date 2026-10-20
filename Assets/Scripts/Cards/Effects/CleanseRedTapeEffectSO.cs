@@ -20,15 +20,15 @@ public int repBonusPerRedTapeCleansed = 1;
         {
             if (rngFailed)
             {
-                Debug.Log("Card effect failed due to RNG!");
-                if (NotificationManager.Instance != null)
-                    NotificationManager.Instance.ShowNotificationAtPosition("Failed!", mousePos, new Color(1f, 0.4f, 0.4f));
+                GameFeedback.WarnAt("Failed!", mousePos);
                 return true;
             }
 
             if (DeckManager.Instance != null)
             {
-                DeckManager.Instance.CleanseRedTape(repBonusPerRedTapeCleansed);
+                int cleansed = DeckManager.Instance.CleanseRedTape(repBonusPerRedTapeCleansed);
+                GameFeedback.ShowAt(cleansed > 0 ? $"{cleansed} Red Tape cleansed" : "No Red Tape found", mousePos,
+                    cleansed > 0 ? GameFeedback.CardColour : GameFeedback.WarningColour);
             }
             return true;
         }

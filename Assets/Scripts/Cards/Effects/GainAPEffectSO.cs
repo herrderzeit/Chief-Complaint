@@ -20,12 +20,11 @@ public int apGenerated = 1;
         {
             if (rngFailed)
             {
-                Debug.Log("Card effect failed due to RNG!");
-                if (NotificationManager.Instance != null)
-                    NotificationManager.Instance.ShowNotificationAtPosition("Failed!", mousePos, new Color(1f, 0.4f, 0.4f));
+                GameFeedback.WarnAt("Failed!", mousePos);
                 return true;
             }
             GameManager.Instance.GainAP(apGenerated);
+            GameFeedback.ShowAt($"+{apGenerated} AP", mousePos, GameFeedback.APColour);
             return true;
         }
     }

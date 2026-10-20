@@ -20,14 +20,16 @@ public int reputationGenerated = 1;
         {
             if (rngFailed)
             {
-                Debug.Log("Card effect failed due to RNG!");
-                if (NotificationManager.Instance != null)
-                    NotificationManager.Instance.ShowNotificationAtPosition("Failed!", mousePos, new Color(1f, 0.4f, 0.4f));
+                GameFeedback.WarnAt("Failed!", mousePos);
                 return true;
             }
             
             if (reputationGenerated > 0) GameManager.Instance.AddReputation(reputationGenerated);
             else if (reputationGenerated < 0) GameManager.Instance.SpendReputation(Mathf.Abs(reputationGenerated));
+
+            if (reputationGenerated != 0)
+                GameFeedback.ShowAt($"{(reputationGenerated > 0 ? "+" : "")}{reputationGenerated} Rep", mousePos,
+                    reputationGenerated > 0 ? GameFeedback.RewardColour : GameFeedback.WarningColour);
             
             return true;
         }

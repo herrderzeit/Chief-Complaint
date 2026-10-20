@@ -24,6 +24,7 @@ public override bool RequiresPatientTarget => false;
             
             if (DeckManager.Instance != null)
             {
+                GameFeedback.ShowAt($"{targetCard.currentCardData.cardName} trashed", targetCard.transform.position, GameFeedback.CardColour);
                 if (HandView.Instance != null) HandView.Instance.RemoveCardVisual(targetCard.gameObject);
                 DeckManager.Instance.RemoveCardFromHand(targetCard.currentCardData, false);
             }

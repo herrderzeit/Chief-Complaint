@@ -96,7 +96,8 @@ namespace ChiefComplaint.Core
             }
         }
 
-        public void CleanseRedTape(int repBonusPerCard)
+        /// <summary>Removes every Red Tape card from the draw pile, hand and discard pile. Returns how many were removed.</summary>
+        public int CleanseRedTape(int repBonusPerCard)
         {
             int totalCleansed = 0;
 
@@ -139,6 +140,7 @@ namespace ChiefComplaint.Core
                 }
                 NotifyDeckCounts();
             }
+            return totalCleansed;
         }
 
         public void DrawCards(int amount)
