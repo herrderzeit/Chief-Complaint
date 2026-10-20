@@ -33,10 +33,13 @@ namespace ChiefComplaint.Cards.Interaction
         private SortingGroup sortingGroup;
         private int originalSortingOrder;
 
-        [Header("Hover Settings")]
         private PatientCardView hoveredPatient;
         private ActionCardView hoveredCard;
         private PlayZoneView hoveredPlayZone;
+
+        [Header("Hover Settings")]
+        [Tooltip("Scale multiplier applied to a card while the mouse is over it in the hand.")]
+        [Range(1f, 3f)] public float hoverZoom = 1.5f;
         public float scaleSpeed = 15f;
         private Vector3 originalScale;
         private Vector3 targetScale;
@@ -79,7 +82,7 @@ namespace ChiefComplaint.Cards.Interaction
         private void ApplyHoverState()
         {
             if (sortingGroup != null) sortingGroup.sortingOrder = originalSortingOrder + 100;
-            targetScale = originalScale * 1.50f;
+            targetScale = originalScale * hoverZoom;
             transform.localPosition += new Vector3(0, 0, -2.0f);
         }
 
