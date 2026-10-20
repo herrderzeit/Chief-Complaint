@@ -47,6 +47,22 @@ namespace ChiefComplaint.Cards.Views
         private Vector3 targetScale;
         private SortingGroup sortingGroup;
         private int originalSortingOrder;
+        private int originalSortingLayerID;
+
+        [Tooltip("Sorting layer used while zoomed, so the card draws over the PlayZone and the rest of the board.")]
+        public string zoomSortingLayer = "Player Hand";
+
+        /// <summary>The symptom card currently zoomed in, if any. Only one may be zoomed at a time.</summary>
+        private static SymptomSubCardView currentlyZoomed;
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetStatics() => currentlyZoomed = null;
+
+        void OnDisable()
+        {
+            // A pooled or destroyed card must not keep blocking other zooms.
+            if (currentlyZoomed == this) currentlyZoomed = null;
+        }
 
         /// <summary>The transform this sub-card was parented to before a zoom unparents it.</summary>
         private Transform originalParent;
@@ -70,6 +86,7 @@ namespace ChiefComplaint.Cards.Views
             if (sortingGroup != null)
             {
                 originalSortingOrder = sortingGroup.sortingOrder;
+                originalSortingLayerID = sortingGroup.sortingLayerID;
             }
         }
 
@@ -249,10 +266,15 @@ namespace ChiefComplaint.Cards.Views
             {
                 if (!isRevealed) return;
 
+                // Another symptom card is already zoomed: close that one first.
+                if (!isZoomed && currentlyZoomed != null && currentlyZoomed != this) return;
+
                 isZoomed = !isZoomed;
 
                 if (isZoomed)
                 {
+                    currentlyZoomed = this;
+
                     // Unparent so the card escapes the patient's SortingGroup and renders above everything.
                     transform.SetParent(null);
 
@@ -265,7 +287,8 @@ namespace ChiefComplaint.Cards.Views
 
                     if (sortingGroup != null)
                     {
-                        // Maximum sorting order to guarantee rendering above all other elements.
+                        // Move to the hand's layer (above the board and PlayZone) at the maximum order.
+                        sortingGroup.sortingLayerName = zoomSortingLayer;
                         sortingGroup.sortingOrder = 30000;
                     }
                 }
@@ -291,6 +314,7 @@ namespace ChiefComplaint.Cards.Views
         private void ResetZoom()
         {
             isZoomed = false;
+            if (currentlyZoomed == this) currentlyZoomed = null;
             targetScale = originalScale;
 
             if (originalParent != null)
@@ -300,6 +324,7 @@ namespace ChiefComplaint.Cards.Views
 
             if (sortingGroup != null)
             {
+                sortingGroup.sortingLayerID = originalSortingLayerID;
                 sortingGroup.sortingOrder = originalSortingOrder;
             }
         }

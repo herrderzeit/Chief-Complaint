@@ -19,6 +19,9 @@ namespace ChiefComplaint.UI
         [Header("Colors")]
         public Color normalColor = new Color(1f, 1f, 1f, 0.3f);
         public Color highlightColor = new Color(0.8f, 1f, 0.5f, 0.6f);
+        [Range(0f, 1f)]
+        [Tooltip("Alpha while no card is being dragged, so players can see where untargeted cards go.")]
+        public float idleAlpha = 0.12f;
 
         [Header("Drag Preview")]
         [Tooltip("World-space label showing what the dragged card gives when played here.")]
@@ -38,16 +41,17 @@ namespace ChiefComplaint.UI
             spriteRenderer = GetComponent<SpriteRenderer>();
             canvasGroup = GetComponent<CanvasGroup>();
 
-            // Initialise to completely invisible
+            // Start at the faint idle level; dragging a playable card fades it up.
+            targetAlpha = idleAlpha;
             if (spriteRenderer != null)
             {
                 Color c = normalColor;
-                c.a = 0f;
+                c.a = idleAlpha;
                 spriteRenderer.color = c;
             }
             if (canvasGroup != null)
             {
-                canvasGroup.alpha = 0f;
+                canvasGroup.alpha = idleAlpha;
             }
             ClearPreview();
         }
@@ -188,7 +192,7 @@ namespace ChiefComplaint.UI
 
         private void UpdateVisuals()
         {
-            targetAlpha = isVisible ? (isHighlighted ? highlightColor.a : normalColor.a) : 0f;
+            targetAlpha = isVisible ? (isHighlighted ? highlightColor.a : normalColor.a) : idleAlpha;
         }
     }
 }
