@@ -260,11 +260,51 @@ namespace ChiefComplaint.Cards.Views
                 return true;
             }
 
+            RevealNextSymptom();
+            return true;
+        }
+
+        /// <summary>Reveals the symptom at <see cref="diagnosedCount"/> and fires the diagnosis feedback and triggers.</summary>
+        private void RevealNextSymptom()
+        {
             diagnosedCount++;
             int revealed = diagnosedCount - 1;
             GameFeedback.ShowAt($"{SymptomName(revealed)} diagnosed", transform.position, GameFeedback.CareColour);
             ExecuteTriggers(PatientTriggerCondition.OnDiagnosed);
             UpdateVisuals();
+        }
+
+        /// <summary>
+        /// <c>true</c> if a Team Assessment of up to <paramref name="maxTier"/> can diagnose this patient: they are
+        /// in a Ward bed and their lowest hidden symptom is within the tier.
+        /// </summary>
+        public bool CanTeamAssess(SymptomTier maxTier) =>
+            !isRemoved && !isFullyDiagnosed &&
+            transform.parent != null && transform.parent.CompareTag("WardSlot") &&
+            assignedTiers[diagnosedCount] <= maxTier;
+
+        /// <summary>
+        /// Team Assessment: diagnoses one hidden symptom picked at random among the lowest-tier hidden ones,
+        /// so Tier 1 symptoms are still found before the main (higher-tier) symptom.
+        /// </summary>
+        public bool TeamAssess(SymptomTier maxTier, System.Random rng = null)
+        {
+            if (!CanTeamAssess(maxTier)) return false;
+
+            // Symptoms are kept sorted by tier, so the lowest hidden tier is at diagnosedCount.
+            SymptomTier lowest = assignedTiers[diagnosedCount];
+            var candidates = new List<int>();
+            for (int i = diagnosedCount; i < assignedSymptoms.Count; i++)
+                if (assignedTiers[i] == lowest) candidates.Add(i);
+
+            int pick = candidates[rng != null ? rng.Next(candidates.Count) : Random.Range(0, candidates.Count)];
+            if (pick != diagnosedCount)
+            {
+                (assignedSymptoms[pick], assignedSymptoms[diagnosedCount]) = (assignedSymptoms[diagnosedCount], assignedSymptoms[pick]);
+                (assignedTiers[pick], assignedTiers[diagnosedCount]) = (assignedTiers[diagnosedCount], assignedTiers[pick]);
+            }
+
+            RevealNextSymptom();
             return true;
         }
 

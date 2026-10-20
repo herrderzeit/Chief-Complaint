@@ -23,7 +23,11 @@ public enum CardTag
     Management,
     Policy,
     Lab,
-    Rookie
+    Rookie,
+    /// <summary>Doctor ladder (Medical Student, Licensed Doctor, Chief of Medicine). Pairs with Nurse for Team Assessment.</summary>
+    Doctor,
+    /// <summary>Nurse ladder (Nursing Student, Registered Nurse, Chief Nurse). Pairs with Doctor for Team Assessment.</summary>
+    Nurse
 }
 
 namespace ChiefComplaint.Cards.Data

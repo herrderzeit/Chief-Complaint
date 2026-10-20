@@ -44,7 +44,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: GameScripts::ActionCardSO
   cardName: Registered Nurse
   cardType: 0
-  tags: 
+  tags: 0a000000
   rulesText: 'Choose: Restore 4 Stability to a patient OR pause their decay for a
     shift.'
   flavorText: A heated blanket, a cup of tea and one eye on the monitors. Sometimes

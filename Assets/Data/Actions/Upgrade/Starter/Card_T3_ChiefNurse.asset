@@ -56,7 +56,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: GameScripts::ActionCardSO
   cardName: Chief Nurse
   cardType: 0
-  tags: 
+  tags: 0a000000
   rulesText: 'Choose: Restore 2 Stability to every Ward patient OR pause decay for
     every Ward patient.'
   flavorText: Nobody teaches you how to run a ward at full capacity. Somehow, they

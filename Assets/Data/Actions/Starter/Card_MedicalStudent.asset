@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ActionCardSO
   cardName: Medical Student
   cardType: 0
-  tags: 
+  tags: 09000000
   rulesText: Gain 1 AP.
   flavorText: Eager to help, desperate for sleep, and fuelled entirely by cafeteria
     coffee.

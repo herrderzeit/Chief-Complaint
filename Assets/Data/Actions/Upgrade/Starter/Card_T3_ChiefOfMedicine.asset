@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ActionCardSO
   cardName: Chief of Medicine
   cardType: 0
-  tags: 
+  tags: 09000000
   rulesText: 'Gain 3 AP.
 
     Draw 1 card(s).'

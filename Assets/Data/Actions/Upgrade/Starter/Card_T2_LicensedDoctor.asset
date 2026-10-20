@@ -27,7 +27,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ActionCardSO
   cardName: Licensed Doctor
   cardType: 0
-  tags: 
+  tags: 09000000
   rulesText: 'Gain 2 AP.
 
     Draw 1 card(s).'

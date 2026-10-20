@@ -27,7 +27,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ActionCardSO
   cardName: Nursing Student
   cardType: 0
-  tags: 
+  tags: 0a000000
   rulesText: 'Choose one: restore 2 Stability, or draw 1 card.'
   flavorText: First to the bedside, last to the break room. A kind word goes a long
     way when the waiting room has been full since Tuesday.

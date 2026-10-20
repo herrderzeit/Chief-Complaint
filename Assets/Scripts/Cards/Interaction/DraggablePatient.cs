@@ -90,6 +90,9 @@ namespace ChiefComplaint.Cards.Interaction
 
         void OnMouseDown()
         {
+            // While a patient is being picked (e.g. Team Assessment), a click selects instead of dragging.
+            if (PatientPicker.IsPicking) { PatientPicker.TryPick(patientView); return; }
+
             // The board is locked during the draft phase and after Game Over.
             if (GameManager.Instance != null && !GameManager.Instance.CanInteract) return;
 

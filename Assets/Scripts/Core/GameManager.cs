@@ -100,7 +100,7 @@ namespace ChiefComplaint.Core
         public GamePhase CurrentPhase { get; private set; } = GamePhase.Shift;
 
         /// <summary><c>true</c> when the board (cards and patients) may be interacted with.</summary>
-        public bool CanInteract => CurrentPhase == GamePhase.Shift && !ChoicePrompt.IsOpen;
+        public bool CanInteract => CurrentPhase == GamePhase.Shift && !ChoicePrompt.IsOpen && !PatientPicker.IsPicking;
 
         private bool isGameOver = false;
 
@@ -140,6 +140,9 @@ namespace ChiefComplaint.Core
         {
             // A card's "choose one" prompt is open: answering it comes first, or its effect would be lost.
             if (ChoicePrompt.IsOpen) return;
+
+            // Escape skips a pending patient pick (e.g. Team Assessment).
+            if (PatientPicker.IsPicking) { PatientPicker.Cancel(); return; }
 
             switch (CurrentPhase)
             {
@@ -222,6 +225,9 @@ namespace ChiefComplaint.Core
         public void EnterDraftPhase()
         {
             if (CurrentPhase != GamePhase.Shift) return;
+
+            // Ending the shift abandons any pending patient pick.
+            PatientPicker.Cancel();
 
             // Patients finish their surgeries: discharges pay out before the draft opens.
             if (boardManager != null) boardManager.ResolveSurgeries();

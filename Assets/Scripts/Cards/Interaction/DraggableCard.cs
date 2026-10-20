@@ -27,6 +27,9 @@ namespace ChiefComplaint.Cards.Interaction
         public static event System.Action<ActionCardSO> OnCardDragStarted;
         public static event System.Action OnCardDragEnded;
 
+        /// <summary>Raised when a card has been played successfully (after its AP is paid), with where it was played.</summary>
+        public static event System.Action<ActionCardSO, Vector3> OnCardPlayed;
+
         private bool isDragging = false;
         private Vector3 offset;
         private Vector3 originalLocalPosition;
@@ -295,6 +298,7 @@ namespace ChiefComplaint.Cards.Interaction
                     }
 
                     GameManager.Instance.SpendAP(cardData.apCost);
+                    OnCardPlayed?.Invoke(cardData, GetMouseWorldPosition());
                     
                     if (HandView.Instance != null) HandView.Instance.RemoveCardVisual(gameObject);
                     if (DeckManager.Instance != null) DeckManager.Instance.RemoveCardFromHand(cardData, !cardData.exhaustsOnUse);
