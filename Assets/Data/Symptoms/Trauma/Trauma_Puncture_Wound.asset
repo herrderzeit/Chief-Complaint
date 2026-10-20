@@ -1,4 +1,4 @@
-﻿%YAML 1.1
+%YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
 --- !u!114 &11400000
 MonoBehaviour:
@@ -20,7 +20,6 @@ MonoBehaviour:
   tier1Name: Puncture Wound
   tier1Description: Small deep wound from a sharp object.
   tier2Name: Impaled Object
-  tier2Description: Object still stuck in the patient. Requires careful surgical
-    removal.
+  tier2Description: Object still stuck in the patient. Requires careful surgical removal.
   tier3Name: Penetrating Chest Trauma
   tier3Description: Stab or gunshot wound to the chest threatening the heart.

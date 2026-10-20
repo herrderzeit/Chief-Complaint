@@ -1,4 +1,4 @@
-﻿%YAML 1.1
+%YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
 --- !u!114 &11400000
 MonoBehaviour:
@@ -21,5 +21,4 @@ MonoBehaviour:
   tier2Name: Seizure
   tier2Description: Electrical storm in the brain causing convulsions.
   tier3Name: Status Epilepticus
-  tier3Description: Non-stop seizures lasting over 5 minutes. High risk of brain
-    damage.
+  tier3Description: Non-stop seizures lasting over 5 minutes. High risk of brain damage.

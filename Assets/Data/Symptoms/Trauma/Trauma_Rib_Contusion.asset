@@ -1,4 +1,4 @@
-﻿%YAML 1.1
+%YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
 --- !u!114 &11400000
 MonoBehaviour:
@@ -22,5 +22,4 @@ MonoBehaviour:
   tier2Name: Fractured Ribs
   tier2Description: Multiple broken ribs making breathing painful.
   tier3Name: Flail Chest
-  tier3Description: Segment of the rib cage has broken loose. Severe respiratory
-    compromise.
+  tier3Description: Segment of the rib cage has broken loose. Severe respiratory compromise.
