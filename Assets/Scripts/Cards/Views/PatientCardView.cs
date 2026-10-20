@@ -526,7 +526,9 @@ namespace ChiefComplaint.Cards.Views
         /// <summary>
         /// Calculates the final Reputation reward, grants it to the player, notifies
         /// <see cref="PatientDeckManager"/> of the cure, and destroys this card.
-        /// <para>Bonus +1 Rep if the patient retained ≥50% stability; −1 Rep penalty at ≤2 stability.</para>
+        /// <para>Awards Activity Funding by escalation type and a small Reputation reward (capped by
+        /// <see cref="GameManager.cureReputationCap"/>). Bonus +1 if the patient retained ≥50% stability;
+        /// −1 penalty at ≤2 stability. The modifier applies to both rewards.</para>
         /// </summary>
         private void DischargePatient()
         {
@@ -536,20 +538,24 @@ namespace ChiefComplaint.Cards.Views
 
             if (GameManager.Instance != null)
             {
-                int finalReward = patientData.reputationReward;
+                int modifier = 0;
 
                 if (currentStability >= (maxStability / 2f))
                 {
-                    finalReward += 1;
-                    GameLog.Info("Bonus Reputation awarded for fast stabilisation!");
+                    modifier = 1;
+                    GameLog.Info("Bonus awarded for fast stabilisation!");
                 }
                 else if (currentStability <= BarelyStableThreshold)
                 {
-                    finalReward = Mathf.Max(0, finalReward - 1);
-                    GameLog.Warn("Reputation penalised for discharging a barely-stable patient.");
+                    modifier = -1;
+                    GameLog.Warn("Reward reduced for discharging a barely-stable patient.");
                 }
 
-                GameManager.Instance.AddReputation(finalReward);
+                int reputationReward = Mathf.Min(patientData.reputationReward, GameManager.Instance.cureReputationCap);
+                GameManager.Instance.AddReputation(Mathf.Max(0, reputationReward + modifier));
+
+                int fundingReward = GameManager.Instance.GetFundingReward(patientData.escalationPhase);
+                GameManager.Instance.AddFunding(Mathf.Max(0, fundingReward + modifier));
             }
 
             if (PatientDeckManager.Instance != null)
@@ -595,7 +601,10 @@ namespace ChiefComplaint.Cards.Views
 
             if (rewardText != null && patientData != null)
             {
-                rewardText.text = $"+{patientData.reputationReward} Rep";
+                var gm = GameManager.Instance;
+                int funding = gm != null ? gm.GetFundingReward(patientData.escalationPhase) : 0;
+                int rep = gm != null ? Mathf.Min(patientData.reputationReward, gm.cureReputationCap) : patientData.reputationReward;
+                rewardText.text = $"+{funding} Funding, +{rep} Rep";
             }
 
             if (tagsText != null && patientData != null)

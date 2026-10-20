@@ -21,6 +21,7 @@ namespace ChiefComplaint.UI
         [Header("Economy UI")]
         public TextMeshProUGUI apText;
         public TextMeshProUGUI repText;
+        public TextMeshProUGUI fundingText;
 
         [Header("Progression UI")]
         public TextMeshProUGUI shiftText;
@@ -41,11 +42,13 @@ namespace ChiefComplaint.UI
             {
                 GameManager.Instance.OnAPChanged += UpdateAPDisplay;
                 GameManager.Instance.OnReputationChanged += UpdateReputationDisplay;
+                GameManager.Instance.OnFundingChanged += UpdateFundingDisplay;
                 GameManager.Instance.OnShiftChanged += UpdateShiftDisplay;
 
                 // Fetch initial values
                 UpdateAPDisplay(GameManager.Instance.CurrentAP);
                 UpdateReputationDisplay(GameManager.Instance.CurrentReputation);
+                UpdateFundingDisplay(GameManager.Instance.CurrentFunding);
                 UpdateShiftDisplay(GameManager.Instance.CurrentShift);
 
                 if (GameManager.Instance.boardManager != null)
@@ -83,6 +86,7 @@ namespace ChiefComplaint.UI
             {
                 GameManager.Instance.OnAPChanged -= UpdateAPDisplay;
                 GameManager.Instance.OnReputationChanged -= UpdateReputationDisplay;
+                GameManager.Instance.OnFundingChanged -= UpdateFundingDisplay;
                 GameManager.Instance.OnShiftChanged -= UpdateShiftDisplay;
 
                 if (GameManager.Instance.boardManager != null)
@@ -112,6 +116,11 @@ namespace ChiefComplaint.UI
         private void UpdateReputationDisplay(int newReputation)
         {
             if (repText != null) repText.text = $"Reputation: {newReputation}";
+        }
+
+        private void UpdateFundingDisplay(int newFunding)
+        {
+            if (fundingText != null) fundingText.text = $"Funding: {newFunding}";
         }
 
         private void UpdateShiftDisplay(int newShift)
