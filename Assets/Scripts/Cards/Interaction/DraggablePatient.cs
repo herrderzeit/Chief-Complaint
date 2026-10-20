@@ -93,6 +93,14 @@ namespace ChiefComplaint.Cards.Interaction
             // The board is locked during the draft phase and after Game Over.
             if (GameManager.Instance != null && !GameManager.Instance.CanInteract) return;
 
+            // A treated patient stays in surgery until the next shift.
+            if (patientView != null && patientView.isInSurgery)
+            {
+                if (NotificationManager.Instance != null)
+                    NotificationManager.Instance.ShowNotificationAtPosition("In surgery until next shift!", UnityEngine.InputSystem.Mouse.current.position.ReadValue(), new Color(1f, 0.4f, 0.4f));
+                return;
+            }
+
             isDragging = true;
             originalPosition = transform.position;
             offset = transform.position - GetMouseWorldPosition();

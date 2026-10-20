@@ -48,6 +48,12 @@ namespace ChiefComplaint.Board
         /// </summary>
         public void AdvanceShift()
         {
+            // Patients treated last shift leave their department and return to their beds.
+            for (int i = 0; i < activePatients.Count; i++)
+            {
+                if (activePatients[i] != null) activePatients[i].ReleaseFromSurgery();
+            }
+
             // Removal happens in OnDestroy (end of frame), so the list is stable while we iterate.
             for (int i = 0; i < activePatients.Count; i++)
             {

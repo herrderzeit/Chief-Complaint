@@ -37,6 +37,12 @@ namespace ChiefComplaint.Cards.Views
         public bool isCritical = false;
         public bool stabilityClockPaused = false;
 
+        /// <summary>
+        /// <c>true</c> after a symptom is treated: the patient stays in the department (keeping it
+        /// "In Use") and cannot be moved until <see cref="ReleaseFromSurgery"/> runs at the next shift.
+        /// </summary>
+        public bool isInSurgery = false;
+
         /// <summary>Set once this patient has died or been discharged and is about to be destroyed.</summary>
         public bool isRemoved { get; private set; }
 
@@ -100,6 +106,7 @@ namespace ChiefComplaint.Cards.Views
             assignedSymptoms = symptoms;
             assignedTiers = tiers;
             diagnosedCount = 0;
+            isInSurgery = false;
 
             // Sort symptoms mechanically so lower tiers must be diagnosed first.
             // Simple bubble sort is fine for 1-4 items.
@@ -424,8 +431,8 @@ namespace ChiefComplaint.Cards.Views
                 }
                 else
                 {
-                    // Auto-return them to their ward bed after successful treatment
-                    ReturnToWard();
+                    // Stay in the department for the rest of the shift; released at the next shift.
+                    isInSurgery = true;
                 }
 
                 return true;
@@ -434,6 +441,14 @@ namespace ChiefComplaint.Cards.Views
             GameLog.Info("Treatment Failed: No matching symptom found for this tier and department.");
             GameFeedback.WarnAt("Symptom tier too high or wrong department!", transform.position);
             return false;
+        }
+
+        /// <summary>Ends a surgery stay and sends the patient back to their reserved ward bed.</summary>
+        public void ReleaseFromSurgery()
+        {
+            if (!isInSurgery) return;
+            isInSurgery = false;
+            ReturnToWard();
         }
 
         /// <summary>
