@@ -322,16 +322,11 @@ namespace ChiefComplaint.Core
         /// <param name="amount">Reputation points to remove.</param>
         public void SpendReputation(int amount)
         {
-            currentReputation -= amount;
+            currentReputation = Mathf.Max(0, currentReputation - amount);
             OnReputationChanged?.Invoke(currentReputation);
             GameLog.Info($"Spent {amount} Reputation! Total: {currentReputation}");
 
-            if (currentReputation <= 0)
-            {
-                currentReputation = 0;
-                OnReputationChanged?.Invoke(currentReputation);
-                TriggerGameOver();
-            }
+            if (currentReputation == 0) TriggerGameOver();
         }
 
         /// <summary>Restores <see cref="currentAP"/> to <see cref="baseAP"/> at shift start.</summary>

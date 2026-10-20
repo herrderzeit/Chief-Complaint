@@ -86,6 +86,17 @@ namespace ChiefComplaint.Tests.EditMode
         }
 
         [Test]
+        public void SpendReputation_BelowZero_NeverRaisesANegativeValue()
+        {
+            var raised = new List<int>();
+            gm.OnReputationChanged += v => raised.Add(v);
+
+            gm.SpendReputation(gm.CurrentReputation + 50);
+
+            CollectionAssert.AreEqual(new[] { 0 }, raised, "Listeners must see one clamped value, never a negative one.");
+        }
+
+        [Test]
         public void TriggerGameOver_IsIdempotent()
         {
             int phaseChanges = 0;

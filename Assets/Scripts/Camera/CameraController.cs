@@ -48,8 +48,10 @@ namespace ChiefComplaint.Cameras
             // to prevent the camera from diving into the board plane.
             if ((UnityEngine.InputSystem.Keyboard.current != null && UnityEngine.InputSystem.Keyboard.current[zoomKey].wasPressedThisFrame) || (UnityEngine.InputSystem.Mouse.current != null && UnityEngine.InputSystem.Mouse.current.rightButton.wasPressedThisFrame))
             {
-                Vector3 mouseWorldPos = cam.ScreenToWorldPoint(UnityEngine.InputSystem.Mouse.current.position.ReadValue());
-                targetPosition = new Vector3(mouseWorldPos.x, mouseWorldPos.y, defaultPosition.z);
+                // Without a mouse there is nothing to aim at, so zoom on the current view.
+                var mouse = UnityEngine.InputSystem.Mouse.current;
+                Vector3 zoomTarget = mouse != null ? cam.ScreenToWorldPoint(mouse.position.ReadValue()) : transform.position;
+                targetPosition = new Vector3(zoomTarget.x, zoomTarget.y, defaultPosition.z);
             }
 
             if ((UnityEngine.InputSystem.Keyboard.current != null && UnityEngine.InputSystem.Keyboard.current[zoomKey].isPressed) || (UnityEngine.InputSystem.Mouse.current != null && UnityEngine.InputSystem.Mouse.current.rightButton.isPressed))

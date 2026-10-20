@@ -213,16 +213,18 @@ namespace ChiefComplaint.Cards.Views
 
         void OnMouseDown()
         {
-            mouseDownPos = UnityEngine.InputSystem.Mouse.current.position.ReadValue();
+            var mouse = UnityEngine.InputSystem.Mouse.current;
+            mouseDownPos = mouse != null ? (Vector3)mouse.position.ReadValue() : Vector3.zero;
             isDraggingParent = false;
         }
 
         void OnMouseDrag()
         {
-            if (isZoomed) return;
+            var mouse = UnityEngine.InputSystem.Mouse.current;
+            if (isZoomed || mouse == null) return;
 
             // If the mouse has moved enough, consider it a drag rather than a click
-            if (!isDraggingParent && Vector3.Distance(mouseDownPos, UnityEngine.InputSystem.Mouse.current.position.ReadValue()) > 5f)
+            if (!isDraggingParent && Vector3.Distance(mouseDownPos, mouse.position.ReadValue()) > 5f)
             {
                 isDraggingParent = true;
                 

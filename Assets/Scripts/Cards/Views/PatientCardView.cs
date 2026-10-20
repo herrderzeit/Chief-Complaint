@@ -151,6 +151,8 @@ namespace ChiefComplaint.Cards.Views
             currentStability = maxStability;
             isRemoved = false; // Reset for pooling
             isCritical = false;
+            // A pooled card may still carry an unused pause from its previous patient.
+            stabilityClockPaused = false;
             assignedWardSlot = null;
 
             SpawnSubCards(subCardPrefab);

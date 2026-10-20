@@ -66,7 +66,7 @@ namespace ChiefComplaint.Cards.Views
 
             // The UI card's frame image is named "Background" (the world-space card uses "Card_Front").
             UnityEngine.UI.Image bg = transform.Find("Background")?.GetComponent<UnityEngine.UI.Image>();
-            if (bg != null) bg.color = GetTypeColor(currentCardData.cardType);
+            if (bg != null) bg.color = CardTypeIconsSO.GetTypeColor(currentCardData.cardType);
 
             if (typeIcon != null && typeIcons != null)
             {
@@ -74,21 +74,6 @@ namespace ChiefComplaint.Cards.Views
                 typeIcon.color = CardTypeIconsSO.GetTypeColor(currentCardData.cardType);
                 typeIcon.enabled = typeIcon.sprite != null;
             }
-        }
-
-        private Color GetTypeColor(ActionCardType type)
-        {
-            return type switch
-            {
-                ActionCardType.Staff          => new Color(0.00f, 0.68f, 0.94f), // Neon Blue
-                ActionCardType.Diagnostic     => new Color(0.51f, 0.75f, 0.51f), // Neon Green
-                ActionCardType.Treatment      => new Color(1.00f, 0.60f, 0.00f), // Amber
-                ActionCardType.Utility        => new Color(0.57f, 0.15f, 0.56f), // Purple
-                ActionCardType.Administration => new Color(0.40f, 0.40f, 0.40f), // Grey
-                ActionCardType.Supply         => new Color(0.99f, 0.93f, 0.13f), // Yellow
-                ActionCardType.RedTape        => new Color(0.93f, 0.11f, 0.14f), // Red
-                _ => Color.white
-            };
         }
     }
 

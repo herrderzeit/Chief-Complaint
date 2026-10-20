@@ -73,6 +73,9 @@ namespace ChiefComplaint.Cards.Interaction
             hoveredCard = null;
             hoveredPlayZone = null;
             targetScale = originalScale == Vector3.zero ? Vector3.one : originalScale;
+
+            // A pooled card can be released while still raised above its neighbours.
+            if (sortingGroup != null) sortingGroup.sortingOrder = originalSortingOrder;
         }
 
         void Update()
@@ -231,7 +234,7 @@ namespace ChiefComplaint.Cards.Interaction
                 ActionCardSO cardData = actionView.currentCardData;
 
                 // AP gate: abort and snap back if the player cannot afford this card.
-                if (GameManager.Instance.CurrentAP < cardData.apCost)
+                if (GameManager.Instance == null || GameManager.Instance.CurrentAP < cardData.apCost)
                 {
                     GameFeedback.WarnAt("NOT ENOUGH AP!", transform.position);
                     ClearHighlights();
@@ -291,7 +294,7 @@ namespace ChiefComplaint.Cards.Interaction
                 // --- 4. Finalise ---
                 if (effectApplied)
                 {
-                    if (!rngFailed && cardData.cardsToDraw > 0)
+                    if (!rngFailed && cardData.cardsToDraw > 0 && DeckManager.Instance != null)
                     {
                         DeckManager.Instance.DrawCards(cardData.cardsToDraw);
                         GameFeedback.ShowAt(GameFeedback.Cards(cardData.cardsToDraw), GetMouseWorldPosition(), GameFeedback.CardColour);

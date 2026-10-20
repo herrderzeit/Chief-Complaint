@@ -99,8 +99,7 @@ namespace ChiefComplaint.Cards.Interaction
             // A treated patient stays in surgery until the next shift.
             if (patientView != null && patientView.isInSurgery)
             {
-                if (NotificationManager.Instance != null)
-                    NotificationManager.Instance.ShowNotificationAtPosition("In surgery until the shift ends!", UnityEngine.InputSystem.Mouse.current.position.ReadValue(), new Color(1f, 0.4f, 0.4f));
+                GameFeedback.WarnAt("In surgery until the shift ends!", GetMouseWorldPosition());
                 return;
             }
 
@@ -175,8 +174,7 @@ namespace ChiefComplaint.Cards.Interaction
 
                 if (isForbiddenBedHopping)
                 {
-                    if (NotificationManager.Instance != null)
-                        NotificationManager.Instance.ShowNotificationAtPosition("Patient already has a bed!", UnityEngine.InputSystem.Mouse.current.position.ReadValue(), new Color(1f, 0.4f, 0.4f));
+                    GameFeedback.WarnAt("Patient already has a bed!", GetMouseWorldPosition());
                     continue;
                 }
 
@@ -187,16 +185,14 @@ namespace ChiefComplaint.Cards.Interaction
                     // 1. Patient must be diagnosed to know where they go
                     if (!patientView.isFullyDiagnosed)
                     {
-                        if (NotificationManager.Instance != null)
-                            NotificationManager.Instance.ShowNotificationAtPosition("Patient needs full diagnosis!", UnityEngine.InputSystem.Mouse.current.position.ReadValue(), new Color(1f, 0.4f, 0.4f));
+                        GameFeedback.WarnAt("Patient needs full diagnosis!", GetMouseWorldPosition());
                         continue;
                     }
 
                     // 2. Patient must match the specific specialty
                     if (!IsMatchingSpecialtyDepartment(deptZone.category))
                     {
-                        if (NotificationManager.Instance != null)
-                            NotificationManager.Instance.ShowNotificationAtPosition("Wrong department for patient!", UnityEngine.InputSystem.Mouse.current.position.ReadValue(), new Color(1f, 0.4f, 0.4f));
+                        GameFeedback.WarnAt("Wrong department for patient!", GetMouseWorldPosition());
                         continue;
                     }
 
@@ -204,8 +200,7 @@ namespace ChiefComplaint.Cards.Interaction
                     bool isDepartmentClosed = !deptZone.isAvailable;
                     if (isDepartmentClosed && !isMyOwnSlot)
                     {
-                        if (NotificationManager.Instance != null)
-                            NotificationManager.Instance.ShowNotificationAtPosition("Department used this shift!", UnityEngine.InputSystem.Mouse.current.position.ReadValue(), new Color(1f, 0.4f, 0.4f));
+                        GameFeedback.WarnAt("Department used this shift!", GetMouseWorldPosition());
                         continue;
                     }
                 }
@@ -218,8 +213,7 @@ namespace ChiefComplaint.Cards.Interaction
                         // Hospitalised patients cannot be returned to triage.
                         if (hit.CompareTag("TriageSlot") && patientView.assignedWardSlot != null && patientView.diagnosedCount > 0)
                         {
-                            if (NotificationManager.Instance != null)
-                                NotificationManager.Instance.ShowNotificationAtPosition("Cannot move hospitalized patient to Triage!", UnityEngine.InputSystem.Mouse.current.position.ReadValue(), new Color(1f, 0.4f, 0.4f));
+                            GameFeedback.WarnAt("Cannot move hospitalized patient to Triage!", GetMouseWorldPosition());
                             continue;
                         }
 

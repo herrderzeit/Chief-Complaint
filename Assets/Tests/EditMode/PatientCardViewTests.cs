@@ -141,6 +141,18 @@ namespace ChiefComplaint.Tests.EditMode
         }
 
         [Test]
+        public void InitialiseCard_ClearsPauseLeftOverFromPooledPatient()
+        {
+            Initialise(SymptomTier.Tier1);
+            view.PauseStabilityClock();
+
+            // The pooled card is reused for a new patient before the pause was consumed.
+            Initialise(SymptomTier.Tier1);
+
+            Assert.IsFalse(view.stabilityClockPaused, "A new patient must not inherit the previous patient's pause.");
+        }
+
+        [Test]
         public void ApplyStabilisation_ClampsToMaxStability()
         {
             Initialise(SymptomTier.Tier1);

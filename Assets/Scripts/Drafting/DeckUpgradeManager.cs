@@ -238,10 +238,12 @@ namespace ChiefComplaint.Drafting
             GameObject rowObj = Instantiate(cardRowPrefab, parentTransform);
 
             TextMeshProUGUI[] texts = rowObj.GetComponentsInChildren<TextMeshProUGUI>();
-            if (texts.Length >= 1) 
+            if (texts.Length == 0)
             {
-                texts[0].text = count > 1 ? $"{card.cardName} (x{count})" : card.cardName;
+                Debug.LogWarning("DeckUpgradeManager: the card row prefab has no TextMeshProUGUI label.");
+                return;
             }
+            texts[0].text = count > 1 ? $"{card.cardName} (x{count})" : card.cardName;
 
             // --- HOVER LOGIC ---
             // Hovering the card name text displays the base card
@@ -269,7 +271,7 @@ namespace ChiefComplaint.Drafting
                         texts[2].gameObject.SetActive(true);
                     }
 
-                    bool canAfford = GameManager.Instance.CurrentFunding >= card.draftUpgradeCost;
+                    bool canAfford = GameManager.Instance != null && GameManager.Instance.CurrentFunding >= card.draftUpgradeCost;
                     upgradeBtn.interactable = canAfford;
 
                     // Attach specific hover logic to the button to show the UPGRADED card
@@ -296,6 +298,8 @@ namespace ChiefComplaint.Drafting
         private void OnUpgradeClicked(ActionCardSO baseCard)
         {
             if (baseCard.directDraftUpgrade == null) return;
+
+            if (GameManager.Instance == null || DeckManager.Instance == null) return;
 
             int cost = baseCard.draftUpgradeCost;
             if (GameManager.Instance.TrySpendFunding(cost))
