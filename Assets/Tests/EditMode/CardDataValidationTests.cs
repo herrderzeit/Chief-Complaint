@@ -76,13 +76,20 @@ namespace ChiefComplaint.Tests
             }
         }
 
-        /// <summary>Counts the list entries under <c>incomingCategories:</c> in the raw YAML.</summary>
+        /// <summary>
+        /// Counts the entries stored under <c>incomingCategories:</c> in the raw YAML. Unity writes an
+        /// enum list as one packed hex string (8 hex characters per entry), but it can also write a
+        /// block list or an empty <c>[]</c>, so all three forms are handled.
+        /// </summary>
         private static int CountStoredCategories(string assetPath)
         {
             var lines = File.ReadAllLines(assetPath);
             int start = System.Array.FindIndex(lines, l => l.TrimStart().StartsWith("incomingCategories:"));
             if (start < 0) return 0;
-            if (Regex.IsMatch(lines[start], @"incomingCategories:\s*\[\]")) return 0;
+
+            string inline = lines[start].Substring(lines[start].IndexOf(':') + 1).Trim();
+            if (inline == "[]") return 0;
+            if (Regex.IsMatch(inline, "^[0-9a-fA-F]+$")) return inline.Length / 8;
 
             int count = 0;
             for (int i = start + 1; i < lines.Length && lines[i].TrimStart().StartsWith("- "); i++)
