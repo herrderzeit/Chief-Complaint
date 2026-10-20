@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-2510180623607605164
+--- !u!114 &-2012566843656631707
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -9,12 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b4a2311a544226649ab22636d522df49, type: 3}
-  m_Name: EitherOrEffect
-  m_EditorClassIdentifier: GameScripts:ChiefComplaint.Cards.Effects:EitherOrEffectSO
-  cardName: Nursing Student
-  reputationGenerated: 2
-  altApGenerated: 1
+  m_Script: {fileID: 11500000, guid: a6e3c35291cb2e44ebce0413a0b97c5a, type: 3}
+  m_Name: Draw1
+  m_EditorClassIdentifier: GameScripts::ChiefComplaint.Cards.Effects.DrawCardsEffectSO
+  cardsToDraw: 1
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -30,7 +28,7 @@ MonoBehaviour:
   cardName: Nursing Student
   cardType: 0
   tags: 
-  rulesText: 'Choose: Gain 2 Rep OR Gain 1 AP.'
+  rulesText: 'Choose: Restore 2 Stability to a patient OR draw 1 card.'
   flavorText: First to the bedside, last to the break room. A kind word goes a long
     way when the waiting room has been full since Tuesday.
   isPlayable: 1
@@ -41,7 +39,37 @@ MonoBehaviour:
   exhaustsOnUse: 0
   exhaustsAtShiftEnd: 0
   effects:
-  - {fileID: -2510180623607605164}
+  - {fileID: 5712920648889888430}
   directDraftUpgrade: {fileID: 11400000, guid: f053edf4202a7cf4cba72e2cce8863af, type: 2}
   draftUpgradeCost: 5
   cardArt: {fileID: 0}
+--- !u!114 &4387732606252277167
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39cce9e5a0feac84aad5fd12da2c3bd5, type: 3}
+  m_Name: Heal2
+  m_EditorClassIdentifier: GameScripts::ChiefComplaint.Cards.Effects.StabilisationHealEffectSO
+  healAmount: 2
+--- !u!114 &5712920648889888430
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ba894ed8d3bda54fa6c197b6c37a823, type: 3}
+  m_Name: Choice
+  m_EditorClassIdentifier: GameScripts::ChiefComplaint.Cards.Effects.ChoiceEffectSO
+  promptTitle: Nursing Student
+  optionALabel: Restore 2 Stability
+  optionA: {fileID: 4387732606252277167}
+  optionBLabel: Draw 1 card
+  optionB: {fileID: -2012566843656631707}
