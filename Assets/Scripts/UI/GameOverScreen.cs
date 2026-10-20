@@ -63,7 +63,7 @@ namespace ChiefComplaint.UI
         public void Show(bool victory = false)
         {
             if (titleText != null)
-                titleText.text = victory ? "YOU SURVIVED!" : "GAME OVER";
+                titleText.text = victory ? "ACCREDITED!" : "GAME OVER";
 
             // Populate the patients-cured stat from the PatientDeckManager.
             if (patientsCuredText != null && PatientDeckManager.Instance != null)

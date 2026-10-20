@@ -22,6 +22,7 @@ namespace ChiefComplaint.UI
         public TextMeshProUGUI apText;
         public TextMeshProUGUI repText;
         public TextMeshProUGUI fundingText;
+        public TextMeshProUGUI accreditationText;
 
         [Header("Progression UI")]
         public TextMeshProUGUI shiftText;
@@ -37,6 +38,10 @@ namespace ChiefComplaint.UI
 
         private void Start()
         {
+            if (ChiefComplaint.Bureaucracy.AccreditationManager.Instance != null)
+                ChiefComplaint.Bureaucracy.AccreditationManager.Instance.OnChanged += UpdateAccreditationDisplay;
+            UpdateAccreditationDisplay();
+
             // Subscribe to GameManager events
             if (GameManager.Instance != null)
             {
@@ -118,6 +123,12 @@ namespace ChiefComplaint.UI
             if (repText != null) repText.text = $"Reputation: {newReputation}";
         }
 
+        private void UpdateAccreditationDisplay()
+        {
+            var acc = ChiefComplaint.Bureaucracy.AccreditationManager.Instance;
+            if (accreditationText != null && acc != null) accreditationText.text = $"Accredited: {acc.tracker.AccreditedCount}/4";
+        }
+
         private void UpdateFundingDisplay(int newFunding)
         {
             if (fundingText != null) fundingText.text = $"Funding: {newFunding}";
@@ -125,8 +136,12 @@ namespace ChiefComplaint.UI
 
         private void UpdateShiftDisplay(int newShift)
         {
-            int goal = GameManager.Instance != null ? GameManager.Instance.shiftsToWin : 0;
-            if (shiftText != null && goal > 0) { shiftText.text = $"Shift: {newShift} / {goal}"; return; }
+            var inspections = ChiefComplaint.Bureaucracy.InspectionManager.Instance;
+            if (shiftText != null && inspections != null)
+            {
+                shiftText.text = $"Shift: {newShift}  (Inspection: {inspections.NextInspectionShift})";
+                return;
+            }
             if (shiftText != null) shiftText.text = $"Shift: {newShift}";
         }
 

@@ -167,6 +167,73 @@ namespace ChiefComplaint.Tests.EditMode
             finally { Object.DestroyImmediate(patient); }
         }
 
+        // ---------------------------------------------------------------- Accreditation
+
+        [Test]
+        public void Accreditation_DepartmentAccreditsAtThresholdOnce()
+        {
+            var t = new AccreditationTracker { threshold = 3 };
+            Assert.IsFalse(t.Record(SymptomCategory.Trauma));
+            Assert.IsFalse(t.Record(SymptomCategory.Trauma));
+            Assert.IsTrue(t.Record(SymptomCategory.Trauma), "The third treatment accredits the department.");
+            Assert.IsFalse(t.Record(SymptomCategory.Trauma), "Further treatments don't re-accredit.");
+            Assert.AreEqual(1, t.AccreditedCount);
+            Assert.IsFalse(t.AllAccredited);
+        }
+
+        [Test]
+        public void Accreditation_AllFourDepartmentsMeansFullyAccredited()
+        {
+            var t = new AccreditationTracker { threshold = 1 };
+            foreach (var d in AccreditationTracker.Departments) t.Record(d);
+            Assert.IsTrue(t.AllAccredited);
+        }
+
+        // ---------------------------------------------------------------- Inspections
+
+        private static List<InspectionCriterion> Checklist(params CriterionType[] types)
+        {
+            var list = new List<InspectionCriterion>();
+            foreach (var t in types) list.Add(new InspectionCriterion { type = t, target = 2 });
+            return list;
+        }
+
+        [Test]
+        public void Inspection_DrawAlwaysChecksAccreditationAndScalesItsTarget()
+        {
+            var rng = new System.Random(3);
+            for (int n = 1; n <= 6; n++)
+            {
+                var c = InspectionRules.Draw(n, rng);
+                Assert.AreEqual(3, c.Count);
+                Assert.AreEqual(CriterionType.DepartmentsAccredited, c[0].type);
+                Assert.AreEqual(System.Math.Min(4, n), c[0].target);
+                Assert.AreNotEqual(c[1].type, c[2].type, "The two random criteria must differ.");
+            }
+        }
+
+        [Test]
+        public void Inspection_OutcomeByCriteriaPassed()
+        {
+            var criteria = Checklist(CriterionType.DepartmentsAccredited, CriterionType.NoDeaths, CriterionType.NoCodeBlue);
+            var good = new InspectionSnapshot { accreditedDepartments = 2 };
+            var oneMiss = new InspectionSnapshot { accreditedDepartments = 2, deathsSinceLast = 1 };
+            var twoMiss = new InspectionSnapshot { accreditedDepartments = 0, deathsSinceLast = 1 };
+
+            Assert.AreEqual(InspectionOutcome.Pass, InspectionRules.Evaluate(criteria, good));
+            Assert.AreEqual(InspectionOutcome.Conditional, InspectionRules.Evaluate(criteria, oneMiss));
+            Assert.AreEqual(InspectionOutcome.Fail, InspectionRules.Evaluate(criteria, twoMiss));
+        }
+
+        [TestCase(InspectionOutcome.Pass, true, true)]
+        [TestCase(InspectionOutcome.Conditional, true, true)]
+        [TestCase(InspectionOutcome.Fail, true, false)]
+        [TestCase(InspectionOutcome.Pass, false, false)]
+        public void Inspection_WinNeedsAPassAndFullAccreditation(InspectionOutcome outcome, bool allAccredited, bool expectWin)
+        {
+            Assert.AreEqual(expectWin, InspectionRules.IsWin(outcome, new InspectionSnapshot { allAccredited = allAccredited }));
+        }
+
         // ---------------------------------------------------------------- Cost modifiers
 
         [Test]

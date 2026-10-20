@@ -28,6 +28,12 @@ namespace ChiefComplaint.UI
         [Tooltip("Optional: A sprite renderer to tint when disabled.")]
         public SpriteRenderer buttonSprite;
 
+        /// <summary>Optional AP adjustment per department (e.g. a discount once it is accredited).</summary>
+        public static System.Func<SymptomCategory, int> costAdjustment;
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetStatics() => costAdjustment = null;
+
         private PatientCardView currentPatient;
         private int currentAPCost = 0;
         private SymptomTier? targetTier = null;
@@ -63,6 +69,7 @@ namespace ChiefComplaint.UI
 
             // 3. Calculate AP Cost based on scaling rules (Tier 1 = 2 AP, Tier 2 = 3 AP, Tier 3 = 4 AP)
             currentAPCost = GetAPCostForTier(targetTier.Value);
+            if (costAdjustment != null) currentAPCost = Mathf.Max(1, currentAPCost + costAdjustment(departmentSlot.category));
 
             // 4. Check if player can afford it
             if (GameManager.Instance.CurrentAP >= currentAPCost)
@@ -106,11 +113,10 @@ namespace ChiefComplaint.UI
 
             if (GameManager.Instance.CurrentAP >= currentAPCost)
             {
-                // Spend AP
-                GameManager.Instance.SpendAP(currentAPCost);
-
-                // Treat the symptom (TryCureSymptom automatically handles marking the department "IN USE")
-                currentPatient.TryCureSymptom(targetTier.Value);
+                // Treat first and only pay if it worked (TryCureSymptom marks the department "IN USE").
+                int cost = currentAPCost;
+                if (currentPatient.TryCureSymptom(targetTier.Value))
+                    GameManager.Instance.SpendAP(cost);
             }
         }
     }

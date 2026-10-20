@@ -95,8 +95,12 @@ namespace ChiefComplaint.Board
             OnCodeBlueCountChanged?.Invoke(codeBlueCount);
         }
 
+        /// <summary>Raised when any patient on the board dies.</summary>
+        public event System.Action<PatientCardView> OnPatientDied;
+
         private void HandlePatientDied(PatientCardView patient)
         {
+            OnPatientDied?.Invoke(patient);
             NotifyCodeBlueStatus(); // Update count since they are no longer alive
         }
 

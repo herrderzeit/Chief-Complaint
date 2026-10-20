@@ -87,8 +87,6 @@ namespace ChiefComplaint.Core
         public int deathReputationPenalty = 5;
         [Tooltip("When a patient dies, a random Red Tape card (incident paperwork) is added to the discard pile.")]
         public bool deathAddsRedTape = true;
-        [Tooltip("Surviving this many shifts wins the run. 0 disables the win condition.")]
-        [Min(0)] public int shiftsToWin = 15;
 
         [Header("Activity Funding")]
         [Tooltip("Funding paid for curing a Walk-In patient.")]
@@ -263,13 +261,6 @@ namespace ChiefComplaint.Core
 
         private void OpenDraft()
         {
-            // Finishing the final shift wins the run instead of opening the draft.
-            if (shiftsToWin > 0 && currentShift >= shiftsToWin)
-            {
-                TriggerVictory();
-                return;
-            }
-
             SetPhase(GamePhase.Draft);
             if (DeckManager.Instance != null) DeckManager.Instance.DiscardHand();
             if (draftManager != null) draftManager.OpenDraftPhase();
@@ -424,7 +415,7 @@ namespace ChiefComplaint.Core
             isGameOver = true;
             SetPhase(GamePhase.GameOver);
 
-            GameLog.Info($"VICTORY: The hospital survived all {shiftsToWin} shifts!");
+            GameLog.Info("VICTORY: The hospital is fully accredited!");
 
             if (gameOverScreen != null)
             {
