@@ -16,6 +16,12 @@ namespace ChiefComplaint.UI
         public float handLiftHeight = 3.0f;
         public float handLiftSpeed = 8f;
 
+        [Header("Lift Trigger (viewport space, 0-1)")]
+        [Tooltip("The hand lifts when the mouse is below this fraction of the screen height.")]
+        [Range(0f, 1f)] public float liftTriggerHeight = 0.22f;
+        [Tooltip("Dead zone at the left and right screen edges where the hand does not lift.")]
+        [Range(0f, 0.5f)] public float liftTriggerSideMargin = 0.05f;
+
         private Vector3 baseHandZonePos;
         [HideInInspector] public bool isDraggingCard = false;
         
@@ -122,7 +128,8 @@ namespace ChiefComplaint.UI
                 if (mouse != null && cam != null)
                 {
                     Vector3 viewportPos = cam.ScreenToViewportPoint(mouse.position.ReadValue());
-                    shouldLift = viewportPos.y < 0.22f && viewportPos.y >= 0f && viewportPos.x > 0.05f && viewportPos.x < 0.95f;
+                    shouldLift = viewportPos.y < liftTriggerHeight && viewportPos.y >= 0f
+                              && viewportPos.x > liftTriggerSideMargin && viewportPos.x < 1f - liftTriggerSideMargin;
                 }
             }
 
