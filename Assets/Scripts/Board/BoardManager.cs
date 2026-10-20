@@ -41,6 +41,19 @@ namespace ChiefComplaint.Board
         // -------------------------------------------------------------------------
 
         /// <summary>
+        /// Ends every surgery stay: fully treated patients are discharged (paying their rewards) and the
+        /// rest return to their beds. Called when End Shift is pressed, before the draft opens.
+        /// </summary>
+        public void ResolveSurgeries()
+        {
+            // Iterate backwards: a discharge removes the patient from activePatients immediately.
+            for (int i = activePatients.Count - 1; i >= 0; i--)
+            {
+                if (i < activePatients.Count && activePatients[i] != null) activePatients[i].ResolveSurgery();
+            }
+        }
+
+        /// <summary>
         /// Called by <see cref="GameManager.StartNewShift"/> to advance the board state:
         /// applies stability decay to every patient on the board and resets department
         /// zone indicators. Spawning is a separate step (<see cref="SpawnPatient"/>) so
@@ -48,11 +61,8 @@ namespace ChiefComplaint.Board
         /// </summary>
         public void AdvanceShift()
         {
-            // Patients treated last shift leave their department and return to their beds.
-            for (int i = 0; i < activePatients.Count; i++)
-            {
-                if (activePatients[i] != null) activePatients[i].ReleaseFromSurgery();
-            }
+            // Safety net: surgeries are normally resolved when End Shift is pressed.
+            ResolveSurgeries();
 
             // Removal happens in OnDestroy (end of frame), so the list is stable while we iterate.
             for (int i = 0; i < activePatients.Count; i++)

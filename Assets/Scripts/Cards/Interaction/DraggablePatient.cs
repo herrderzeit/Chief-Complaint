@@ -97,7 +97,7 @@ namespace ChiefComplaint.Cards.Interaction
             if (patientView != null && patientView.isInSurgery)
             {
                 if (NotificationManager.Instance != null)
-                    NotificationManager.Instance.ShowNotificationAtPosition("In surgery until next shift!", UnityEngine.InputSystem.Mouse.current.position.ReadValue(), new Color(1f, 0.4f, 0.4f));
+                    NotificationManager.Instance.ShowNotificationAtPosition("In surgery until the shift ends!", UnityEngine.InputSystem.Mouse.current.position.ReadValue(), new Color(1f, 0.4f, 0.4f));
                 return;
             }
 

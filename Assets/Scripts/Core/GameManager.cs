@@ -216,6 +216,9 @@ namespace ChiefComplaint.Core
         {
             if (CurrentPhase != GamePhase.Shift) return;
 
+            // Patients finish their surgeries: discharges pay out before the draft opens.
+            if (boardManager != null) boardManager.ResolveSurgeries();
+
             SetPhase(GamePhase.Draft);
             if (DeckManager.Instance != null) DeckManager.Instance.DiscardHand();
             if (draftManager != null) draftManager.OpenDraftPhase();

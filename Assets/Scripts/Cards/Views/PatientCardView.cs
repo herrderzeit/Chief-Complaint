@@ -39,9 +39,12 @@ namespace ChiefComplaint.Cards.Views
 
         /// <summary>
         /// <c>true</c> after a symptom is treated: the patient stays in the department (keeping it
-        /// "In Use") and cannot be moved until <see cref="ReleaseFromSurgery"/> runs at the next shift.
+        /// "In Use") and cannot be moved until <see cref="ResolveSurgery"/> runs when the shift ends.
         /// </summary>
         public bool isInSurgery = false;
+
+        /// <summary><c>true</c> when the patient is in surgery with every symptom treated, waiting to be discharged at End Shift.</summary>
+        public bool isAwaitingDischarge => isInSurgery && assignedSymptoms.Count == 0;
 
         /// <summary>Set once this patient has died or been discharged and is about to be destroyed.</summary>
         public bool isRemoved { get; private set; }
@@ -425,15 +428,9 @@ namespace ChiefComplaint.Cards.Views
                     deptZone.MarkAsUsed();
                 }
 
-                if (assignedSymptoms.Count == 0)
-                {
-                    DischargePatient();
-                }
-                else
-                {
-                    // Stay in the department for the rest of the shift; released at the next shift.
-                    isInSurgery = true;
-                }
+                // Stay in the department for the rest of the shift. When the shift ends the patient
+                // is discharged (all symptoms treated) or sent back to their bed.
+                isInSurgery = true;
 
                 return true;
             }
@@ -443,12 +440,17 @@ namespace ChiefComplaint.Cards.Views
             return false;
         }
 
-        /// <summary>Ends a surgery stay and sends the patient back to their reserved ward bed.</summary>
-        public void ReleaseFromSurgery()
+        /// <summary>
+        /// Ends a surgery stay when the shift ends: discharges the patient and pays their rewards if
+        /// every symptom has been treated, otherwise sends them back to their reserved ward bed.
+        /// </summary>
+        public void ResolveSurgery()
         {
-            if (!isInSurgery) return;
+            if (!isInSurgery || isRemoved) return;
             isInSurgery = false;
-            ReturnToWard();
+
+            if (assignedSymptoms.Count == 0) DischargePatient();
+            else ReturnToWard();
         }
 
         /// <summary>
