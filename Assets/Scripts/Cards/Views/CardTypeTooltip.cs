@@ -17,9 +17,6 @@ namespace ChiefComplaint.Cards.Views
         public GameObject tooltipRoot;
         public TextMeshPro label;
 
-        [Tooltip("Seconds the mouse must rest on the icon before the tooltip appears.")]
-        [Min(0f)] public float hoverDelay = 2f;
-
         private float hoverTime;
 
         private void OnEnable()
@@ -43,7 +40,9 @@ namespace ChiefComplaint.Cards.Views
 
             hoverTime = over ? hoverTime + Time.deltaTime : 0f;
 
-            bool show = over && hoverTime >= hoverDelay;
+            // The delay is set once for the whole hand on HandView.
+            float delay = HandView.Instance != null ? HandView.Instance.typeTooltipDelay : 2f;
+            bool show = over && hoverTime >= delay;
             if (tooltipRoot.activeSelf != show) tooltipRoot.SetActive(show);
         }
 

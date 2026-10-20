@@ -17,6 +17,8 @@ namespace ChiefComplaint.UI
         public float handLiftSpeed = 8f;
         [Tooltip("Scale multiplier applied to a card while the mouse is over it in the hand.")]
         [Range(1f, 3f)] public float hoverZoom = 1.5f;
+        [Tooltip("Seconds the mouse must rest on a card's type icon before the card type tooltip appears.")]
+        [Min(0f)] public float typeTooltipDelay = 2f;
 
         [Header("Lift Trigger (viewport space, 0-1)")]
         [Tooltip("The hand lifts when the mouse is below this fraction of the screen height.")]
