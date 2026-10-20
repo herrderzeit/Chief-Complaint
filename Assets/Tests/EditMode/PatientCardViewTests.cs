@@ -79,6 +79,31 @@ namespace ChiefComplaint.Tests.EditMode
         }
 
         [Test]
+        public void InitialiseCard_WithHandover_RevealsThePrimarySymptomFirst()
+        {
+            patient.arrivesWithHandover = true;
+            Initialise(SymptomTier.Tier1, SymptomTier.Tier1, SymptomTier.Tier3);
+
+            Assert.AreEqual(1, view.diagnosedCount);
+            Assert.AreEqual(SymptomTier.Tier3, view.assignedTiers[0], "The primary symptom is handed over already diagnosed.");
+            CollectionAssert.AreEqual(
+                new[] { SymptomTier.Tier1, SymptomTier.Tier1 },
+                view.assignedTiers.GetRange(1, 2),
+                "The remaining hidden symptoms stay sorted by tier.");
+        }
+
+        [Test]
+        public void InitialiseCard_WithoutHandover_StartsUndiagnosedAndSorted()
+        {
+            Initialise(SymptomTier.Tier3, SymptomTier.Tier1, SymptomTier.Tier1);
+
+            Assert.AreEqual(0, view.diagnosedCount);
+            CollectionAssert.AreEqual(
+                new[] { SymptomTier.Tier1, SymptomTier.Tier1, SymptomTier.Tier3 },
+                view.assignedTiers);
+        }
+
+        [Test]
         public void AdvanceShiftDecay_ReducesStabilityByDecayRate()
         {
             Initialise(SymptomTier.Tier1);

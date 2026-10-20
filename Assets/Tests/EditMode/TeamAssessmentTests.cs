@@ -33,10 +33,13 @@ namespace ChiefComplaint.Tests.EditMode
             created.Clear();
         }
 
-        private void Initialise(params SymptomTier[] tiers)
+        private void Initialise(params SymptomTier[] tiers) => Initialise(false, tiers);
+
+        private void Initialise(bool handover, params SymptomTier[] tiers)
         {
             var patient = ScriptableObject.CreateInstance<PatientCardSO>();
             patient.startingStability = 10;
+            patient.arrivesWithHandover = handover;
             created.Add(patient);
             var symptoms = new List<SymptomCardSO>();
             for (int i = 0; i < tiers.Length; i++)
@@ -84,6 +87,33 @@ namespace ChiefComplaint.Tests.EditMode
                 firstRevealed.Add(view.assignedSymptoms[0]);
             }
             Assert.Greater(firstRevealed.Count, 1, "Either Tier 1 symptom can be the one revealed.");
+        }
+
+        [Test]
+        public void Handover_NextHiddenSymptomIsTier1ForADiagnosticCard()
+        {
+            Initialise(true, SymptomTier.Tier1, SymptomTier.Tier1, SymptomTier.Tier3);
+
+            Assert.IsTrue(view.TryDiagnoseNext(SymptomTier.Tier1));
+            Assert.AreEqual(2, view.diagnosedCount);
+            Assert.AreEqual(SymptomTier.Tier1, view.assignedTiers[1]);
+        }
+
+        [Test]
+        public void Handover_TeamAssessPicksAmongTheLowestHiddenTier()
+        {
+            var revealed = new HashSet<SymptomCardSO>();
+            for (int seed = 0; seed < 20; seed++)
+            {
+                Initialise(true, SymptomTier.Tier1, SymptomTier.Tier1, SymptomTier.Tier3);
+                SymptomCardSO primary = view.assignedSymptoms[0];
+
+                Assert.IsTrue(view.TeamAssess(SymptomTier.Tier1, new System.Random(seed)));
+                Assert.AreSame(primary, view.assignedSymptoms[0], "The handed-over symptom stays revealed in place.");
+                Assert.AreEqual(SymptomTier.Tier1, view.assignedTiers[1]);
+                revealed.Add(view.assignedSymptoms[1]);
+            }
+            Assert.Greater(revealed.Count, 1, "Either hidden Tier 1 symptom can be the one revealed.");
         }
 
         [Test]
