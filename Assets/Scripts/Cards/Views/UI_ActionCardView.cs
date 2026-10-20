@@ -29,6 +29,11 @@ namespace ChiefComplaint.Cards.Views
         [Header("UI Feedback")]
         public GameObject highlightOutline;
 
+        [Header("Type Badge")]
+        public CardTypeIconsSO typeIcons;
+        /// <summary>The icon inside the dark type badge; tinted with the card type colour.</summary>
+        public UnityEngine.UI.Image typeIcon;
+
         public void InitialiseCard(ActionCardSO cardData)
         {
             currentCardData = cardData;
@@ -61,6 +66,13 @@ namespace ChiefComplaint.Cards.Views
 
             UnityEngine.UI.Image bg = transform.Find("Card_Front")?.GetComponent<UnityEngine.UI.Image>();
             if (bg != null) bg.color = GetTypeColor(currentCardData.cardType);
+
+            if (typeIcon != null && typeIcons != null)
+            {
+                typeIcon.sprite = typeIcons.GetIcon(currentCardData.cardType);
+                typeIcon.color = CardTypeIconsSO.GetTypeColor(currentCardData.cardType);
+                typeIcon.enabled = typeIcon.sprite != null;
+            }
         }
 
         private Color GetTypeColor(ActionCardType type)

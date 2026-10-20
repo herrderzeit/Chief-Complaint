@@ -34,6 +34,12 @@ namespace ChiefComplaint.Cards.Views
         /// </summary>
         public GameObject highlightOutline;
 
+        [Header("Type Badge")]
+        /// <summary>Lookup of icon sprites per card type, shared with the UI card.</summary>
+        public CardTypeIconsSO typeIcons;
+        /// <summary>The icon inside the dark type badge; tinted with the card type colour.</summary>
+        public SpriteRenderer typeIcon;
+
         /// <summary>
         /// Binds <paramref name="cardData"/> to this view and immediately refreshes all visuals.
         /// Call this once after instantiating the card prefab.
@@ -79,6 +85,12 @@ namespace ChiefComplaint.Cards.Views
 
             SpriteRenderer bg = transform.Find("Card_Front")?.GetComponent<SpriteRenderer>();
             if (bg != null) bg.color = GetTypeColor(currentCardData.cardType);
+
+            if (typeIcon != null && typeIcons != null)
+            {
+                typeIcon.sprite = typeIcons.GetIcon(currentCardData.cardType);
+                typeIcon.color = CardTypeIconsSO.GetTypeColor(currentCardData.cardType);
+            }
         }
 
         private Color GetTypeColor(ActionCardType type)

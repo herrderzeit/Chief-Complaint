@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be7072832df414d4a99bf88dd93ac9c6, type: 3}
+  m_Name: CardTypeIcons
+  m_EditorClassIdentifier: GameScripts::ChiefComplaint.Cards.Data.CardTypeIconsSO
+  entries:
+  - type: 0
+    icon: {fileID: 3286163911610860551, guid: 01a4f0f78e823094083c6a4a981e9727, type: 3}
+  - type: 1
+    icon: {fileID: 3286163911610860551, guid: a248cc58f7c7c884fa0a0362d43ae9a8, type: 3}
+  - type: 2
+    icon: {fileID: 3286163911610860551, guid: 5c36fa222fd0275459662666d2138dfc, type: 3}
+  - type: 3
+    icon: {fileID: 3286163911610860551, guid: 7c7d64d915e4aec42922eb4e529dad5e, type: 3}
+  - type: 4
+    icon: {fileID: 3286163911610860551, guid: 76e8cae8aea0c9249ad99eb7c3266745, type: 3}
+  - type: 5
+    icon: {fileID: 3286163911610860551, guid: 5bb8ef3b62be02e4482dfe9bab3823b0, type: 3}
+  - type: 6
+    icon: {fileID: 3286163911610860551, guid: 5febf2be5a660e647a9f7935a8a27be3, type: 3}
