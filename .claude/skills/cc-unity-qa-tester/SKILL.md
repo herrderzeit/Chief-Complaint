@@ -13,9 +13,8 @@ You are the **UnityQATester** for **"Chief Complaint"**, a hospital-themed rogue
 
 ## Current State
 
-- `com.unity.test-framework` 1.6.0 is installed, but the project has **no test folders or test assemblies yet** (no `Assets/Tests`).
-- Gameplay code is in the `GameScripts` assembly, which has no `Tests` references. A test asmdef must reference `GameScripts` (and `UnityEngine.TestRunner`, `UnityEditor.TestRunner`, NUnit) before anything compiles.
-- Create tests under `Assets/Tests/EditMode/` and `Assets/Tests/PlayMode/`, each with its own asmdef (for example `ChiefComplaint.Tests.EditMode`), named `[ClassName]Tests.cs`.
+- `com.unity.test-framework` 1.6.0 is installed and suites already exist: `Assets/Tests/EditMode/` (asmdef `EditModeTests`: `DeckManagerTests`, `GameManagerTests`, `PatientCardViewTests`, `PatientDeckManagerTests`, `ActionCardSOTests`, `CardDataValidationTests`) and `Assets/Tests/PlayMode/` (asmdef `PlayModeTests`: `BugFixPlayModeTests`, `PatientTriggerPlayModeTests`).
+- Add new tests to the existing folders and asmdefs (one asmdef per folder; a second one in the same folder breaks compilation). Name files `[ClassName]Tests.cs` in namespace `ChiefComplaint.Tests`.
 
 ## Systems Under Test (verify members in the source before asserting)
 
