@@ -109,12 +109,23 @@ namespace ChiefComplaint.Core
                 }
             }
 
+            for (int i = drawPile.Count - 1; i >= 0; i--)
+            {
+                if (drawPile[i].cardType == ActionCardType.RedTape)
+                {
+                    drawPile.RemoveAt(i);
+                    totalCleansed++;
+                }
+            }
+
             for (int i = handData.Count - 1; i >= 0; i--)
             {
                 if (handData[i].cardType == ActionCardType.RedTape)
                 {
+                    ActionCardSO card = handData[i];
                     handData.RemoveAt(i);
-                    if (HandView.Instance != null) HandView.Instance.RemoveCardVisualAtIndex(i);
+                    // Remove the matching visual by card, not index: the hand visuals can be ordered differently.
+                    if (HandView.Instance != null) HandView.Instance.RemoveCardVisualFor(card);
                     totalCleansed++;
                 }
             }
@@ -192,9 +203,10 @@ namespace ChiefComplaint.Core
 
         public void RemoveCardFromHand(ActionCardSO cardData, bool sendToDiscard = true)
         {
-            handData.Remove(cardData);
+            // Only a card that was actually in the hand can move to the discard pile.
+            bool removed = handData.Remove(cardData);
 
-            if (sendToDiscard)
+            if (removed && sendToDiscard)
             {
                 discardPile.Add(cardData);
             }

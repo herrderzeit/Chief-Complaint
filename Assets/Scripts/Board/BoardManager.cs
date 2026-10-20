@@ -64,9 +64,11 @@ namespace ChiefComplaint.Board
             // Safety net: surgeries are normally resolved when End Shift is pressed.
             ResolveSurgeries();
 
-            // Removal happens in OnDestroy (end of frame), so the list is stable while we iterate.
-            for (int i = 0; i < activePatients.Count; i++)
+            // A death removes the patient from activePatients immediately, so iterate backwards
+            // over the list: no patient is skipped when an earlier one is removed.
+            for (int i = activePatients.Count - 1; i >= 0; i--)
             {
+                if (i >= activePatients.Count) continue;
                 PatientCardView patient = activePatients[i];
                 if (patient != null && !patient.isRemoved) patient.AdvanceShiftDecay();
             }

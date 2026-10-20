@@ -27,6 +27,8 @@ namespace ChiefComplaint.UI
         [Header("Stats Display")]
         /// <summary>Text label used to display the total number of patients cured this run.</summary>
         public TextMeshProUGUI patientsCuredText;
+        /// <summary>The large heading; set to a win or loss message when the screen is shown.</summary>
+        public TextMeshProUGUI titleText;
 
         [Header("Buttons")]
         public Button restartButton;
@@ -58,8 +60,11 @@ namespace ChiefComplaint.UI
         /// Displays the Game Over screen: populates stats, pauses the game, and
         /// fades the overlay in. Call this from <see cref="GameManager.TriggerGameOver"/>.
         /// </summary>
-        public void Show()
+        public void Show(bool victory = false)
         {
+            if (titleText != null)
+                titleText.text = victory ? "YOU SURVIVED!" : "GAME OVER";
+
             // Populate the patients-cured stat from the PatientDeckManager.
             if (patientsCuredText != null && PatientDeckManager.Instance != null)
             {

@@ -69,6 +69,10 @@ namespace ChiefComplaint.Core
         public int initialPatientCount = 2;
         [Tooltip("Reputation lost when a patient dies (Code Blue).")]
         public int deathReputationPenalty = 5;
+        [Tooltip("When a patient dies, a random Red Tape card (incident paperwork) is added to the discard pile.")]
+        public bool deathAddsRedTape = true;
+        [Tooltip("Surviving this many shifts wins the run. 0 disables the win condition.")]
+        [Min(0)] public int shiftsToWin = 15;
 
         [Header("Activity Funding")]
         [Tooltip("Funding paid for curing a Walk-In patient.")]
@@ -219,6 +223,13 @@ namespace ChiefComplaint.Core
             // Patients finish their surgeries: discharges pay out before the draft opens.
             if (boardManager != null) boardManager.ResolveSurgeries();
 
+            // Finishing the final shift wins the run instead of opening the draft.
+            if (shiftsToWin > 0 && currentShift >= shiftsToWin && CurrentPhase != GamePhase.GameOver)
+            {
+                TriggerVictory();
+                return;
+            }
+
             SetPhase(GamePhase.Draft);
             if (DeckManager.Instance != null) DeckManager.Instance.DiscardHand();
             if (draftManager != null) draftManager.OpenDraftPhase();
@@ -341,11 +352,30 @@ namespace ChiefComplaint.Core
             if (gameOverScreen != null)
             {
                 gameOverScreen.gameObject.SetActive(true);
-                gameOverScreen.Show();
+                gameOverScreen.Show(false);
             }
             else
             {
                 Debug.LogWarning("GameManager: No GameOverScreen assigned in the Inspector!");
+            }
+        }
+
+        /// <summary>
+        /// Ends the run as a win after the final shift. Locks the board and shows the end screen
+        /// in its victory form. Guarded by <see cref="isGameOver"/> so it fires once per run.
+        /// </summary>
+        public void TriggerVictory()
+        {
+            if (isGameOver) return;
+            isGameOver = true;
+            SetPhase(GamePhase.GameOver);
+
+            GameLog.Info($"VICTORY: The hospital survived all {shiftsToWin} shifts!");
+
+            if (gameOverScreen != null)
+            {
+                gameOverScreen.gameObject.SetActive(true);
+                gameOverScreen.Show(true);
             }
         }
     }

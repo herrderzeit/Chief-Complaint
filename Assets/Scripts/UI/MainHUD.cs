@@ -125,6 +125,8 @@ namespace ChiefComplaint.UI
 
         private void UpdateShiftDisplay(int newShift)
         {
+            int goal = GameManager.Instance != null ? GameManager.Instance.shiftsToWin : 0;
+            if (shiftText != null && goal > 0) { shiftText.text = $"Shift: {newShift} / {goal}"; return; }
             if (shiftText != null) shiftText.text = $"Shift: {newShift}";
         }
 

@@ -85,6 +85,26 @@ namespace ChiefComplaint.Tests.EditMode
         }
 
         [Test]
+        public void EnterDraftPhase_OnFinalShift_WinsTheRun()
+        {
+            gm.shiftsToWin = 1; // the run starts on shift 1
+
+            gm.EnterDraftPhase();
+
+            Assert.AreEqual(GamePhase.GameOver, gm.CurrentPhase, "Ending the final shift should end the run as a win.");
+        }
+
+        [Test]
+        public void EnterDraftPhase_BeforeFinalShift_OpensDraft()
+        {
+            gm.shiftsToWin = 15;
+
+            gm.EnterDraftPhase();
+
+            Assert.AreEqual(GamePhase.Draft, gm.CurrentPhase);
+        }
+
+        [Test]
         public void CureReputationCap_NeverExceedsFundingForHarderPatients()
         {
             Assert.LessOrEqual(gm.cureReputationCap, gm.ambulanceFundingReward);

@@ -317,6 +317,13 @@ namespace ChiefComplaint.Cards.Views
                 }
 
                 ExecuteTriggers(PatientTriggerCondition.OnDeath);
+
+                // A death generates incident paperwork: a random Red Tape card joins the discard pile.
+                if (GameManager.Instance != null && GameManager.Instance.deathAddsRedTape && DeckManager.Instance != null)
+                {
+                    DeckManager.Instance.SpawnRandomRedTape();
+                }
+
                 OnRemoved?.Invoke(this);
                 if (BoardView.Instance != null) BoardView.Instance.ReleasePatientCard(this);
                 else Destroy(gameObject);

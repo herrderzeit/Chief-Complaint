@@ -96,6 +96,19 @@ namespace ChiefComplaint.UI
             }
         }
 
+        /// <summary>Removes the first hand visual showing <paramref name="cardData"/>, if any.</summary>
+        public void RemoveCardVisualFor(ActionCardSO cardData)
+        {
+            for (int i = 0; i < activeCards.Count; i++)
+            {
+                if (activeCards[i] != null && activeCards[i].currentCardData == cardData)
+                {
+                    RemoveCardVisualAtIndex(i);
+                    return;
+                }
+            }
+        }
+
         public void RemoveCardVisualAtIndex(int index)
         {
             if (index >= 0 && index < activeCards.Count)
