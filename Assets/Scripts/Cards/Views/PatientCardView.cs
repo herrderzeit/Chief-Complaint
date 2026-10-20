@@ -542,6 +542,9 @@ namespace ChiefComplaint.Cards.Views
                                 else DeckManager.Instance.SpawnRandomRedTape(false);
                             }
                             break;
+                        case PatientTriggerEffect.DiscardCard:
+                            DiscardRandomCards(trigger.effectValue);
+                            break;
                         case PatientTriggerEffect.AddCardToHand:
                             if (DeckManager.Instance != null)
                             {
@@ -597,6 +600,19 @@ namespace ChiefComplaint.Cards.Views
             OnRemoved?.Invoke(this);
             if (BoardView.Instance != null) BoardView.Instance.ReleasePatientCard(this);
             else Destroy(gameObject);
+        }
+
+        /// <summary>Moves <paramref name="count"/> random cards from the hand to the discard pile.</summary>
+        private static void DiscardRandomCards(int count)
+        {
+            var deck = DeckManager.Instance;
+            if (deck == null) return;
+            for (int i = 0; i < count && deck.handData.Count > 0; i++)
+            {
+                ActionCardSO card = deck.handData[Random.Range(0, deck.handData.Count)];
+                deck.RemoveCardFromHand(card);
+                if (HandView.Instance != null) HandView.Instance.RemoveCardVisualFor(card);
+            }
         }
 
         // -------------------------------------------------------------------------

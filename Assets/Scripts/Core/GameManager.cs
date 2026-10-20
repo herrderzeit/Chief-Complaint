@@ -100,7 +100,7 @@ namespace ChiefComplaint.Core
         public GamePhase CurrentPhase { get; private set; } = GamePhase.Shift;
 
         /// <summary><c>true</c> when the board (cards and patients) may be interacted with.</summary>
-        public bool CanInteract => CurrentPhase == GamePhase.Shift;
+        public bool CanInteract => CurrentPhase == GamePhase.Shift && !ChoicePrompt.IsOpen;
 
         private bool isGameOver = false;
 
@@ -138,6 +138,9 @@ namespace ChiefComplaint.Core
         /// </summary>
         private void HandleEscape()
         {
+            // A card's "choose one" prompt is open: answering it comes first, or its effect would be lost.
+            if (ChoicePrompt.IsOpen) return;
+
             switch (CurrentPhase)
             {
                 case GamePhase.GameOver:

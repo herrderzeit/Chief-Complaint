@@ -189,7 +189,14 @@ public class PatientTriggerPlayModeTests
         yield return null;
 
         Assert.IsTrue(cured, "Symptom should be cured.");
-        Assert.IsTrue(patientView.isRemoved, "Patient should be cured and removed.");
+        // Fully treated patients stay in their department until End Shift, then are discharged.
+        Assert.IsTrue(patientView.isAwaitingDischarge, "A fully treated patient waits in the department for End Shift.");
+        Assert.IsFalse(patientView.isRemoved);
+
+        patientView.ResolveSurgery();
+        yield return null;
+
+        Assert.IsTrue(patientView.isRemoved, "Patient should be discharged when the shift ends.");
         // We know it fired because it didn't throw a NullReference or Exception.
         
         Object.Destroy(deptObj);

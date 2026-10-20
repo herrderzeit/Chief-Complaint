@@ -159,6 +159,9 @@ namespace ChiefComplaint.Board
             view.OnStabilityChanged += HandleStabilityChanged;
 
             view.InitialiseCard(randomPatient, drawnSymptoms, drawnTiers, null); // Prefab logic handled in BoardView
+
+            // A new arrival may already be critical, so refresh the Code Blue count straight away.
+            NotifyCodeBlueStatus();
         }
     }
 }

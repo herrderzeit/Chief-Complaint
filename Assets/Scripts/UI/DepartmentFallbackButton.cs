@@ -106,11 +106,10 @@ namespace ChiefComplaint.UI
 
             if (GameManager.Instance.CurrentAP >= currentAPCost)
             {
-                // Spend AP
-                GameManager.Instance.SpendAP(currentAPCost);
-
-                // Treat the symptom (TryCureSymptom automatically handles marking the department "IN USE")
-                currentPatient.TryCureSymptom(targetTier.Value);
+                // Treat first and only pay if it worked (TryCureSymptom marks the department "IN USE").
+                int cost = currentAPCost;
+                if (currentPatient.TryCureSymptom(targetTier.Value))
+                    GameManager.Instance.SpendAP(cost);
             }
         }
     }

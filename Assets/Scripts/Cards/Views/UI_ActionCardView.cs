@@ -64,7 +64,8 @@ namespace ChiefComplaint.Cards.Views
             if (costText != null)
                 costText.text = currentCardData.apCost.ToString();
 
-            UnityEngine.UI.Image bg = transform.Find("Card_Front")?.GetComponent<UnityEngine.UI.Image>();
+            // The UI card's frame image is named "Background" (the world-space card uses "Card_Front").
+            UnityEngine.UI.Image bg = transform.Find("Background")?.GetComponent<UnityEngine.UI.Image>();
             if (bg != null) bg.color = GetTypeColor(currentCardData.cardType);
 
             if (typeIcon != null && typeIcons != null)

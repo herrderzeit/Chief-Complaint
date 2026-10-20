@@ -26,6 +26,9 @@ namespace ChiefComplaint.UI
         private TextMeshProUGUI labelA, labelB;
         private Button buttonA, buttonB;
 
+        /// <summary><c>true</c> while a choice is on screen; the board and Escape wait until it is answered.</summary>
+        public static bool IsOpen => instance != null && instance.panel != null && instance.panel.activeSelf;
+
         public static void Show(string title, string optionA, Action onA, string optionB, Action onB)
         {
             if (instance == null)
