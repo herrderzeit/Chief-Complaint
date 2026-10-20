@@ -18,7 +18,7 @@ namespace ChiefComplaint.Editor.Tools
         [MenuItem("Chief Complaint/Data Tools/Rebuild Draft Pool")]
         public static void FixPool()
         {
-            var draftManager = Object.FindFirstObjectByType<DraftManager>();
+            var draftManager = Object.FindAnyObjectByType<DraftManager>();
             if (draftManager != null)
             {
                 draftManager.draftableCardsPool.Clear();

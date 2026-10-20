@@ -82,7 +82,7 @@ public class BugFixPlayModeTests
     [UnityTest]
     public IEnumerator P0_2_BoardManager_TriageSlot_DoesNotLeakWhenPatientMoves()
     {
-        var boardManager = Object.FindFirstObjectByType<BoardManager>();
+        var boardManager = Object.FindAnyObjectByType<BoardManager>();
         Assert.IsNotNull(boardManager, "BoardManager should be present.");
 
         foreach(var patient in boardManager.ActivePatients)
@@ -117,7 +117,7 @@ public class BugFixPlayModeTests
     {
         var gameManager = GameManager.Instance;
         var patientDeck = PatientDeckManager.Instance;
-        var boardManager = Object.FindFirstObjectByType<BoardManager>();
+        var boardManager = Object.FindAnyObjectByType<BoardManager>();
         Assert.IsNotNull(gameManager);
         
         var triggerPatient = ScriptableObject.CreateInstance<PatientCardSO>();

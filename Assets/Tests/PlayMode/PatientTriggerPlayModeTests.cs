@@ -26,7 +26,7 @@ public class PatientTriggerPlayModeTests
         }
 
         // Clean up any patients from previous tests
-        var boardManager = Object.FindFirstObjectByType<BoardManager>();
+        var boardManager = Object.FindAnyObjectByType<BoardManager>();
         if (boardManager != null)
         {
             foreach (var patient in new List<PatientCardView>(boardManager.ActivePatients))
@@ -52,7 +52,7 @@ public class PatientTriggerPlayModeTests
     public IEnumerator Trigger_OnTurnEnd_LoseAP_FiresCorrectly()
     {
         var gameManager = GameManager.Instance;
-        var boardManager = Object.FindFirstObjectByType<BoardManager>();
+        var boardManager = Object.FindAnyObjectByType<BoardManager>();
 
         // Set up the trigger
         testPatientTemplate.triggers.Add(new PatientTrigger
@@ -83,7 +83,7 @@ public class PatientTriggerPlayModeTests
     public IEnumerator Trigger_OnDiagnosed_GainReputation_FiresCorrectly()
     {
         var gameManager = GameManager.Instance;
-        var boardManager = Object.FindFirstObjectByType<BoardManager>();
+        var boardManager = Object.FindAnyObjectByType<BoardManager>();
 
         // Set up the trigger
         testPatientTemplate.triggers.Add(new PatientTrigger
@@ -124,7 +124,7 @@ public class PatientTriggerPlayModeTests
     public IEnumerator Trigger_OnDeath_DrawCard_FiresCorrectly()
     {
         var deckManager = DeckManager.Instance;
-        var boardManager = Object.FindFirstObjectByType<BoardManager>();
+        var boardManager = Object.FindAnyObjectByType<BoardManager>();
 
         // Set up the trigger
         testPatientTemplate.startingStability = 1; // Will die after 1 turn of decay (decay = 2)
@@ -157,7 +157,7 @@ public class PatientTriggerPlayModeTests
     {
         // Testing that a stability change trigger when cured doesn't break anything, 
         // even though they are being discharged.
-        var boardManager = Object.FindFirstObjectByType<BoardManager>();
+        var boardManager = Object.FindAnyObjectByType<BoardManager>();
 
         testPatientTemplate.triggers.Add(new PatientTrigger
         {
