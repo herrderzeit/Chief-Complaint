@@ -5151,6 +5151,7 @@ GameObject:
   - component: {fileID: 775658916}
   - component: {fileID: 775658918}
   - component: {fileID: 775658917}
+  - component: {fileID: 775658919}
   m_Layer: 0
   m_Name: BureaucracyManager
   m_TagString: Untagged
@@ -5222,6 +5223,26 @@ MonoBehaviour:
   - {fileID: 11400000, guid: d9f122ab55cf94e488dcf8971c495829, type: 2}
   - {fileID: 11400000, guid: b939682ebafa5b54abe710287087394b, type: 2}
   firstDirectiveShift: 2
+--- !u!114 &775658919
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 775658914}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f0ab9f5f3aa87b84988d42ba246c68fc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameScripts::ChiefComplaint.Bureaucracy.IntakeManager
+  fraudCaughtReputation: 1
+  genuineReferredPenalty: 2
+  suspiciousComplaints:
+  - Chronic Back Pain (only opioids help)
+  - Toothache (lost my prescription)
+  - Migraine (allergic to everything but codeine)
+  - Sprained Wrist (needs a sick note)
+  - Insomnia (out of sleeping pills)
 --- !u!1 &779142174
 GameObject:
   m_ObjectHideFlags: 0

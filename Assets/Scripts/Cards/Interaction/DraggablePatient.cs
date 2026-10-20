@@ -220,6 +220,14 @@ namespace ChiefComplaint.Cards.Interaction
                             continue;
                         }
 
+                        // First admission from Triage: the intake paperwork may need stamping first.
+                        if (hit.CompareTag("WardSlot") && patientView.assignedWardSlot == null)
+                        {
+                            Transform bed = hit.transform;
+                            if (AdmissionGate.TryIntercept(patientView, () => AdmitTo(bed)))
+                                break; // snaps back to Triage for now; AdmitTo runs if the form is approved
+                        }
+
                         SnapToSlot(hit.transform);
                         droppedInValidSlot = true;
 
@@ -410,6 +418,15 @@ namespace ChiefComplaint.Cards.Interaction
         /// Also updates <see cref="originalPosition"/> so a failed future drop snaps here.
         /// </summary>
         /// <param name="slotTransform">The target slot transform to snap to.</param>
+        /// <summary>Moves the patient into <paramref name="bed"/> and reserves it (used after the intake form is approved).</summary>
+        private void AdmitTo(Transform bed)
+        {
+            if (patientView == null || patientView.isRemoved) return;
+            SnapToSlot(bed);
+            patientView.assignedWardSlot = bed;
+            patientView.ClearGhost();
+        }
+
         private void SnapToSlot(Transform slotTransform)
         {
             transform.position = new Vector3(slotTransform.position.x, slotTransform.position.y, -1f);

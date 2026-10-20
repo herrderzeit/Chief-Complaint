@@ -275,6 +275,20 @@ namespace ChiefComplaint.Core
             if (draftManager != null) draftManager.OpenDraftPhase();
         }
 
+        /// <summary>Locks the board for a mid-shift dialog (e.g. an intake form). Returns <c>false</c> if not in a shift.</summary>
+        public bool BeginEvent()
+        {
+            if (CurrentPhase != GamePhase.Shift) return false;
+            SetPhase(GamePhase.Event);
+            return true;
+        }
+
+        /// <summary>Unlocks the board after <see cref="BeginEvent"/>.</summary>
+        public void EndEvent()
+        {
+            if (CurrentPhase == GamePhase.Event) SetPhase(GamePhase.Shift);
+        }
+
         private void SetPhase(GamePhase phase)
         {
             if (CurrentPhase == phase) return;

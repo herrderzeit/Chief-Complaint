@@ -43,6 +43,9 @@ namespace ChiefComplaint.Cards.Views
         /// </summary>
         public bool isInSurgery = false;
 
+        /// <summary>The intake paperwork this patient arrived with (created when first admitted), or <c>null</c>.</summary>
+        public ChiefComplaint.Bureaucracy.IntakeForm intakeForm;
+
         /// <summary><c>true</c> when the patient is in surgery with every symptom treated, waiting to be discharged at End Shift.</summary>
         public bool isAwaitingDischarge => isInSurgery && assignedSymptoms.Count == 0;
 
@@ -116,6 +119,7 @@ namespace ChiefComplaint.Cards.Views
             assignedTiers = tiers;
             diagnosedCount = 0;
             isInSurgery = false;
+            intakeForm = null;
 
             // Sort symptoms mechanically so lower tiers must be diagnosed first.
             // Simple bubble sort is fine for 1-4 items.
@@ -462,6 +466,17 @@ namespace ChiefComplaint.Cards.Views
             return false;
         }
 
+        /// <summary>Sends the patient away from Triage without treatment (no rewards). Used when paperwork is refused.</summary>
+        public void Refer()
+        {
+            if (isRemoved) return;
+            isRemoved = true;
+            GameLog.Info($"{patientData.patientName} was referred elsewhere.");
+            OnRemoved?.Invoke(this);
+            if (BoardView.Instance != null) BoardView.Instance.ReleasePatientCard(this);
+            else Destroy(gameObject);
+        }
+
         /// <summary>
         /// Ends a surgery stay when the shift ends: discharges the patient and pays their rewards if
         /// every symptom has been treated, otherwise sends them back to their reserved ward bed.
@@ -594,6 +609,8 @@ namespace ChiefComplaint.Cards.Views
                 GameManager.Instance.AddReputation(Mathf.Max(0, reputationReward + modifier));
 
                 int fundingReward = GameManager.Instance.GetFundingReward(patientData.escalationPhase);
+                // Falsified paperwork means the claim is rejected: no Funding for this patient.
+                if (intakeForm != null && intakeForm.admittedFalsified) fundingReward = 0;
                 GameManager.Instance.AddFunding(Mathf.Max(0, fundingReward + modifier));
             }
 
