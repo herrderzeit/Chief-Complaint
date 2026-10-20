@@ -56,7 +56,7 @@ namespace ChiefComplaint.Cards.Views
                 nameText.text = currentCardData.cardName;
 
             if (rulesText != null)
-                rulesText.text = $"<b>[{currentCardData.cardType.ToString().ToUpper()}]</b>\n\n{currentCardData.rulesText}";
+                rulesText.text = currentCardData.rulesText;
 
             if (flavorText != null)
                 flavorText.text = $"<i><color=#D3D3D3>{currentCardData.flavorText}</color></i>";

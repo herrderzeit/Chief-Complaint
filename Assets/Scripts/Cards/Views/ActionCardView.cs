@@ -39,6 +39,8 @@ namespace ChiefComplaint.Cards.Views
         public CardTypeIconsSO typeIcons;
         /// <summary>The icon inside the dark type badge; tinted with the card type colour.</summary>
         public SpriteRenderer typeIcon;
+        /// <summary>Hover tooltip on the type icon that names the card type.</summary>
+        public CardTypeTooltip typeTooltip;
 
         /// <summary>
         /// Binds <paramref name="cardData"/> to this view and immediately refreshes all visuals.
@@ -65,7 +67,7 @@ namespace ChiefComplaint.Cards.Views
 
         /// <summary>
         /// Pushes the latest values from <see cref="currentCardData"/> to all label components.
-        /// Card type is shown in bold uppercase; flavour text is rendered in italics with a dimmed colour.
+        /// Card type is shown by the type badge (with a hover tooltip); flavour text is rendered in italics with a dimmed colour.
         /// </summary>
         public void UpdateVisuals()
         {
@@ -75,7 +77,7 @@ namespace ChiefComplaint.Cards.Views
                 nameText.text = currentCardData.cardName;
 
             if (rulesText != null)
-                rulesText.text = $"<b>[{currentCardData.cardType.ToString().ToUpper()}]</b>\n\n{currentCardData.rulesText}";
+                rulesText.text = currentCardData.rulesText;
 
             if (flavorText != null)
                 flavorText.text = $"<i><color=#D3D3D3>{currentCardData.flavorText}</color></i>";
@@ -91,6 +93,9 @@ namespace ChiefComplaint.Cards.Views
                 typeIcon.sprite = typeIcons.GetIcon(currentCardData.cardType);
                 typeIcon.color = CardTypeIconsSO.GetTypeColor(currentCardData.cardType);
             }
+
+            if (typeTooltip != null)
+                typeTooltip.SetText(CardTypeIconsSO.GetDisplayName(currentCardData.cardType));
         }
 
         private Color GetTypeColor(ActionCardType type)

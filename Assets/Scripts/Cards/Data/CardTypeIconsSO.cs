@@ -29,6 +29,12 @@ namespace ChiefComplaint.Cards.Data
             return null;
         }
 
+        /// <summary>Readable name for a card type, e.g. <c>RedTape</c> becomes "Red Tape".</summary>
+        public static string GetDisplayName(ActionCardType type)
+        {
+            return System.Text.RegularExpressions.Regex.Replace(type.ToString(), "(?<=[a-z])(?=[A-Z])", " ");
+        }
+
         /// <summary>The neon tint used for each card type's icon (matches the card frame colours).</summary>
         public static Color GetTypeColor(ActionCardType type)
         {
