@@ -3713,21 +3713,6 @@ MonoBehaviour:
   traumaFlightsCured: 0
   ambulanceCureThreshold: 3
   traumaFlightCureThreshold: 8
---- !u!115 &594385200
-MonoScript:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: 
-  serializedVersion: 7
-  m_DefaultReferences: {}
-  m_Icon: {fileID: 0}
-  m_Type: 0
-  m_ExecutionOrder: 0
-  m_ClassName: AccreditationManager
-  m_Namespace: ChiefComplaint.Bureaucracy
-  m_AssemblyName: GameScripts
 --- !u!1 &603602263
 GameObject:
   m_ObjectHideFlags: 0
@@ -5304,9 +5289,11 @@ GameObject:
   - component: {fileID: 775658918}
   - component: {fileID: 775658917}
   - component: {fileID: 775658919}
-  - component: {fileID: 775658921}
   - component: {fileID: 775658920}
+  - component: {fileID: 775658924}
+  - component: {fileID: 775658923}
   - component: {fileID: 775658922}
+  - component: {fileID: 775658921}
   m_Layer: 0
   m_Name: BureaucracyManager
   m_TagString: Untagged
@@ -5423,11 +5410,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 775658914}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 594385200}
+  m_Script: {fileID: 11500000, guid: 1f7a0c7ce1af0ff49aa73035ead582b8, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: GameScripts::ChiefComplaint.Bureaucracy.AccreditationManager
-  treatmentsToAccredit: 4
-  fallbackDiscount: 1
+  m_EditorClassIdentifier: GameScripts::ChiefComplaint.Bureaucracy.DilemmaManager
+  pool:
+  - {fileID: 11400000, guid: aee593a06c39875419b5a182a3fd6df6, type: 2}
+  - {fileID: 11400000, guid: 201fbae2d09ddd342ac864879844593a, type: 2}
+  - {fileID: 11400000, guid: b944a78bbdc79a54aa650811f4e762d0, type: 2}
+  - {fileID: 11400000, guid: bf2e2cceb2c7afc4fa0e5a687ef816bd, type: 2}
+  - {fileID: 11400000, guid: e4fae7846078cca4e90909b853c500b0, type: 2}
+  - {fileID: 11400000, guid: 7c7a983f50106ff41985ea31a25d0637, type: 2}
+  chancePerShift: 0.35
+  firstDilemmaShift: 2
+  noRepeatWindow: 3
 --- !u!114 &775658922
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5437,9 +5432,35 @@ MonoBehaviour:
   m_GameObject: {fileID: 775658914}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 1090685931}
+  m_Script: {fileID: 11500000, guid: bc0ea6444c327f046b1f55a5f061aa42, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameScripts::ChiefComplaint.Bureaucracy.HeadlineGenerator
+--- !u!114 &775658923
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 775658914}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb8e58e300ee2ff46b3b4fca5993f75e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: GameScripts::ChiefComplaint.Bureaucracy.UpkeepManager
+--- !u!114 &775658924
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 775658914}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 630d42541c56eff42a33383a3007c8b8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameScripts::ChiefComplaint.Bureaucracy.AccreditationManager
+  treatmentsToAccredit: 4
+  fallbackDiscount: 1
 --- !u!1 &779142174
 GameObject:
   m_ObjectHideFlags: 0
@@ -7304,21 +7325,6 @@ Transform:
   - {fileID: 1014672864}
   m_Father: {fileID: 1158472228}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!115 &1090685931
-MonoScript:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: 
-  serializedVersion: 7
-  m_DefaultReferences: {}
-  m_Icon: {fileID: 0}
-  m_Type: 0
-  m_ExecutionOrder: 0
-  m_ClassName: UpkeepManager
-  m_Namespace: ChiefComplaint.Bureaucracy
-  m_AssemblyName: GameScripts
 --- !u!1001 &1127674803
 PrefabInstance:
   m_ObjectHideFlags: 0

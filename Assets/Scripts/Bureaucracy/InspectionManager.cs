@@ -31,6 +31,10 @@ namespace ChiefComplaint.Bureaucracy
         private List<InspectionCriterion> criteria = new List<InspectionCriterion>();
         private readonly System.Random rng = new System.Random();
         private int curedAtLastInspection;
+        private InspectionOutcome? lastOutcome;
+
+        /// <summary>The outcome of an inspection held this shift (read once by the headline writer), or null.</summary>
+        public InspectionOutcome? ConsumeLastOutcome() { var o = lastOutcome; lastOutcome = null; return o; }
         private int deathsSinceLast;
 
         protected override void Awake()
@@ -154,6 +158,7 @@ namespace ChiefComplaint.Bureaucracy
                 case InspectionOutcome.Conditional: if (DeckManager.Instance != null) DeckManager.Instance.SpawnRandomRedTape(); break;
                 default: gm.SpendReputation(failReputationPenalty); break;
             }
+            lastOutcome = outcome;
             GameLog.Info($"INSPECTION #{InspectionNumber}: {outcome}");
         }
 

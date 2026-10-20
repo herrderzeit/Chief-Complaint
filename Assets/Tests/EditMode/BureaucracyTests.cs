@@ -259,6 +259,32 @@ namespace ChiefComplaint.Tests.EditMode
             Assert.AreEqual(BillType.Maintenance, unpaid[1].type);
         }
 
+        // ---------------------------------------------------------------- Headlines
+
+        [Test]
+        public void Headlines_DeathsOutrankGoodNews()
+        {
+            var report = new ShiftReport { shift = 3, deaths = 2, cured = 5, newlyAccredited = "Cardiology" };
+            string headline = HeadlineWriter.Write(report, new System.Random(1));
+            StringAssert.Contains("2", headline, "A death headline should report how many patients were lost.");
+        }
+
+        [Test]
+        public void Headlines_AccreditationNamesTheDepartment()
+        {
+            var report = new ShiftReport { shift = 4, newlyAccredited = "Isolation" };
+            StringAssert.Contains("Isolation", HeadlineWriter.Write(report, new System.Random(2)));
+        }
+
+        [Test]
+        public void Headlines_EveryReportProducesText()
+        {
+            var rng = new System.Random(5);
+            foreach (var r in new[] { new ShiftReport(), new ShiftReport { shift = 2 }, new ShiftReport { shift = 2, citations = 4 },
+                                      new ShiftReport { shift = 2, fraudCaught = 1 }, new ShiftReport { shift = 5, inspection = InspectionOutcome.Fail } })
+                Assert.IsFalse(string.IsNullOrEmpty(HeadlineWriter.Write(r, rng)));
+        }
+
         // ---------------------------------------------------------------- Cost modifiers
 
         [Test]

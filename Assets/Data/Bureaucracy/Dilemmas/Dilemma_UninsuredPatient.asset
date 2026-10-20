@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5fdd1b0cee739f4c900f43558a299f9, type: 3}
+  m_Name: Dilemma_UninsuredPatient
+  m_EditorClassIdentifier: GameScripts::ChiefComplaint.Bureaucracy.DilemmaSO
+  title: No Insurance
+  description: A frightened patient has no insurance and no money, but clearly needs
+    care. The Board's policy is very clear. Your conscience is less clear.
+  optionALabel: Treat for free
+  optionAEffects:
+  - type: 0
+    amount: -3
+  - type: 1
+    amount: 2
+  optionBLabel: Send them away
+  optionBEffects:
+  - type: 1
+    amount: -1
