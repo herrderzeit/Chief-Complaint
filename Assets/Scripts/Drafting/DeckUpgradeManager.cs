@@ -45,6 +45,14 @@ namespace ChiefComplaint.Drafting
         public Transform deckViewContentTransform;
         public GameObject cardRowPrefab; // Shared prefab for displaying a card
 
+        [Header("Group Headers")]
+        [Tooltip("Height of the headings placed above each tier (Upgrades tab) or card type (View Deck tab).")]
+        public float tierHeaderHeight = 34f;
+        public float tierHeaderFontSize = 22f;
+        public Color tierHeaderColour = new Color(0.96f, 0.6f, 0.1f, 1f);
+        [Tooltip("Strip behind each heading, so dark type colours stay readable on the grey list.")]
+        public Color groupHeaderBackground = new Color(0.08f, 0.1f, 0.14f, 0.85f);
+
         [Header("Card Preview UI")]
         public UI_ActionCardView uiActionCardPrefab; // The dedicated UI prefab
         public Transform previewCardSpawnPoint; // Where to place the UI card prefab
@@ -127,13 +135,55 @@ namespace ChiefComplaint.Drafting
                 }
             }
 
-            uniqueCardBuffer.Sort((a, b) => string.Compare(a.cardName, b.cardName));
+            uniqueCardBuffer.Sort((a, b) =>
+            {
+                int byTier = a.powerTier.CompareTo(b.powerTier);
+                return byTier != 0 ? byTier : string.Compare(a.cardName, b.cardName);
+            });
 
+            int currentTier = -1;
             for (int i = 0; i < uniqueCardBuffer.Count; i++)
             {
                 ActionCardSO card = uniqueCardBuffer[i];
+                if (card.powerTier != currentTier)
+                {
+                    currentTier = card.powerTier;
+                    SpawnGroupHeader($"TIER {currentTier}", $"upgrades to Tier {currentTier + 1}", tierHeaderColour, upgradesContentTransform);
+                }
                 SpawnCardRow(card, upgradesContentTransform, true, cardCounts[card.cardName]);
             }
+        }
+
+        /// <summary>
+        /// Adds a heading (e.g. "TIER 1" or "TREATMENT") above a group of rows: a dark strip with the title in
+        /// <paramref name="colour"/> and a smaller subtitle, styled with the row prefab's font.
+        /// </summary>
+        private void SpawnGroupHeader(string title, string subtitle, Color colour, Transform parentTransform)
+        {
+            var go = new GameObject($"Header_{title}", typeof(RectTransform), typeof(Image));
+            go.transform.SetParent(parentTransform, false);
+            ((RectTransform)go.transform).sizeDelta = new Vector2(0f, tierHeaderHeight);
+            var strip = go.GetComponent<Image>();
+            strip.color = groupHeaderBackground;
+            strip.raycastTarget = false;
+
+            var textGo = new GameObject("Label", typeof(RectTransform), typeof(TextMeshProUGUI));
+            var textRt = (RectTransform)textGo.transform;
+            textRt.SetParent(go.transform, false);
+            textRt.anchorMin = Vector2.zero;
+            textRt.anchorMax = Vector2.one;
+            textRt.offsetMin = textRt.offsetMax = Vector2.zero;
+
+            var text = textGo.GetComponent<TextMeshProUGUI>();
+            var rowText = cardRowPrefab != null ? cardRowPrefab.GetComponentInChildren<TextMeshProUGUI>(true) : null;
+            if (rowText != null) text.font = rowText.font;
+            text.text = $"{title}  <size=75%><color=#F0F0F0>{subtitle}</color></size>";
+            text.fontSize = tierHeaderFontSize;
+            text.fontStyle = FontStyles.Bold;
+            text.color = colour;
+            text.alignment = TextAlignmentOptions.MidlineLeft;
+            text.margin = new Vector4(12f, 0f, 0f, 0f);
+            text.raycastTarget = false;
         }
 
         public void RefreshDeckList()
@@ -168,6 +218,15 @@ namespace ChiefComplaint.Drafting
             for (int i = 0; i < uniqueCardBuffer.Count; i++)
             {
                 ActionCardSO card = uniqueCardBuffer[i];
+                if (i == 0 || card.cardType != uniqueCardBuffer[i - 1].cardType)
+                {
+                    int typeTotal = 0;
+                    for (int j = i; j < uniqueCardBuffer.Count && uniqueCardBuffer[j].cardType == card.cardType; j++)
+                        typeTotal += cardCounts[uniqueCardBuffer[j].cardName];
+                    SpawnGroupHeader(CardTypeIconsSO.GetDisplayName(card.cardType).ToUpperInvariant(),
+                        $"{typeTotal} card{(typeTotal == 1 ? "" : "s")}",
+                        CardTypeIconsSO.GetTypeColor(card.cardType), deckViewContentTransform);
+                }
                 SpawnCardRow(card, deckViewContentTransform, false, cardCounts[card.cardName]);
             }
         }
