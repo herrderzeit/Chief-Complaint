@@ -673,7 +673,7 @@ namespace ChiefComplaint.Cards.Views
                 var gm = GameManager.Instance;
                 int funding = gm != null ? gm.GetFundingReward(patientData.escalationPhase) : 0;
                 int rep = gm != null ? Mathf.Min(patientData.reputationReward, gm.cureReputationCap) : patientData.reputationReward;
-                rewardText.text = $"+{funding} Funding, +{rep} Rep";
+                rewardText.text = $"+{funding} Funding\n+{rep} Rep";
             }
 
             if (tagsText != null && patientData != null)
