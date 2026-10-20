@@ -234,6 +234,31 @@ namespace ChiefComplaint.Tests.EditMode
             Assert.AreEqual(expectWin, InspectionRules.IsWin(outcome, new InspectionSnapshot { allAccredited = allAccredited }));
         }
 
+        // ---------------------------------------------------------------- Upkeep
+
+        [TestCase(0, 0, 1, 0)]
+        [TestCase(2, 3, 1, 3)]   // staff 2 + supplies 1
+        [TestCase(5, 4, 3, 7)]   // staff capped at 3 + supplies 2 + maintenance 2
+        public void Upkeep_BillTotals(int patients, int treatments, int shift, int expectedTotal)
+        {
+            int total = 0;
+            foreach (var b in UpkeepRules.BillsFor(patients, treatments, shift)) total += b.amount;
+            Assert.AreEqual(expectedTotal, total);
+        }
+
+        [Test]
+        public void Upkeep_PaysInPriorityOrderUntilMoneyRunsOut()
+        {
+            var bills = UpkeepRules.BillsFor(3, 4, 3); // staff 3, supplies 2, maintenance 2
+
+            var unpaid = UpkeepRules.PayInOrder(bills, 4, out int spent);
+
+            Assert.AreEqual(3, spent, "Staff (3) is paid; supplies (2) no longer fits in the remaining 1.");
+            Assert.AreEqual(2, unpaid.Count);
+            Assert.AreEqual(BillType.Supplies, unpaid[0].type);
+            Assert.AreEqual(BillType.Maintenance, unpaid[1].type);
+        }
+
         // ---------------------------------------------------------------- Cost modifiers
 
         [Test]
