@@ -1,4 +1,4 @@
-﻿%YAML 1.1
+%YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
 --- !u!114 &11400000
 MonoBehaviour:
@@ -17,6 +17,8 @@ MonoBehaviour:
   - Musculoskeletal
   - Neurological
   - Systemic
+  - Fall
+  - Crush
   tier1Name: Muscle Weakness
   tier1Description: Patient feels lethargic.
   tier2Name: Severe Hypokalemia

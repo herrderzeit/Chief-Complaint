@@ -1,4 +1,4 @@
-﻿%YAML 1.1
+%YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
 --- !u!114 &11400000
 MonoBehaviour:
@@ -16,6 +16,9 @@ MonoBehaviour:
   clinicalTags:
   - Respiratory
   - Dyspnoea
+  - Sepsis
+  - MVA
+  - Polytrauma
   tier1Name: Tachypnea
   tier1Description: Abnormally rapid breathing.
   tier2Name: Pulmonary Edema
