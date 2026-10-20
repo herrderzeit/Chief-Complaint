@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b4a2311a544226649ab22636d522df49, type: 3}
   m_Name: EitherOrEffect
   m_EditorClassIdentifier: GameScripts:ChiefComplaint.Cards.Effects:EitherOrEffectSO
-  cardName: Bedside Manner
+  cardName: Enrolled Nurse
   reputationGenerated: 2
   altApGenerated: 1
 --- !u!114 &11400000
@@ -25,14 +25,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a19c702a9b380a64ba00656724a44857, type: 3}
-  m_Name: Card_BedsideManner
+  m_Name: Card_EnrolledNurse
   m_EditorClassIdentifier: Assembly-CSharp::ActionCardSO
-  cardName: Bedside Manner
+  cardName: Enrolled Nurse
   cardType: 3
   tags: 
   rulesText: 'Choose: Gain 2 Rep OR Gain 1 AP.'
-  flavorText: A warm smile and a reassuring nod go a long way when the waiting room
-    has been full since Tuesday.
+  flavorText: First to the bedside, last to the break room. A kind word goes a long
+    way when the waiting room has been full since Tuesday.
   isPlayable: 1
   successChance: 1
   apCost: 0

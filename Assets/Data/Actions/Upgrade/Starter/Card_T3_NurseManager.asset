@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b4a2311a544226649ab22636d522df49, type: 3}
   m_Name: EitherOrEffect
   m_EditorClassIdentifier: GameScripts:ChiefComplaint.Cards.Effects:EitherOrEffectSO
-  cardName: Miracle Worker
+  cardName: Nurse Manager
   reputationGenerated: 8
   altApGenerated: 4
 --- !u!114 &11400000
@@ -25,14 +25,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a19c702a9b380a64ba00656724a44857, type: 3}
-  m_Name: Card_T3_MiracleWorker
+  m_Name: Card_T3_NurseManager
   m_EditorClassIdentifier: GameScripts::ActionCardSO
-  cardName: Miracle Worker
+  cardName: Nurse Manager
   cardType: 3
   tags: 
   rulesText: 'Choose: Gain 8 Rep OR Gain 4 AP.'
-  flavorText: They don't teach you how to navigate a packed waiting room in medical
-    school, but somehow, you keep everyone calm.
+  flavorText: Nobody teaches you how to run a ward at full capacity. Somehow, they
+    keep everyone calm anyway.
   isPlayable: 1
   successChance: 1
   apCost: 0
