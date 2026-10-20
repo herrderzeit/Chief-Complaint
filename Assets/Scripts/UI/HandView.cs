@@ -35,6 +35,7 @@ namespace ChiefComplaint.UI
         protected override void Awake()
         {
             base.Awake();
+            ChiefComplaint.Core.CardCostModifiers.OnChanged += RefreshCardVisuals;
             if (handZone != null) baseHandZonePos = handZone.localPosition;
             
             cardPool = new ObjectPool<ActionCardView>(
@@ -65,6 +66,19 @@ namespace ChiefComplaint.UI
         private void OnDestroyCard(ActionCardView card)
         {
             Destroy(card.gameObject);
+        }
+
+        protected override void OnDestroy()
+        {
+            ChiefComplaint.Core.CardCostModifiers.OnChanged -= RefreshCardVisuals;
+            base.OnDestroy();
+        }
+
+        /// <summary>Re-draws every card in hand, e.g. after an AP cost modifier changes.</summary>
+        public void RefreshCardVisuals()
+        {
+            foreach (var card in activeCards)
+                if (card != null) card.UpdateVisuals();
         }
 
         public void SpawnCardVisual(ActionCardSO cardData)

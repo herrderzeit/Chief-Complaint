@@ -83,7 +83,14 @@ namespace ChiefComplaint.Cards.Views
                 flavorText.text = $"<i><color=#D3D3D3>{currentCardData.flavorText}</color></i>";
 
             if (costText != null)
-                costText.text = currentCardData.apCost.ToString();
+            {
+                // Show the current cost, highlighted when a rule or penalty has changed it.
+                int cost = CardCostModifiers.GetCost(currentCardData);
+                costText.text = cost.ToString();
+                costText.color = cost > currentCardData.apCost ? new Color(1f, 0.45f, 0.35f)
+                               : cost < currentCardData.apCost ? new Color(0.45f, 1f, 0.55f)
+                               : Color.white;
+            }
 
             SpriteRenderer bg = transform.Find("Card_Front")?.GetComponent<SpriteRenderer>();
             if (bg != null) bg.color = GetTypeColor(currentCardData.cardType);

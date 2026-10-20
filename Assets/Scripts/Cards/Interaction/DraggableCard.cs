@@ -228,7 +228,7 @@ namespace ChiefComplaint.Cards.Interaction
                 ActionCardSO cardData = actionView.currentCardData;
 
                 // AP gate: abort and snap back if the player cannot afford this card.
-                if (GameManager.Instance.CurrentAP < cardData.apCost)
+                if (GameManager.Instance.CurrentAP < CardCostModifiers.GetCost(cardData))
                 {
                     GameFeedback.WarnAt("NOT ENOUGH AP!", transform.position);
                     ClearHighlights();
@@ -288,7 +288,7 @@ namespace ChiefComplaint.Cards.Interaction
                         DeckManager.Instance.DrawCards(cardData.cardsToDraw);
                     }
 
-                    GameManager.Instance.SpendAP(cardData.apCost);
+                    GameManager.Instance.SpendAP(CardCostModifiers.GetCost(cardData));
                     
                     if (HandView.Instance != null) HandView.Instance.RemoveCardVisual(gameObject);
                     if (DeckManager.Instance != null) DeckManager.Instance.RemoveCardFromHand(cardData, !cardData.exhaustsOnUse);

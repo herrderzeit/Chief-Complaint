@@ -24,7 +24,9 @@ namespace ChiefComplaint.Core
         /// <summary>A tutorial dialog or prompt is currently active.</summary>
         Tutorial,
         /// <summary>The player pressed Escape and is deciding whether to quit; the board is locked.</summary>
-        Paused
+        Paused,
+        /// <summary>A shift-start or End Shift dialog (briefing, inspection, upkeep...) is open; the board is locked.</summary>
+        Event
     }
 
     /// <summary>
@@ -54,6 +56,18 @@ namespace ChiefComplaint.Core
 
         /// <summary>Raised whenever <see cref="CurrentPhase"/> changes.</summary>
         public event System.Action<GamePhase> OnPhaseChanged;
+
+        /// <summary>
+        /// Raised at the start of every shift (including the first), after AP is restored and before
+        /// the hand is drawn, so per-shift rules and cost modifiers are in place for the new hand.
+        /// </summary>
+        public event System.Action<int> OnShiftStarted;
+
+        /// <summary>Steps run after the board is set up at the start of a shift (e.g. the morning briefing).</summary>
+        public readonly ShiftSequence shiftStartSteps = new ShiftSequence();
+
+        /// <summary>Steps run when End Shift is pressed, before the draft opens (e.g. audits, inspections, upkeep).</summary>
+        public readonly ShiftSequence shiftEndSteps = new ShiftSequence();
 
         [Header("Economy Stats")]
         /// <summary>Action Points restored to the player at the start of every shift.</summary>
@@ -176,6 +190,7 @@ namespace ChiefComplaint.Core
         {
             SetPhase(GamePhase.Shift);
             ResetAP();
+            OnShiftStarted?.Invoke(currentShift);
 
             if (DeckManager.Instance != null) DeckManager.Instance.StartRun();
 
@@ -184,6 +199,16 @@ namespace ChiefComplaint.Core
                 for (int i = 0; i < initialPatientCount; i++) boardManager.SpawnPatient();
                 boardManager.NotifyCodeBlueStatus();
             }
+
+            RunShiftStartSteps();
+        }
+
+        /// <summary>Locks the board while the shift-start steps run, then hands control to the player.</summary>
+        private void RunShiftStartSteps()
+        {
+            if (shiftStartSteps.IsEmpty) return;
+            SetPhase(GamePhase.Event);
+            shiftStartSteps.Run(() => SetPhase(GamePhase.Shift), () => CurrentPhase == GamePhase.GameOver);
         }
 
         /// <summary>
@@ -208,11 +233,15 @@ namespace ChiefComplaint.Core
             // A patient death during decay can end the run.
             if (CurrentPhase == GamePhase.GameOver) return;
 
+            OnShiftStarted?.Invoke(currentShift);
+
             // DeckManager is a Singleton because cards need global access to it;
             // GameManager commands it here during the shift-state transition.
             if (DeckManager.Instance != null) DeckManager.Instance.StartNewShift();
 
             if (boardManager != null) boardManager.SpawnPatient();
+
+            RunShiftStartSteps();
         }
 
         /// <summary>Opens the inter-shift draft/market panel. Ignored unless a shift is in progress.</summary>
@@ -223,8 +252,17 @@ namespace ChiefComplaint.Core
             // Patients finish their surgeries: discharges pay out before the draft opens.
             if (boardManager != null) boardManager.ResolveSurgeries();
 
+            if (CurrentPhase == GamePhase.GameOver) return;
+
+            // End Shift steps (audits, inspections, upkeep) may show dialogs; the draft opens when they finish.
+            SetPhase(GamePhase.Event);
+            shiftEndSteps.Run(OpenDraft, () => CurrentPhase == GamePhase.GameOver);
+        }
+
+        private void OpenDraft()
+        {
             // Finishing the final shift wins the run instead of opening the draft.
-            if (shiftsToWin > 0 && currentShift >= shiftsToWin && CurrentPhase != GamePhase.GameOver)
+            if (shiftsToWin > 0 && currentShift >= shiftsToWin)
             {
                 TriggerVictory();
                 return;
