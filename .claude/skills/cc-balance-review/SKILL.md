@@ -22,13 +22,13 @@ If the user named an area (for example "Red Tape cards" or "Trauma Flight patien
 
 ## Step 1: Fan out to the personas (in parallel, read-only)
 
-Spawn three read-only subagents **in one message** (subagent type `Explore` or `general-purpose`). Each agent must first read its persona file, adopt it, and be told it may not edit anything. Give each its question and the scope from above. Ask each to return findings in the format under "Finding format".
+Spawn three subagents **in one message**, using the subagent type in the table. Tell each that this is a **read-only** audit: it may not edit, create or delete any project file, and any simulator output goes in the scratchpad. The rules agent is `general-purpose` and must first read the "You are the lead" and "Engineering rules" sections of `CLAUDE.md` and adopt that persona. Give each its question and the scope from above. Ask each to return findings in the format under "Finding format".
 
-| Agent | Persona file to read first | Question |
+| Agent | Subagent type | Question |
 |---|---|---|
-| Economy and content | `.claude/skills/cc-medical-data-scraper/SKILL.md` | Are AP costs, `powerTier`, draft value (`ActionCardSO.CalculateDraftValue()`), reputation rewards, `startingStability` and `stabilityDecayPerTurn` coherent? Can cumulative stability decay outpace maximum AP output in early shifts? Is each escalation pool (WalkIn, Ambulance, TraumaFlight) the right difficulty for its triage range? Are there cards that are strictly better or worse than another at the same cost, duplicate names, or tier/cost outliers? Do patient `clinicalTags` and symptom `clinicalTags` pair logically? |
-| Rules and systems | `.claude/skills/cc-card-engine-specialist/SKILL.md` | Read the manager and effect code (`GameManager`, `DeckManager`, `BoardManager`, `PatientDeckManager`, `Cards/Effects/`). Do the rules create degenerate loops or dead ends: infinite draw or AP, free exhaust-free engines, Red Tape that cannot be cleansed, reputation that can go unrecoverable, a shift that cannot be won, cards whose `successChance` makes them never worth playing? Is anything un-winnable or trivially won because of how decay, draw and AP interact? |
-| Test coverage | `.claude/skills/cc-unity-qa-tester/SKILL.md` | Which balance assumptions are already enforced by tests in `Assets/Tests/`, and which are not? Propose specific parameterised boundary tests (name, inputs, expected result) for the unprotected ones. Do not write them. |
+| Economy and content | `cc-medical-data-scraper` | Are AP costs, `powerTier`, draft value (`ActionCardSO.CalculateDraftValue()`), reputation rewards, `startingStability` and `stabilityDecayPerTurn` coherent? Can cumulative stability decay outpace maximum AP output in early shifts? Is each escalation pool (WalkIn, Ambulance, TraumaFlight) the right difficulty for its triage range? Are there cards that are strictly better or worse than another at the same cost, duplicate names, or tier/cost outliers? Do patient `clinicalTags` and symptom `clinicalTags` pair logically? |
+| Rules and systems | `general-purpose` (card-engine persona from `CLAUDE.md`) | Read the manager and effect code (`GameManager`, `DeckManager`, `BoardManager`, `PatientDeckManager`, `Cards/Effects/`). Do the rules create degenerate loops or dead ends: infinite draw or AP, free exhaust-free engines, Red Tape that cannot be cleansed, reputation that can go unrecoverable, a shift that cannot be won, cards whose `successChance` makes them never worth playing? Is anything un-winnable or trivially won because of how decay, draw and AP interact? |
+| Test coverage | `cc-unity-qa-tester` | Which balance assumptions are already enforced by tests in `Assets/Tests/`, and which are not? Propose specific parameterised boundary tests (name, inputs, expected result) for the unprotected ones. Do not write them. |
 
 Tell every agent: "Cite the asset path or `file:line` for every finding. Say 'not verified' where you could not check something. Do not speculate about numbers you did not read."
 
@@ -50,7 +50,7 @@ Produce one report, in chat, with these sections in order:
 
 If the user asks for the report to be kept, write it to `docs/balance-reviews/YYYY-MM-DD.md` (create the folder) rather than a scratch location.
 
-End by asking which fixes, if any, to apply. When approved, route each to its owner: data and number changes to the economy persona, C# changes to the card-engine persona, new tests to the QA persona.
+End by asking which fixes, if any, to apply. When approved, route each to its owner: data and number changes to `cc-medical-data-scraper`, C# changes to the lead (main session), new tests to `cc-unity-qa-tester`.
 
 ## Finding format (give this to each agent)
 
