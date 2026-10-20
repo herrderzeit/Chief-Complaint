@@ -1091,9 +1091,9 @@ MonoBehaviour:
   initialPatientCount: 2
   deathReputationPenalty: 5
   walkInFundingReward: 2
-  ambulanceFundingReward: 5
+  ambulanceFundingReward: 6
   traumaFlightFundingReward: 8
-  cureReputationCap: 2
+  cureReputationCap: 3
 --- !u!1001 &178885641
 PrefabInstance:
   m_ObjectHideFlags: 0

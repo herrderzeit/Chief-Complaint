@@ -74,11 +74,11 @@ namespace ChiefComplaint.Core
         [Tooltip("Funding paid for curing a Walk-In patient.")]
         public int walkInFundingReward = 2;
         [Tooltip("Funding paid for curing an Ambulance patient.")]
-        public int ambulanceFundingReward = 5;
+        public int ambulanceFundingReward = 6;
         [Tooltip("Funding paid for curing a Trauma Flight patient.")]
         public int traumaFlightFundingReward = 8;
         [Tooltip("Maximum Reputation a cure can award. Reputation is the life total; Funding is the spending currency.")]
-        public int cureReputationCap = 2;
+        public int cureReputationCap = 3;
 
         /// <summary>Action Points the player can currently spend.</summary>
         public int CurrentAP => currentAP;

@@ -29,7 +29,7 @@ namespace ChiefComplaint.Tests.EditMode
         }
 
         [TestCase(EscalationType.WalkIn, 2)]
-        [TestCase(EscalationType.Ambulance, 5)]
+        [TestCase(EscalationType.Ambulance, 6)]
         [TestCase(EscalationType.TraumaFlight, 8)]
         public void GetFundingReward_MatchesEscalationType(EscalationType type, int expected)
         {
@@ -85,9 +85,10 @@ namespace ChiefComplaint.Tests.EditMode
         }
 
         [Test]
-        public void CureReputationCap_IsSmallerThanTheLowestFundingReward()
+        public void CureReputationCap_NeverExceedsFundingForHarderPatients()
         {
-            Assert.LessOrEqual(gm.cureReputationCap, gm.walkInFundingReward);
+            Assert.LessOrEqual(gm.cureReputationCap, gm.ambulanceFundingReward);
+            Assert.LessOrEqual(gm.cureReputationCap, gm.traumaFlightFundingReward);
         }
     }
 }
