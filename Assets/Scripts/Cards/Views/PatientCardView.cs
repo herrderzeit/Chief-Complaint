@@ -665,7 +665,7 @@ namespace ChiefComplaint.Cards.Views
 
             if (decayText != null)
             {
-                decayText.text = $"-{decayRate}/turn";
+                decayText.text = $"-{decayRate} / shift";
             }
 
             if (rewardText != null && patientData != null)
