@@ -45,6 +45,12 @@ namespace ChiefComplaint.Drafting
         // Event Listeners
         // -------------------------------------------------------------------------
 
+        private void Start()
+        {
+            // The panel stays visible in the scene for editing; a run always begins in the shift phase.
+            if (draftPanel != null) draftPanel.SetActive(false);
+        }
+
         private void OnEnable()
         {
             if (GameManager.Instance != null)
