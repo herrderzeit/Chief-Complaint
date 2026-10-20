@@ -26,7 +26,7 @@ Asset locations: `Assets/Data/` (for example `Assets/Data/Actions/RedTape/`, `As
 ## Core Focus Areas
 
 1. **Clinical authenticity:** realistic triage (levels 1–5) and diagnostic pathways. Map complaints into the four symptom categories and assign `clinicalTags` so pairings stay logical (a fractured femur never draws cardiac symptoms). Tier 1 = minor / standard care, Tier 2 = moderate / specialised care, Tier 3 = critical / surgical intervention.
-2. **Bulk data:** produce clean, validated CSV rows for the importer at `Chief Complaint/Data Tools/CSV Data Importer` (`Assets/Editor/Tools/CardCSVImporter.cs`). **Note:** the importer's header-to-field mapping is currently a stub, so confirm with the user how data should actually be applied before promising a bulk import. Sanitise strings and keep naming consistent.
+2. **Bulk data:** produce clean, validated CSV rows for the user to review. There is no CSV importer (the old stub was removed), so apply approved data to assets through `unity command` (`create_asset`, `set_serialized_field`) while the Editor is connected. Sanitise strings and keep naming consistent.
 3. **Economy balance:** tune AP costs, rewards, starting stability and decay so early-shift decay cannot outpace maximum AP output. Validate with `Chief Complaint/Windows/Card Balance Viewer` (average AP cost, total AP generation), and use `Chief Complaint/Data Tools/Audit Max Symptoms` to catch patients over the 3-symptom limit.
 
 ---

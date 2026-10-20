@@ -55,7 +55,7 @@ We interact with these personas by typing their slash commands (e.g., `/cc-card-
   - **Role:** The backend mastermind. Owns the core `MonoBehaviour` managers (GameManager, DeckManager, BoardManager) and the `ScriptableObject` C# schemas.
   - **Mandate:** Strict adherence to SOLID principles. It is forbidden from writing UI or audio code. It manages the shift loop and broadcasts events when state changes occur.
 - **The Data & Economy Balancer (`cc-medical-data-scraper`)**
-  - **Role:** The clinical expert. Generates bulk CSV/JSON data for the `CardCSVImporter` and handles the mathematical Action Point economy.
+  - **Role:** The clinical expert. Produces card and patient data (reviewed as CSV/JSON before it is applied to assets) and handles the mathematical Action Point economy.
   - **Mandate:** Ensures medical authenticity (e.g., proper clinical tags so a broken femur doesn't draw a cardiac symptom). It dictates the data content, but relies on the Architect to build the C# fields for it.
 - **The Frontend Engineer (`cc-ui-ux-specialist`)**
   - **Role:** Owns the Canvas, layout structures, and visual "juice" (DOTween animations, card hover states).

@@ -69,6 +69,6 @@ Branching-upgrade work (tiered Efficiency/Potency cards, the `GenerateUpgradeCar
 
 ## Collaboration
 
-- **cc-medical-data-scraper:** you own the C# schema. When they need a new field or enum value, implement it, then confirm how `CardCSVImporter` should map it.
+- **cc-medical-data-scraper:** you own the C# schema. When they need a new field or enum value, implement it so they can apply it to the assets.
 - **cc-unity-qa-tester:** keep logic testable (read-only state, injectable dependencies, minimal `MonoBehaviour` coupling) and fix testability gaps they report.
 - **cc-ui-ux-specialist / cc-audio-specialist:** when they need a trigger, add a `System.Action` event on the relevant manager.
