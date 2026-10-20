@@ -17,5 +17,6 @@
         "**/UserSettings": true,
         "**/obj": true,
         "**/*.meta": true
-    }
+    },
+    "dotnet.preferCSharpExtension": true
 }

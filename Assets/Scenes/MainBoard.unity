@@ -7929,7 +7929,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Funding: 6'
+  m_text: Funding_Text
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: d1b782b9124952e4fbc227c4db26e3ff, type: 2}
   m_sharedMaterial: {fileID: -6562987489540235994, guid: d1b782b9124952e4fbc227c4db26e3ff, type: 2}
