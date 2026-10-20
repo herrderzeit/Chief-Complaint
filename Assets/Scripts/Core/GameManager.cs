@@ -48,6 +48,8 @@ namespace ChiefComplaint.Core
         // Economy Events
         public event System.Action<int> OnAPChanged;
         public event System.Action<int> OnReputationChanged;
+        /// <summary>Raised whenever the Activity Funding balance changes.</summary>
+        public event System.Action<int> OnFundingChanged;
         public event System.Action<int> OnShiftChanged;
 
         /// <summary>Raised whenever <see cref="CurrentPhase"/> changes.</summary>
@@ -58,6 +60,8 @@ namespace ChiefComplaint.Core
         public int baseAP = 3;
         [SerializeField] private int currentAP;
         [SerializeField] private int currentReputation = 10;
+        [Tooltip("Activity Funding the run starts with. Spent on draft cards and card upgrades.")]
+        [SerializeField] private int currentFunding = 6;
         [SerializeField] private int currentShift = 1;
 
         [Header("Run Balance")]
@@ -66,11 +70,24 @@ namespace ChiefComplaint.Core
         [Tooltip("Reputation lost when a patient dies (Code Blue).")]
         public int deathReputationPenalty = 5;
 
+        [Header("Activity Funding")]
+        [Tooltip("Funding paid for curing a Walk-In patient.")]
+        public int walkInFundingReward = 2;
+        [Tooltip("Funding paid for curing an Ambulance patient.")]
+        public int ambulanceFundingReward = 6;
+        [Tooltip("Funding paid for curing a Trauma Flight patient.")]
+        public int traumaFlightFundingReward = 8;
+        [Tooltip("Maximum Reputation a cure can award. Reputation is the life total; Funding is the spending currency.")]
+        public int cureReputationCap = 3;
+
         /// <summary>Action Points the player can currently spend.</summary>
         public int CurrentAP => currentAP;
 
         /// <summary>The hospital's current Reputation (also the lose condition).</summary>
         public int CurrentReputation => currentReputation;
+
+        /// <summary>Activity Funding the player can currently spend on drafts and upgrades.</summary>
+        public int CurrentFunding => currentFunding;
 
         /// <summary>The current shift number, starting at 1.</summary>
         public int CurrentShift => currentShift;
@@ -229,6 +246,41 @@ namespace ChiefComplaint.Core
         {
             currentAP += amount;
             OnAPChanged?.Invoke(currentAP);
+        }
+
+        /// <summary>Returns the base Activity Funding paid for curing a patient of the given escalation type.</summary>
+        /// <param name="type">The patient's escalation phase.</param>
+        public int GetFundingReward(EscalationType type)
+        {
+            switch (type)
+            {
+                case EscalationType.Ambulance:    return ambulanceFundingReward;
+                case EscalationType.TraumaFlight: return traumaFlightFundingReward;
+                default:                          return walkInFundingReward;
+            }
+        }
+
+        /// <summary>Adds Activity Funding (income or a refund) and refreshes the UI.</summary>
+        /// <param name="amount">Funding to add.</param>
+        public void AddFunding(int amount)
+        {
+            currentFunding += amount;
+            OnFundingChanged?.Invoke(currentFunding);
+            GameLog.Info($"Gained {amount} Funding! Total: {currentFunding}");
+        }
+
+        /// <summary>
+        /// Spends Activity Funding if the player can afford it. Unlike Reputation, running out never ends the run.
+        /// </summary>
+        /// <param name="amount">Funding to spend.</param>
+        /// <returns><c>true</c> if the Funding was spent; <c>false</c> if the balance was too low.</returns>
+        public bool TrySpendFunding(int amount)
+        {
+            if (amount > currentFunding) return false;
+            currentFunding -= amount;
+            OnFundingChanged?.Invoke(currentFunding);
+            GameLog.Info($"Spent {amount} Funding! Total: {currentFunding}");
+            return true;
         }
 
         /// <summary>Awards Reputation and refreshes the UI.</summary>

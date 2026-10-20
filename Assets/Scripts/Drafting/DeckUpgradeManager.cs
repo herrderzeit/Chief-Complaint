@@ -54,15 +54,15 @@ namespace ChiefComplaint.Drafting
         {
             SwitchTab(0);
             HidePreview();
-            if (GameManager.Instance != null) GameManager.Instance.OnReputationChanged += OnReputationChanged;
+            if (GameManager.Instance != null) GameManager.Instance.OnFundingChanged += OnFundingChanged;
         }
 
         private void OnDisable()
         {
-            if (GameManager.Instance != null) GameManager.Instance.OnReputationChanged -= OnReputationChanged;
+            if (GameManager.Instance != null) GameManager.Instance.OnFundingChanged -= OnFundingChanged;
         }
 
-        private void OnReputationChanged(int newRep)
+        private void OnFundingChanged(int newFunding)
         {
             // If we are currently looking at the upgrades tab, refresh the list to grey out unaffordable buttons
             if (upgradesContainer != null && upgradesContainer.activeInHierarchy)
@@ -206,11 +206,11 @@ namespace ChiefComplaint.Drafting
                     if (texts.Length >= 3)
                     {
                         // The third text component in the prefab is the cost text
-                        texts[2].text = $"{card.draftUpgradeCost} Rep";
+                        texts[2].text = $"{card.draftUpgradeCost} Funding";
                         texts[2].gameObject.SetActive(true);
                     }
 
-                    bool canAfford = (GameManager.Instance.CurrentReputation - card.draftUpgradeCost) > 0;
+                    bool canAfford = GameManager.Instance.CurrentFunding >= card.draftUpgradeCost;
                     upgradeBtn.interactable = canAfford;
 
                     // Attach specific hover logic to the button to show the UPGRADED card
@@ -239,9 +239,8 @@ namespace ChiefComplaint.Drafting
             if (baseCard.directDraftUpgrade == null) return;
 
             int cost = baseCard.draftUpgradeCost;
-            if (GameManager.Instance.CurrentReputation - cost > 0)
+            if (GameManager.Instance.TrySpendFunding(cost))
             {
-                GameManager.Instance.SpendReputation(cost);
 
                 if (DeckManager.Instance.drawPile.Contains(baseCard))
                 {
@@ -259,7 +258,7 @@ namespace ChiefComplaint.Drafting
                     DeckManager.Instance.handData.Add(baseCard.directDraftUpgrade);
                 }
 
-                Debug.Log($"Upgraded {baseCard.cardName} to {baseCard.directDraftUpgrade.cardName} for {cost} Rep!");
+                Debug.Log($"Upgraded {baseCard.cardName} to {baseCard.directDraftUpgrade.cardName} for {cost} Funding!");
                 RefreshUpgradesList(); // Refresh to reflect the removal of the upgraded card
                 HidePreview();
             }

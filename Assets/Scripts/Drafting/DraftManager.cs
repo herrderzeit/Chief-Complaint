@@ -48,16 +48,16 @@ namespace ChiefComplaint.Drafting
         private void OnEnable()
         {
             if (GameManager.Instance != null)
-                GameManager.Instance.OnReputationChanged += OnReputationChanged;
+                GameManager.Instance.OnFundingChanged += OnFundingChanged;
         }
 
         private void OnDisable()
         {
             if (GameManager.Instance != null)
-                GameManager.Instance.OnReputationChanged -= OnReputationChanged;
+                GameManager.Instance.OnFundingChanged -= OnFundingChanged;
         }
 
-        private void OnReputationChanged(int newRep)
+        private void OnFundingChanged(int newFunding)
         {
             RefreshAffordability();
         }
@@ -83,7 +83,7 @@ namespace ChiefComplaint.Drafting
 
         /// <summary>
         /// Populates the five market slots with randomly chosen cards, calculates their
-        /// dynamic Reputation costs, and rebuilds all UI text and button listeners.
+        /// dynamic Activity Funding costs, and rebuilds all UI text and button listeners.
         /// </summary>
         private void RollMarketCards()
         {
@@ -99,7 +99,7 @@ namespace ChiefComplaint.Drafting
                 currentCosts[i] = dynamicCost;
 
                 cardNameTexts[i].text = rolledCard.cardName;
-                cardCostTexts[i].text = $"Cost: {dynamicCost} Rep";
+                cardCostTexts[i].text = $"Cost: {dynamicCost} Funding";
 
                 string apText = rolledCard.apCost == 0 ? "FREE" : $"{rolledCard.apCost} AP";
 
@@ -123,8 +123,8 @@ namespace ChiefComplaint.Drafting
 
         /// <summary>
         /// Toggles the purchase state of a market slot.
-        /// On first click: spends Reputation and adds the card to the pending cart (greyed button).
-        /// On second click: refunds Reputation and removes the card from the cart.
+        /// On first click: spends Activity Funding and adds the card to the pending cart (greyed button).
+        /// On second click: refunds the Funding and removes the card from the cart.
         /// </summary>
         /// <param name="slotIndex">Zero-based index of the market slot (0–2).</param>
         public void TogglePurchase(int slotIndex)
@@ -135,27 +135,25 @@ namespace ChiefComplaint.Drafting
 
             if (!isSlotPurchased[slotIndex])
             {
-                // Reserve 1 Rep as a floor — a draft purchase must never trigger Game Over.
-                if (GameManager.Instance.CurrentReputation - cost > 0)
+                if (GameManager.Instance.TrySpendFunding(cost))
                 {
-                    GameManager.Instance.SpendReputation(cost);
                     pendingPurchases.Add(cardToBuy);
                     isSlotPurchased[slotIndex] = true;
 
-                    Debug.Log($"Reserved {cardToBuy.cardName} for {cost} Rep!");
+                    Debug.Log($"Reserved {cardToBuy.cardName} for {cost} Funding!");
                 }
                 else
                 {
-                    Debug.Log("Not enough Reputation!");
+                    Debug.Log("Not enough Funding!");
                 }
             }
             else
             {
-                GameManager.Instance.AddReputation(cost);
+                GameManager.Instance.AddFunding(cost);
                 pendingPurchases.Remove(cardToBuy);
                 isSlotPurchased[slotIndex] = false;
 
-                Debug.Log($"Refunded {cardToBuy.cardName}, gained {cost} Rep back!");
+                Debug.Log($"Refunded {cardToBuy.cardName}, gained {cost} Funding back!");
             }
 
             RefreshAffordability();
@@ -188,7 +186,7 @@ namespace ChiefComplaint.Drafting
 
         /// <summary>
         /// Updates the colour and interactability of all market slots based on
-        /// their purchase status and the player's current Reputation.
+        /// their purchase status and the player's current Activity Funding.
         /// </summary>
         private void RefreshAffordability()
         {
@@ -207,9 +205,8 @@ namespace ChiefComplaint.Drafting
                 }
                 else
                 {
-                    // Mirror the purchase guard: card is only affordable if buying it
-                    // would still leave the player with at least 1 Reputation.
-                    if (GameManager.Instance.CurrentReputation - currentCosts[i] > 0)
+                    // Mirror the purchase guard: affordable if the Funding balance covers the cost.
+                    if (GameManager.Instance.CurrentFunding >= currentCosts[i])
                     {
                         // Affordable
                         buttonImage.color = GetCardTypeColor(currentOfferedCards[i].cardType);
