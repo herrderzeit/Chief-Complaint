@@ -24,10 +24,9 @@ namespace ChiefComplaint.Drafting
     {
         [Header("UI References")]
         public GameObject draftPanel;
-        public Button[] cardOptionButtons;
-        public TextMeshProUGUI[] cardNameTexts;
-        public TextMeshProUGUI[] cardCostTexts;
-        public TextMeshProUGUI[] cardDescriptionTexts;
+        [Tooltip("One market offer; an instance is spawned into the market container for each card on sale.")]
+        public DraftMarketCardView marketCardPrefab;
+        public Transform marketContainer;
         public GameObject endShiftButton;
 
         [Header("Market Data")]
@@ -39,6 +38,7 @@ namespace ChiefComplaint.Drafting
         private List<ActionCardSO> currentOfferedCards = new List<ActionCardSO>();
         private int[] currentCosts = new int[MARKET_SIZE];
         private bool[] isSlotPurchased = new bool[MARKET_SIZE];
+        private readonly List<DraftMarketCardView> marketCards = new List<DraftMarketCardView>();
         private List<ActionCardSO> pendingPurchases = new List<ActionCardSO>();
 
         // -------------------------------------------------------------------------
@@ -88,36 +88,27 @@ namespace ChiefComplaint.Drafting
         }
 
         /// <summary>
-        /// Populates the five market slots with randomly chosen cards, calculates their
-        /// dynamic Activity Funding costs, and rebuilds all UI text and button listeners.
+        /// Rolls five random cards for the market, prices them via <see cref="ActionCardSO.CalculateDraftValue"/>
+        /// and spawns a <see cref="DraftMarketCardView"/> for each.
         /// </summary>
         private void RollMarketCards()
         {
             currentOfferedCards.Clear();
+            foreach (var old in marketCards) if (old != null) Destroy(old.gameObject);
+            marketCards.Clear();
 
             for (int i = 0; i < MARKET_SIZE; i++)
             {
                 ActionCardSO rolledCard = draftableCardsPool[Random.Range(0, draftableCardsPool.Count)];
                 currentOfferedCards.Add(rolledCard);
                 isSlotPurchased[i] = false;
+                currentCosts[i] = rolledCard.CalculateDraftValue();
 
-                int dynamicCost = rolledCard.CalculateDraftValue();
-                currentCosts[i] = dynamicCost;
-
-                cardNameTexts[i].text = rolledCard.cardName;
-                cardCostTexts[i].text = $"Cost: {dynamicCost} Funding";
-
-                string apText = rolledCard.apCost == 0 ? "FREE" : $"{rolledCard.apCost} AP";
-
-                cardDescriptionTexts[i].text =
-                    $"<b>[{rolledCard.cardType.ToString().ToUpper()}]</b>   <b>{apText}</b>\n\n" +
-                    $"{rolledCard.rulesText}\n\n" +
-                    $"<i><color=#D3D3D3>{rolledCard.flavorText}</color></i>";
-
-                // Capture the loop index for the closure before assigning the listener.
-                int slotIndex = i;
-                cardOptionButtons[i].onClick.RemoveAllListeners();
-                cardOptionButtons[i].onClick.AddListener(() => TogglePurchase(slotIndex));
+                if (marketCardPrefab == null || marketContainer == null) continue;
+                DraftMarketCardView view = Instantiate(marketCardPrefab, marketContainer);
+                int slotIndex = i; // captured for the click callback
+                view.Setup(rolledCard, currentCosts[i], () => TogglePurchase(slotIndex));
+                marketCards.Add(view);
             }
 
             RefreshAffordability();
@@ -132,12 +123,11 @@ namespace ChiefComplaint.Drafting
         /// On first click: spends Activity Funding and adds the card to the pending cart (greyed button).
         /// On second click: refunds the Funding and removes the card from the cart.
         /// </summary>
-        /// <param name="slotIndex">Zero-based index of the market slot (0–2).</param>
+        /// <param name="slotIndex">Zero-based index of the market slot (0–4).</param>
         public void TogglePurchase(int slotIndex)
         {
             ActionCardSO cardToBuy = currentOfferedCards[slotIndex];
             int cost = currentCosts[slotIndex];
-            Image buttonImage = cardOptionButtons[slotIndex].GetComponent<Image>();
 
             if (!isSlotPurchased[slotIndex])
             {
@@ -191,59 +181,17 @@ namespace ChiefComplaint.Drafting
         // -------------------------------------------------------------------------
 
         /// <summary>
-        /// Updates the colour and interactability of all market slots based on
-        /// their purchase status and the player's current Activity Funding.
+        /// Updates each market card for its purchase status and the player's current Activity Funding.
         /// </summary>
         private void RefreshAffordability()
         {
-            for (int i = 0; i < MARKET_SIZE; i++)
+            int funding = GameManager.Instance != null ? GameManager.Instance.CurrentFunding : 0;
+            for (int i = 0; i < marketCards.Count; i++)
             {
-                if (currentOfferedCards.Count <= i) continue;
-
-                Image buttonImage = cardOptionButtons[i].GetComponent<Image>();
-                if (buttonImage == null) continue;
-
-                if (isSlotPurchased[i])
-                {
-                    // In cart (reserved)
-                    buttonImage.color = Color.gray;
-                    cardOptionButtons[i].interactable = true; // Click to refund
-                }
-                else
-                {
-                    // Mirror the purchase guard: affordable if the Funding balance covers the cost.
-                    if (GameManager.Instance.CurrentFunding >= currentCosts[i])
-                    {
-                        // Affordable
-                        buttonImage.color = GetCardTypeColor(currentOfferedCards[i].cardType);
-                        cardOptionButtons[i].interactable = true;
-                    }
-                    else
-                    {
-                        // Too Expensive
-                        buttonImage.color = new Color(0.2f, 0.2f, 0.2f, 0.8f); // Dark Grey / Dimmed
-                        cardOptionButtons[i].interactable = false;
-                    }
-                }
+                if (marketCards[i] == null) continue;
+                // Mirror the purchase guard: affordable if the Funding balance covers the cost.
+                marketCards[i].SetState(isSlotPurchased[i], funding >= currentCosts[i]);
             }
-        }
-
-        /// <summary>
-        /// Returns a thematic tint colour for a card's button based on its <see cref="ActionCardType"/>.
-        /// </summary>
-        /// <param name="type">The card type to look up.</param>
-        /// <returns>A <see cref="Color"/> representing the card type's visual theme.</returns>
-        private Color GetCardTypeColor(ActionCardType type)
-        {
-            return type switch
-            {
-                ActionCardType.Staff      => new Color(0.85f, 0.65f, 0.2f),   // Gold
-                ActionCardType.Diagnostic => new Color(0.2f,  0.6f,  0.85f),  // Blue
-                ActionCardType.Treatment  => new Color(0.2f,  0.75f, 0.3f),   // Green
-                ActionCardType.Utility    => new Color(0.6f,  0.4f,  0.8f),   // Purple
-                ActionCardType.RedTape    => new Color(0.85f, 0.2f,  0.2f),   // Red
-                _ => Color.white
-            };
         }
     }
 
