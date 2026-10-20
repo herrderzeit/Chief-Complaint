@@ -28,7 +28,7 @@ MonoBehaviour:
   m_Name: Card_T2_RegisteredNurse
   m_EditorClassIdentifier: GameScripts::ActionCardSO
   cardName: Registered Nurse
-  cardType: 3
+  cardType: 0
   tags: 
   rulesText: 'Choose: Gain 4 Rep OR Gain 2 AP.'
   flavorText: A heated blanket, a cup of tea and one eye on the monitors. Sometimes

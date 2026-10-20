@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-2510180623607605164
+--- !u!114 &-5665361454415291121
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b4a2311a544226649ab22636d522df49, type: 3}
   m_Name: EitherOrEffect
   m_EditorClassIdentifier: GameScripts:ChiefComplaint.Cards.Effects:EitherOrEffectSO
-  cardName: Enrolled Nurse
-  reputationGenerated: 2
-  altApGenerated: 1
+  cardName: Chief Nurse
+  reputationGenerated: 8
+  altApGenerated: 4
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -25,23 +25,23 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a19c702a9b380a64ba00656724a44857, type: 3}
-  m_Name: Card_EnrolledNurse
-  m_EditorClassIdentifier: Assembly-CSharp::ActionCardSO
-  cardName: Enrolled Nurse
-  cardType: 3
+  m_Name: Card_T3_ChiefNurse
+  m_EditorClassIdentifier: GameScripts::ActionCardSO
+  cardName: Chief Nurse
+  cardType: 0
   tags: 
-  rulesText: 'Choose: Gain 2 Rep OR Gain 1 AP.'
-  flavorText: First to the bedside, last to the break room. A kind word goes a long
-    way when the waiting room has been full since Tuesday.
+  rulesText: 'Choose: Gain 8 Rep OR Gain 4 AP.'
+  flavorText: Nobody teaches you how to run a ward at full capacity. Somehow, they
+    keep everyone calm anyway.
   isPlayable: 1
   successChance: 1
   apCost: 0
   cardsToDraw: 0
-  powerTier: 1
+  powerTier: 3
   exhaustsOnUse: 0
   exhaustsAtShiftEnd: 0
   effects:
-  - {fileID: -2510180623607605164}
-  directDraftUpgrade: {fileID: 11400000, guid: f053edf4202a7cf4cba72e2cce8863af, type: 2}
+  - {fileID: -5665361454415291121}
+  directDraftUpgrade: {fileID: 0}
   draftUpgradeCost: 5
   cardArt: {fileID: 0}
