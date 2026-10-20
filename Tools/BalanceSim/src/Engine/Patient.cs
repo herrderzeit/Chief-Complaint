@@ -62,7 +62,7 @@ namespace ChiefComplaint.Sim.Engine
             }
         }
 
-        public bool CanTeamAssess(int maxTier) => !Removed && !IsFullyDiagnosed && Symptoms[DiagnosedCount].Tier <= maxTier;
+        public bool CanTeamAssess(int maxTier) => !Removed && !IsFullyDiagnosed && Location == Location.Ward && Symptoms[DiagnosedCount].Tier <= maxTier;
 
         /// <summary>Lowest tier among the symptoms of a category, or 0 if none (or not fully diagnosed).</summary>
         public int LowestTierIn(SymptomCategory category)

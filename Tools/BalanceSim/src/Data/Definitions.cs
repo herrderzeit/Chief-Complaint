@@ -68,6 +68,15 @@ namespace ChiefComplaint.Sim.Data
         public override bool RequiresPatientTarget => true;
     }
 
+    /// <summary>
+    /// TrashCardEffectSO: removes a card in hand from the run. The game lets the player drop it on any hand card;
+    /// the simulator has no card targets, so it trashes Red Tape first, else the cheapest Tier 1 card.
+    /// </summary>
+    public sealed class TrashEffect : EffectDef
+    {
+        public override bool RequiresPatientTarget => false;
+    }
+
     public sealed class CleanseRedTapeEffect : EffectDef
     {
         public int RepPerCard = 1;
@@ -122,6 +131,7 @@ namespace ChiefComplaint.Sim.Data
         public bool IsPlayable = true;
         public float SuccessChance = 1f;
         public int ApCost;
+        public int ReputationCost;   // all or nothing: needs Reputation above it; paid only if the card lands
         public int CardsToDraw;
         public int PowerTier = 1;
         public bool ExhaustsOnUse;
@@ -190,6 +200,7 @@ namespace ChiefComplaint.Sim.Data
         public int StartingStability = 10;
         public int DecayPerTurn = 1;
         public int ReputationReward = 2;
+        public bool ArrivesWithHandover;   // paramedic handover: primary symptom arrives diagnosed
         public List<PatientTriggerDef> Triggers = new List<PatientTriggerDef>();
 
         public override string ToString() => Name;
@@ -200,7 +211,8 @@ namespace ChiefComplaint.Sim.Data
     {
         public List<CardDef> StartingDeck = new List<CardDef>();
         public List<CardDef> RedTapePool = new List<CardDef>();
-        public List<CardDef> DraftPool = new List<CardDef>();
+        public List<CardDef> DraftPool = new List<CardDef>();   // the supply piles' cards, in pile order
+        public List<SupplyPileDef> SupplyPiles = new List<SupplyPileDef>();
         public List<PatientDef> WalkInPool = new List<PatientDef>();
         public List<PatientDef> AmbulancePool = new List<PatientDef>();
         public List<PatientDef> TraumaFlightPool = new List<PatientDef>();
@@ -217,5 +229,13 @@ namespace ChiefComplaint.Sim.Data
             EscalationType.TraumaFlight => TraumaFlightPool,
             _ => WalkInPool
         };
+    }
+
+    /// <summary>One supply-room pile (DraftManager.supplyPiles / SupplyPileConfig).</summary>
+    public sealed class SupplyPileDef
+    {
+        public CardDef Card;
+        public EscalationType UnlockAt = EscalationType.WalkIn;
+        public int MaxStock = 3;
     }
 }

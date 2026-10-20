@@ -51,8 +51,9 @@ namespace ChiefComplaint.Sim.Engine
         public int PendingTeamAssessmentTier { get; private set; }
 
         // Draft (DraftManager)
-        public readonly List<CardDef> MarketOffers = new List<CardDef>();
-        public readonly List<bool> MarketPurchased = new List<bool>();
+        // Supply room (DraftManager / SupplyRoom): one entry per Data.SupplyPiles pile.
+        public readonly List<bool> PileUnlocked = new List<bool>();
+        public readonly List<int> PileStock = new List<int>();
         private readonly List<CardDef> pendingPurchases = new List<CardDef>();
 
         public Game(GameData data, int seed, IRunObserver observer = null, GameConfig config = null)
@@ -143,7 +144,7 @@ namespace ChiefComplaint.Sim.Engine
             var seen = new HashSet<CardDef>();
             foreach (CardDef card in Hand)
             {
-                if (!seen.Add(card) || !card.IsPlayable || AP < card.ApCost) continue;
+                if (!seen.Add(card) || !card.IsPlayable || AP < card.ApCost || !CanAffordReputation(card)) continue;
                 if (card.Effects.Any(e => e is CureEffect)) continue; // played through Treat
 
                 bool requiresPatient = card.Effects.Any(e => e.RequiresPatientTarget);
@@ -165,7 +166,7 @@ namespace ChiefComplaint.Sim.Engine
                     var seenCure = new HashSet<CardDef>();
                     foreach (CardDef card in Hand)
                     {
-                        if (!seenCure.Add(card) || !card.IsPlayable || AP < card.ApCost) continue;
+                        if (!seenCure.Add(card) || !card.IsPlayable || AP < card.ApCost || !CanAffordReputation(card)) continue;
                         CureEffect cure = card.Effects.OfType<CureEffect>().FirstOrDefault();
                         if (cure == null || cure.MaxTier < lowest) continue;
                         actions.Add(new GameAction { Kind = ActionKind.Treat, Patient = p, Department = dept, Card = card, Cost = card.ApCost });
@@ -211,12 +212,12 @@ namespace ChiefComplaint.Sim.Engine
 
         private void AddDraftActions(List<GameAction> actions)
         {
-            for (int i = 0; i < MarketOffers.Count; i++)
+            for (int i = 0; i < PileStock.Count; i++)
             {
-                if (MarketPurchased[i]) continue;
-                int cost = MarketOffers[i].DraftValue;
+                if (!PileUnlocked[i] || PileStock[i] <= 0) continue;
+                int cost = Data.SupplyPiles[i].Card.DraftValue;
                 if (Funding >= cost)
-                    actions.Add(new GameAction { Kind = ActionKind.Buy, Card = MarketOffers[i], MarketSlot = i, Cost = cost });
+                    actions.Add(new GameAction { Kind = ActionKind.Buy, Card = Data.SupplyPiles[i].Card, MarketSlot = i, Cost = cost });
             }
             // DeckUpgradeManager lists every distinct card in draw + discard + hand (the hand is empty during the draft).
             foreach (CardDef card in OwnedCards.Distinct())
@@ -267,6 +268,7 @@ namespace ChiefComplaint.Sim.Engine
         public bool PlayCard(CardDef card, Patient target, int option = -1)
         {
             if (Phase != Phase.Shift || !Hand.Contains(card) || !card.IsPlayable || AP < card.ApCost) return false;
+            if (!CanAffordReputation(card)) return false;
             if (target != null && target.Removed) return false;
 
             bool requiresPatient = card.Effects.Any(e => e.RequiresPatientTarget);
@@ -286,6 +288,7 @@ namespace ChiefComplaint.Sim.Engine
 
             if (!rngFailed && card.CardsToDraw > 0) DrawCards(card.CardsToDraw);
             SpendAP(card.ApCost);
+            if (card.ReputationCost > 0) SpendReputation(card.ReputationCost, "card:" + card.Name);
             Hand.Remove(card);
             if (!card.ExhaustsOnUse) DiscardPile.Add(card);
             observer?.OnCardPlayed(this, card, target);
@@ -371,9 +374,23 @@ namespace ChiefComplaint.Sim.Engine
                 case ChoiceEffect c: return (c.OptionA != null && CanApply(c.OptionA, target)) || (c.OptionB != null && CanApply(c.OptionB, target));
                 case WardWideEffect w:
                     return w.PatientEffect != null && WardPatients().Any(p => CanApply(w.PatientEffect, p));
+                case TrashEffect _: return TrashCandidate() != null;
                 case UnknownEffect _: return false;
                 default: return true;
             }
+        }
+
+        /// <summary>The card a trash effect removes: a Red Tape card in hand, else the cheapest Tier 1 card (never another trash card).</summary>
+        private CardDef TrashCandidate()
+        {
+            CardDef best = null;
+            foreach (CardDef c in Hand)
+            {
+                if (c.Effects.Any(e => e is TrashEffect)) continue;
+                if (c.Type == CardType.RedTape) return c;
+                if (c.PowerTier == 1 && (best == null || c.DraftValue < best.DraftValue)) best = c;
+            }
+            return best;
         }
 
         /// <summary>Would <c>Apply</c> return true (assuming the success roll passes)? Side-effect free.</summary>
@@ -425,6 +442,9 @@ namespace ChiefComplaint.Sim.Engine
                     return true;
                 case CleanseRedTapeEffect c:
                     if (!rngFailed) CleanseRedTape(c.RepPerCard);
+                    return true;
+                case TrashEffect _:
+                    if (!rngFailed) Hand.Remove(TrashCandidate());
                     return true;
                 case EitherOrEffect e:
                     if (!rngFailed)
@@ -642,6 +662,14 @@ namespace ChiefComplaint.Sim.Engine
                 for (int j = 0; j < p.Symptoms.Count - i - 1; j++)
                     if (p.Symptoms[j].Tier > p.Symptoms[j + 1].Tier)
                         (p.Symptoms[j], p.Symptoms[j + 1]) = (p.Symptoms[j + 1], p.Symptoms[j]);
+            // Paramedic handover: the primary (highest-tier) symptom arrives diagnosed, moved to the front.
+            if (def.ArrivesWithHandover && p.Symptoms.Count > 0)
+            {
+                var primary = p.Symptoms[p.Symptoms.Count - 1];
+                p.Symptoms.RemoveAt(p.Symptoms.Count - 1);
+                p.Symptoms.Insert(0, primary);
+                p.DiagnosedCount = 1;
+            }
             p.InitialSymptomCount = p.Symptoms.Count;
             p.InitialMaxTier = p.Symptoms.Count == 0 ? 0 : p.Symptoms.Max(s => s.Tier);
 
@@ -747,24 +775,30 @@ namespace ChiefComplaint.Sim.Engine
         private void OpenDraft()
         {
             pendingPurchases.Clear();
-            MarketOffers.Clear();
-            MarketPurchased.Clear();
-            if (Data.DraftPool.Count == 0) return;
-            for (int i = 0; i < Config.MarketSize; i++)
+            // SupplyRoom.OpenDraft: newly reached piles unlock full; open piles restock +1 up to max.
+            var reached = TraumaFlightsUnlocked ? EscalationType.TraumaFlight : AmbulancesUnlocked ? EscalationType.Ambulance : EscalationType.WalkIn;
+            for (int i = 0; i < Data.SupplyPiles.Count; i++)
             {
-                MarketOffers.Add(Data.DraftPool[rng.Next(0, Data.DraftPool.Count)]);
-                MarketPurchased.Add(false);
+                if (PileStock.Count <= i) { PileUnlocked.Add(false); PileStock.Add(0); }
+                var pile = Data.SupplyPiles[i];
+                if (!PileUnlocked[i])
+                {
+                    if (reached < pile.UnlockAt) continue;
+                    PileUnlocked[i] = true;
+                    PileStock[i] = pile.MaxStock;
+                }
+                else PileStock[i] = Math.Min(pile.MaxStock, PileStock[i] + 1);
             }
         }
 
         private void Buy(int slot)
         {
-            if (Phase != Phase.Draft || slot < 0 || slot >= MarketOffers.Count || MarketPurchased[slot]) return;
-            CardDef card = MarketOffers[slot];
+            if (Phase != Phase.Draft || slot < 0 || slot >= PileStock.Count || !PileUnlocked[slot] || PileStock[slot] <= 0) return;
+            CardDef card = Data.SupplyPiles[slot].Card;
             int cost = card.DraftValue;
             if (!TrySpendFunding(cost, "buy")) return;
             pendingPurchases.Add(card);
-            MarketPurchased[slot] = true;
+            PileStock[slot]--;
             observer?.OnPurchase(this, "buy:" + card.Name, card, cost);
         }
 
@@ -793,6 +827,9 @@ namespace ChiefComplaint.Sim.Engine
         // =====================================================================
 
         private void SpendAP(int amount) => AP = Math.Max(0, AP - amount);
+
+        /// <summary>Mirrors <c>DraggableCard.CanAffordReputation</c>: Reputation must stay above 0 after paying.</summary>
+        private bool CanAffordReputation(CardDef card) => card.ReputationCost <= 0 || Reputation > card.ReputationCost;
         private void GainAP(int amount) => AP += amount;
 
         private void AddReputation(int amount, string source)

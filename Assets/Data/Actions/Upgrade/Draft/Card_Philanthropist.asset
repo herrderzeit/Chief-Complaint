@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c7cba7fd310eb343b3d0291f39dc1d4, type: 3}
   m_Name: GainReputationEffect
   m_EditorClassIdentifier: GameScripts:ChiefComplaint.Cards.Effects:GainReputationEffectSO
-  reputationGenerated: 6
+  reputationGenerated: 4
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -28,27 +28,15 @@ MonoBehaviour:
   cardName: Philanthropist
   cardType: 0
   tags: 
-  rulesText: Gain 6 Reputation.
-  flavorText: Deep pockets and a desire for good PR. Just smile, nod, and gladly
-    take the cheque.
+  rulesText: Gain 4 Reputation. Exhausts.
+  flavorText: Deep pockets and a desire for good PR. Just smile, nod, and gladly take the cheque.
   isPlayable: 1
   successChance: 1
   apCost: 1
-  apGenerated: 0
-  reputationGenerated: 6
-  isEitherOr: 0
-  altApGenerated: 0
-  isDiagnostic: 0
-  diagnosesSymptomTier: 3
-  pausesStabilityClock: 0
-  stabilisationHeal: 0
-  curesSymptomTier: 0
+  reputationCost: 0
   cardsToDraw: 0
-  cleansesRedTape: 0
-  repBonusPerRedTapeCleansed: 0
   powerTier: 3
-  isTrashCard: 0
-  exhaustsOnUse: 0
+  exhaustsOnUse: 1
   exhaustsAtShiftEnd: 0
   effects:
   - {fileID: -9126909604860248107}

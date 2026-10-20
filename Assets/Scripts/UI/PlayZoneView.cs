@@ -1,4 +1,6 @@
 using UnityEngine;
+using TMPro;
+using ChiefComplaint.Core;
 using ChiefComplaint.Cards.Data;
 using ChiefComplaint.Cards.Interaction;
 
@@ -17,6 +19,12 @@ namespace ChiefComplaint.UI
         [Header("Colors")]
         public Color normalColor = new Color(1f, 1f, 1f, 0.3f);
         public Color highlightColor = new Color(0.8f, 1f, 0.5f, 0.6f);
+
+        [Header("Drag Preview")]
+        [Tooltip("World-space label showing what the dragged card gives when played here.")]
+        [SerializeField] private TextMeshPro previewText;
+        [SerializeField] private Color previewColor = Color.white;
+        [SerializeField] private Color warningColor = new Color(1f, 0.45f, 0.4f, 1f);
 
         [Header("Fade Settings")]
         public float fadeSpeed = 5f;
@@ -41,6 +49,7 @@ namespace ChiefComplaint.UI
             {
                 canvasGroup.alpha = 0f;
             }
+            ClearPreview();
         }
 
         private void OnEnable()
@@ -76,6 +85,7 @@ namespace ChiefComplaint.UI
                 {
                     canvasGroup.alpha = newAlpha;
                 }
+                SetPreviewAlpha(newAlpha);
             }
             else
             {
@@ -86,6 +96,7 @@ namespace ChiefComplaint.UI
                     targetColor.a = currentAlpha;
                     spriteRenderer.color = targetColor;
                 }
+                SetPreviewAlpha(targetAlpha);
             }
         }
 
@@ -107,6 +118,7 @@ namespace ChiefComplaint.UI
             if (!requiresTarget)
             {
                 isVisible = true;
+                SetPreview(card);
                 UpdateVisuals();
             }
         }
@@ -115,7 +127,57 @@ namespace ChiefComplaint.UI
         {
             isVisible = false;
             isHighlighted = false;
+            ClearPreview();
             UpdateVisuals();
+        }
+
+        /// <summary>
+        /// Fills the label with the card's play-zone results, or an affordability warning if it can't be played.
+        /// </summary>
+        private void SetPreview(ActionCardSO card)
+        {
+            if (previewText == null) return;
+
+            string text;
+            Color colour = previewColor;
+            var gm = GameManager.Instance;
+            if (gm != null && gm.CurrentAP < card.apCost)
+            {
+                text = "Not enough AP";
+                colour = warningColor;
+            }
+            else if (gm != null && !DraggableCard.CanAffordReputation(card.reputationCost, gm.CurrentReputation))
+            {
+                text = "Not enough Reputation";
+                colour = warningColor;
+            }
+            else
+            {
+                text = card.PlayZonePreview();
+            }
+
+            colour.a = previewText.color.a; // keep the current fade; Update drives the alpha
+            previewText.color = colour;
+            previewText.text = text;
+        }
+
+        private void ClearPreview()
+        {
+            if (previewText == null) return;
+            previewText.text = string.Empty;
+            SetPreviewAlpha(0f);
+        }
+
+        /// <summary>
+        /// The label fades with the zone but reads at full strength once the zone is at its normal alpha.
+        /// </summary>
+        private void SetPreviewAlpha(float zoneAlpha)
+        {
+            if (previewText == null) return;
+            float a = normalColor.a > 0f ? Mathf.Clamp01(zoneAlpha / normalColor.a) : (zoneAlpha > 0f ? 1f : 0f);
+            Color c = previewText.color;
+            c.a = a;
+            previewText.color = c;
         }
 
         public void SetHighlight(bool highlight)

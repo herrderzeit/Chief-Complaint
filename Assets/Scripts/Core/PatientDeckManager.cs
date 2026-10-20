@@ -265,6 +265,11 @@ namespace ChiefComplaint.Core
             }
         }
 
+        /// <summary>The highest escalation stage reached so far (unlocks supply-room piles, among other things).</summary>
+        public EscalationType CurrentEscalation =>
+            traumaTriggered ? EscalationType.TraumaFlight :
+            ambulanceTriggered ? EscalationType.Ambulance : EscalationType.WalkIn;
+
         /// <summary>
         /// Returns the name of the highest escalation phase reached so far.
         /// </summary>

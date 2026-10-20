@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a19c702a9b380a64ba00656724a44857, type: 3}
+  m_Name: Card_ShiftHandover
+  m_EditorClassIdentifier: GameScripts::ChiefComplaint.Cards.Data.ActionCardSO
+  cardName: Shift Handover
+  cardType: 5
+  tags: 05000000i
+  rulesText: Draw 2 cards.
+  flavorText: Bed 4 is fine, Bed 6 is not, and someone ate the last biscuit.
+  isPlayable: 1
+  successChance: 1
+  apCost: 1
+  reputationCost: 0
+  cardsToDraw: 2
+  powerTier: 1
+  exhaustsOnUse: 0
+  exhaustsAtShiftEnd: 0
+  effects: []
+  directDraftUpgrade: {fileID: 0}
+  draftUpgradeCost: 0
+  cardArt: {fileID: 0}

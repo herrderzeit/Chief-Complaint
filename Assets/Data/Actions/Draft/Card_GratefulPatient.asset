@@ -15,27 +15,15 @@ MonoBehaviour:
   cardName: Grateful Patient
   cardType: 0
   tags: 
-  rulesText: Gain 3 Reputation.
-  flavorText: They insisted on giving back after the incredible care their spouse
-    received in the ICU.
+  rulesText: Gain 3 Reputation. Exhausts.
+  flavorText: They insisted on giving back after the incredible care their spouse received in the ICU.
   isPlayable: 1
   successChance: 1
-  apCost: 0
-  apGenerated: 0
-  reputationGenerated: 3
-  isEitherOr: 0
-  altApGenerated: 0
-  isDiagnostic: 0
-  diagnosesSymptomTier: 3
-  pausesStabilityClock: 0
-  stabilisationHeal: 0
-  curesSymptomTier: 0
+  apCost: 1
+  reputationCost: 0
   cardsToDraw: 0
-  cleansesRedTape: 0
-  repBonusPerRedTapeCleansed: 0
   powerTier: 2
-  isTrashCard: 0
-  exhaustsOnUse: 0
+  exhaustsOnUse: 1
   exhaustsAtShiftEnd: 0
   effects:
   - {fileID: 3250616386878591184}

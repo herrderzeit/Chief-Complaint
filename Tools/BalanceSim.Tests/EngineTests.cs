@@ -160,12 +160,13 @@ namespace ChiefComplaint.Sim.Tests
             var data = Content(new[] { Doctor(), Nurse(), Doctor(), Nurse() }, Patient(EscalationType.WalkIn, 5, 10, 1, SymptomCategory.Trauma, SymptomCategory.Internal));
             var g = Start(data);
             Patient p = g.Patients.Single();
+            g.Apply(Find(g, ActionKind.Admit)); // Team Assessment needs a Ward bed
 
             g.PlayCard(g.Hand.First(c => c.HasTag(CardTag.Doctor)), null);
             Assert.Equal(Phase.Shift, g.Phase);
             g.PlayCard(g.Hand.First(c => c.HasTag(CardTag.Nurse)), null);
             Assert.Equal(Phase.TeamAssessment, g.Phase);
-            g.Apply(Find(g, ActionKind.TeamAssess)); // works even in Triage
+            g.Apply(Find(g, ActionKind.TeamAssess));
             Assert.Equal(1, p.DiagnosedCount);
             Assert.Equal(Phase.Shift, g.Phase);
 

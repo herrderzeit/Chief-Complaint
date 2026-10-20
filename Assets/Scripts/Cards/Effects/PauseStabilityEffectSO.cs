@@ -13,6 +13,7 @@ public override bool RequiresPatientTarget => true;
         public override bool RequiresCardTarget => false;
 
         // A patient waiting to be discharged at End Shift never decays again, so a pause would be wasted.
+        public override string Describe() => "Pause decay";
         public override bool CanApply(PatientCardView targetPatient, ActionCardView targetCard) =>
             targetPatient != null && !targetPatient.stabilityClockPaused && !targetPatient.isAwaitingDischarge;
 

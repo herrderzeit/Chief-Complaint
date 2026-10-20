@@ -81,6 +81,11 @@ namespace ChiefComplaint.Cards.Views
         /// Toggled active/inactive by <see cref="DraggableCard"/> to indicate a valid target.
         /// </summary>
         public GameObject highlightOutline;
+        [Tooltip("Outline colour while this patient is a valid target for the card being dragged (the hover colour is the outline's own).")]
+        public Color targetableOutlineColour = new Color(0.4f, 1f, 0.7f, 0.35f);
+        private bool hoverHighlighted;
+        private bool targetable;
+        private Color? outlineBaseColour;
 
         [Header("Visual Feedback")]
         /// <summary>
@@ -163,9 +168,36 @@ namespace ChiefComplaint.Cards.Views
         }
 
         /// <summary>
-        /// Instantiates one <see cref="SymptomSubCardView"/> per assigned symptom, arranged
-        /// in a centred horizontal row beneath the patient card. The highest tier (last in list)
-        /// is placed in the middle visually.
+        /// Horizontal slot (in sub-card widths) for each symptom: the primary (highest-tier) symptom always
+        /// sits in the centre slot (0), and the others fill the left (-1) then right (+1) slots in list order.
+        /// Placement follows tier rather than list position, so a paramedic handover (which moves the
+        /// primary to the front of the list) or a 2-symptom patient still shows the primary in the middle.
+        /// </summary>
+        public static int[] SubCardSlots(IReadOnlyList<SymptomTier> tiers)
+        {
+            int count = tiers.Count;
+            var slots = new int[count];
+            if (count == 0) return slots;
+
+            // Last occurrence of the highest tier is the primary (the sort keeps it last unless a handover moved it).
+            int primary = 0;
+            for (int i = 1; i < count; i++)
+                if (tiers[i] >= tiers[primary]) primary = i;
+
+            int side = -1;
+            for (int i = 0; i < count; i++)
+            {
+                if (i == primary) continue;
+                slots[i] = side;
+                // Left, right, then further out if a patient ever has more than 3 symptoms.
+                side = side < 0 ? -side : -side - 1;
+            }
+            return slots;
+        }
+
+        /// <summary>
+        /// Instantiates one <see cref="SymptomSubCardView"/> per assigned symptom in a row beneath the
+        /// patient card, with the primary (highest-tier) symptom in the centre (see <see cref="SubCardSlots"/>).
         /// </summary>
         /// <param name="prefab">The symptom sub-card prefab to instantiate.</param>
         private void SpawnSubCards(GameObject prefab)
@@ -174,28 +206,11 @@ namespace ChiefComplaint.Cards.Views
 
             float spacing = 0.9f;
             int count = assignedSymptoms.Count;
+            int[] slots = SubCardSlots(assignedTiers);
             for (int i = 0; i < count; i++)
             {
-                // Map the mechanical index to a visual position index.
-                // If 3 items: i=0 -> vis=0 (Left), i=1 -> vis=2 (Right), i=2 (Highest Tier) -> vis=1 (Middle)
-                int visualIndex = i;
-                if (count == 3)
-                {
-                    if (i == 0) visualIndex = 0;
-                    else if (i == 1) visualIndex = 2;
-                    else if (i == 2) visualIndex = 1;
-                }
-                else if (count == 4)
-                {
-                    // Just in case: Lowest to highest: Left, Right, Far Left, Middle
-                    if (i == 0) visualIndex = 0;
-                    else if (i == 1) visualIndex = 3;
-                    else if (i == 2) visualIndex = 1;
-                    else if (i == 3) visualIndex = 2;
-                }
+                Vector3 spawnPos = subCardSpawnParent.position + new Vector3(slots[i] * spacing, 0f, -0.05f);
 
-                Vector3 spawnPos = subCardSpawnParent.position + new Vector3((visualIndex - (count - 1) / 2f) * spacing, 0f, -0.05f);
-                
                 SymptomSubCardView subView = null;
                 if (BoardView.Instance != null)
                 {
@@ -799,10 +814,45 @@ namespace ChiefComplaint.Cards.Views
         /// <param name="isHighlighted"><c>true</c> to show the outline; <c>false</c> to hide it.</param>
         public void SetHighlight(bool isHighlighted)
         {
-            if (highlightOutline != null)
-            {
-                highlightOutline.SetActive(isHighlighted);
-            }
+            hoverHighlighted = isHighlighted;
+            RefreshOutline();
+        }
+
+        /// <summary>
+        /// Soft glow marking this patient as a valid target for the card being dragged. Separate from
+        /// <see cref="SetHighlight"/> (hover / picking), which shows the full outline on top.
+        /// </summary>
+        public void SetTargetable(bool isTargetable)
+        {
+            targetable = isTargetable;
+            RefreshOutline();
+        }
+
+        private void RefreshOutline()
+        {
+            if (highlightOutline == null) return;
+            var outline = highlightOutline.GetComponent<SpriteRenderer>();
+            if (outline != null && outlineBaseColour == null) outlineBaseColour = outline.color;
+
+            highlightOutline.SetActive(hoverHighlighted || targetable);
+            if (outline != null) outline.color = hoverHighlighted ? outlineBaseColour.Value : targetableOutlineColour;
+        }
+
+        /// <summary><c>true</c> if a diagnosis of up to <paramref name="maxTier"/> would reveal a symptom now (mirrors <see cref="TryDiagnoseNext"/>).</summary>
+        public bool CanDiagnoseWith(SymptomTier maxTier) =>
+            !isRemoved && !isFullyDiagnosed &&
+            transform.parent != null && transform.parent.CompareTag("WardSlot") &&
+            assignedTiers[diagnosedCount] <= maxTier;
+
+        /// <summary><c>true</c> if a treatment of up to <paramref name="maxTier"/> would cure a symptom now (mirrors <see cref="TryCureSymptom"/>).</summary>
+        public bool CanCureWith(SymptomTier maxTier)
+        {
+            if (isRemoved || isInSurgery || !isFullyDiagnosed || transform.parent == null) return false;
+            DepartmentSlot dept = transform.parent.GetComponent<DepartmentSlot>();
+            if (dept == null || !dept.isAvailable) return false;
+            for (int i = 0; i < assignedSymptoms.Count; i++)
+                if (assignedSymptoms[i].specialtyCategory == dept.category && assignedTiers[i] <= maxTier) return true;
+            return false;
         }
 
         // -------------------------------------------------------------------------

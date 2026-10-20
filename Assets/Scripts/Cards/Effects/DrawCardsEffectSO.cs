@@ -14,6 +14,7 @@ namespace ChiefComplaint.Cards.Effects
         public override bool RequiresPatientTarget => false;
         public override bool RequiresCardTarget => false;
 
+        public override string Describe() => $"+{cardsToDraw} Card{(cardsToDraw == 1 ? "" : "s")}";
         public override bool CanApply(PatientCardView targetPatient, ActionCardView targetCard) => DeckManager.Instance != null;
 
         public override bool Apply(PatientCardView targetPatient, ActionCardView targetCard, bool rngFailed, Vector3 mousePos)

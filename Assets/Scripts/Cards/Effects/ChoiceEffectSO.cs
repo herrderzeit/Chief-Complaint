@@ -31,6 +31,16 @@ namespace ChiefComplaint.Cards.Effects
         public override bool RequiresCardTarget =>
             (optionA != null && optionA.RequiresCardTarget) || (optionB != null && optionB.RequiresCardTarget);
 
+        public override string Describe() => JoinOptions(optionA != null ? optionA.Describe() : null, optionB != null ? optionB.Describe() : null);
+        // On the play zone only the option that needs no target applies.
+        public override string DescribeOnPlayZone() =>
+            JoinOptions(optionA != null ? optionA.DescribeOnPlayZone() : null, optionB != null ? optionB.DescribeOnPlayZone() : null);
+        public override bool IsValidTarget(PatientCardView patient) =>
+            (optionA != null && optionA.IsValidTarget(patient)) || (optionB != null && optionB.IsValidTarget(patient));
+
+        private static string JoinOptions(string a, string b) =>
+            string.IsNullOrEmpty(a) ? b : string.IsNullOrEmpty(b) ? a : $"{a} or {b}";
+
         public override bool CanApply(PatientCardView targetPatient, ActionCardView targetCard) =>
             CanUse(optionA, targetPatient, targetCard) || CanUse(optionB, targetPatient, targetCard);
 

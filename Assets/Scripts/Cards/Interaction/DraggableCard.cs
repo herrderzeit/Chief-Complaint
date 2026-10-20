@@ -30,6 +30,32 @@ namespace ChiefComplaint.Cards.Interaction
         /// <summary>Raised when a card has been played successfully (after its AP is paid), with where it was played.</summary>
         public static event System.Action<ActionCardSO, Vector3> OnCardPlayed;
 
+        /// <summary>
+        /// Glows every patient the card could be played on (or clears the glow when <paramref name="card"/> is null).
+        /// Nothing glows if the card can't be afforded.
+        /// </summary>
+        private static void ShowValidTargets(ActionCardSO card)
+        {
+            var gm = GameManager.Instance;
+            var board = gm != null ? gm.boardManager : null;
+            if (board == null) return;
+
+            bool affordable = card != null && card.isPlayable && gm.CurrentAP >= card.apCost &&
+                              CanAffordReputation(card.reputationCost, gm.CurrentReputation);
+            foreach (var patient in board.ActivePatients)
+            {
+                if (patient == null) continue;
+                bool valid = false;
+                if (affordable)
+                    foreach (var effect in card.effects)
+                        if (effect != null && effect.IsValidTarget(patient)) { valid = true; break; }
+                patient.SetTargetable(valid);
+            }
+        }
+
+        /// <summary><c>true</c> if a card costing <paramref name="cost"/> Reputation may be played: Reputation must stay above 0 afterwards.</summary>
+        public static bool CanAffordReputation(int cost, int currentReputation) => cost <= 0 || currentReputation > cost;
+
         private bool isDragging = false;
         private Vector3 offset;
         private Vector3 originalLocalPosition;
@@ -129,6 +155,7 @@ namespace ChiefComplaint.Cards.Interaction
 
             if (actionView != null && actionView.currentCardData != null)
             {
+                ShowValidTargets(actionView.currentCardData);
                 OnCardDragStarted?.Invoke(actionView.currentCardData);
             }
         }
@@ -214,6 +241,7 @@ namespace ChiefComplaint.Cards.Interaction
         {
             if (!isDragging) return;
             isDragging = false;
+            ShowValidTargets(null);
             OnCardDragEnded?.Invoke();
             
             if (HandView.Instance != null) HandView.Instance.isDraggingCard = false;
@@ -237,6 +265,16 @@ namespace ChiefComplaint.Cards.Interaction
                 if (GameManager.Instance == null || GameManager.Instance.CurrentAP < cardData.apCost)
                 {
                     GameFeedback.WarnAt("NOT ENOUGH AP!", transform.position);
+                    ClearHighlights();
+                    transform.localPosition = originalLocalPosition;
+                    if (isHovering) ApplyHoverState();
+                    return;
+                }
+
+                // Reputation gate: a Reputation cost may never be what ends the run.
+                if (!CanAffordReputation(cardData.reputationCost, GameManager.Instance.CurrentReputation))
+                {
+                    GameFeedback.WarnAt("NOT ENOUGH REPUTATION!", transform.position);
                     ClearHighlights();
                     transform.localPosition = originalLocalPosition;
                     if (isHovering) ApplyHoverState();
@@ -301,6 +339,12 @@ namespace ChiefComplaint.Cards.Interaction
                     }
 
                     GameManager.Instance.SpendAP(cardData.apCost);
+                    if (cardData.reputationCost > 0)
+                    {
+                        // Paid only now that an effect has landed, so a fizzled card costs no Reputation.
+                        GameManager.Instance.SpendReputation(cardData.reputationCost);
+                        GameFeedback.ShowAt($"-{cardData.reputationCost} Rep", GetMouseWorldPosition(), GameFeedback.WarningColour);
+                    }
                     OnCardPlayed?.Invoke(cardData, GetMouseWorldPosition());
                     
                     if (HandView.Instance != null) HandView.Instance.RemoveCardVisual(gameObject);

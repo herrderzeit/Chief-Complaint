@@ -25,7 +25,7 @@ MonoBehaviour:
   startingStability: 5
   stabilityDecayPerTurn: 3
   arrivesWithHandover: 1
-  reputationReward: 6
+  reputationReward: 3
   triggers:
   - condition: 2
     effect: 4

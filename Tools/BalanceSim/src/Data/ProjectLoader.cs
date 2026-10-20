@@ -95,7 +95,28 @@ namespace ChiefComplaint.Sim.Data
             else data.Warnings.Add("DeckManager not found in scene; empty starting deck.");
 
             if (draftManager != null)
-                data.DraftPool = draftManager.GetRefList("draftableCardsPool").Select(LoadCard).Where(x => x != null).ToList();
+            {
+                foreach (var map in draftManager.GetMapList("supplyPiles"))
+                {
+                    if (!map.TryGetValue("card", out string cardRef) || !UnityRef.TryParse(cardRef, out UnityRef r)) continue;
+                    CardDef card = LoadCard(r);
+                    if (card == null) continue;
+                    data.SupplyPiles.Add(new SupplyPileDef
+                    {
+                        Card = card,
+                        UnlockAt = map.TryGetValue("unlockAt", out string u) && int.TryParse(u, out int ui) ? (EscalationType)ui : EscalationType.WalkIn,
+                        MaxStock = map.TryGetValue("maxStock", out string m) && int.TryParse(m, out int mi) ? Math.Max(1, mi) : 3
+                    });
+                }
+                if (data.SupplyPiles.Count == 0)
+                {
+                    // Older scenes: the random-roll pool, treated as open piles of 3.
+                    foreach (CardDef card in draftManager.GetRefList("draftableCardsPool").Select(LoadCard).Where(x => x != null))
+                        data.SupplyPiles.Add(new SupplyPileDef { Card = card });
+                    if (data.SupplyPiles.Count > 0) data.Warnings.Add("DraftManager has no supplyPiles; using draftableCardsPool as open piles of 3.");
+                }
+                data.DraftPool = data.SupplyPiles.Select(sp => sp.Card).ToList();
+            }
 
             if (boardView != null)
             {
@@ -185,6 +206,7 @@ namespace ChiefComplaint.Sim.Data
             card.IsPlayable = doc.GetBool("isPlayable", true);
             card.SuccessChance = doc.GetFloat("successChance", 1f);
             card.ApCost = doc.GetInt("apCost");
+            card.ReputationCost = doc.GetInt("reputationCost");
             card.CardsToDraw = doc.GetInt("cardsToDraw");
             card.PowerTier = doc.GetInt("powerTier", 1);
             card.ExhaustsOnUse = doc.GetBool("exhaustsOnUse");
@@ -224,6 +246,7 @@ namespace ChiefComplaint.Sim.Data
                 case "CureSymptomEffectSO": return new CureEffect { MaxTier = doc.GetInt("curesSymptomTier", 3) };
                 case "StabilisationHealEffectSO": return new HealEffect { Amount = doc.GetInt("healAmount", 1) };
                 case "PauseStabilityEffectSO": return new PauseEffect();
+                case "TrashCardEffectSO": return new TrashEffect();
                 case "CleanseRedTapeEffectSO": return new CleanseRedTapeEffect { RepPerCard = doc.GetInt("repBonusPerRedTapeCleansed", 1) };
                 case "EitherOrEffectSO":
                     return new EitherOrEffect { Reputation = doc.GetInt("reputationGenerated", 1), Ap = doc.GetInt("altApGenerated", 1) };
@@ -285,6 +308,7 @@ namespace ChiefComplaint.Sim.Data
                 Categories = doc.GetPackedIntList("incomingCategories").Take(3).Select(x => (SymptomCategory)x).ToList(),
                 Tags = doc.GetList("clinicalTags"),
                 StartingStability = doc.GetInt("startingStability", 10),
+                ArrivesWithHandover = doc.GetBool("arrivesWithHandover"),
                 DecayPerTurn = doc.GetInt("stabilityDecayPerTurn", 1),
                 ReputationReward = doc.GetInt("reputationReward", 2)
             };

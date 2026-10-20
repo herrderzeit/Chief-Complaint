@@ -14,10 +14,10 @@ using ChiefComplaint.Utils;
 namespace ChiefComplaint.Drafting
 {
     /// <summary>
-    /// Controls the inter-shift draft/market phase. Rolls three random cards from the
-    /// draftable pool, prices them dynamically via <see cref="ActionCardSO.CalculateDraftValue"/>,
-    /// and manages a shopping-cart of pending purchases that are committed to the deck
-    /// when the player closes the panel.
+    /// Controls the inter-shift draft phase: the "supply room" market. Every draftable card has a pile with
+    /// limited stock (<see cref="SupplyRoom"/>); piles unlock as the run escalates and restock between drafts.
+    /// Prices come from <see cref="ActionCardSO.CalculateDraftValue"/>. Bought copies wait in a cart (Funding
+    /// already spent, refundable) and join the discard pile when the next shift starts.
     /// </summary>
     [UnityEngine.Scripting.APIUpdating.MovedFrom(true, null, null, null)]
     public class DraftManager : MonoBehaviour
@@ -29,17 +29,19 @@ namespace ChiefComplaint.Drafting
         public Transform marketContainer;
         public GameObject endShiftButton;
 
-        [Header("Market Data")]
-        public List<ActionCardSO> draftableCardsPool;
+        [Header("Supply Room")]
+        [Tooltip("One entry per pile: the card, the escalation stage that unlocks it, and its maximum stock.")]
+        public List<SupplyPileConfig> supplyPiles = new List<SupplyPileConfig>();
 
-        // Single source of truth for how many cards appear in the market each draft.
-        private const int MARKET_SIZE = 5;
+        /// <summary>Raised whenever pile stock, the cart or unlocks change (for UI and audio).</summary>
+        public event System.Action OnSupplyChanged;
 
-        private List<ActionCardSO> currentOfferedCards = new List<ActionCardSO>();
-        private int[] currentCosts = new int[MARKET_SIZE];
-        private bool[] isSlotPurchased = new bool[MARKET_SIZE];
+        private SupplyRoom supplyRoom;
         private readonly List<DraftMarketCardView> marketCards = new List<DraftMarketCardView>();
-        private List<ActionCardSO> pendingPurchases = new List<ActionCardSO>();
+        private readonly List<ActionCardSO> boughtBuffer = new List<ActionCardSO>();
+
+        /// <summary>The supply room's runtime state (null until the first draft opens).</summary>
+        public SupplyRoom Supply => supplyRoom;
 
         // -------------------------------------------------------------------------
         // Event Listeners
@@ -73,8 +75,8 @@ namespace ChiefComplaint.Drafting
         // -------------------------------------------------------------------------
 
         /// <summary>
-        /// Opens the draft panel and rolls a fresh market of five cards.
-        /// Clears any leftover pending purchases from a previous draft.
+        /// Opens the draft panel: unlocks piles for the escalation stage reached, restocks open piles and
+        /// rebuilds the market cards.
         /// </summary>
         public void OpenDraftPhase()
         {
@@ -83,34 +85,30 @@ namespace ChiefComplaint.Drafting
                 endShiftButton.SetActive(false);
             }
             draftPanel.SetActive(true);
-            pendingPurchases.Clear();
-            RollMarketCards();
+
+            supplyRoom ??= new SupplyRoom(supplyPiles);
+            var reached = PatientDeckManager.Instance != null ? PatientDeckManager.Instance.CurrentEscalation : EscalationType.WalkIn;
+            supplyRoom.OpenDraft(reached);
+
+            BuildMarketCards();
+            OnSupplyChanged?.Invoke();
         }
 
-        /// <summary>
-        /// Rolls five random cards for the market, prices them via <see cref="ActionCardSO.CalculateDraftValue"/>
-        /// and spawns a <see cref="DraftMarketCardView"/> for each.
-        /// </summary>
-        private void RollMarketCards()
+        /// <summary>Spawns one <see cref="DraftMarketCardView"/> per pile, in the order the piles are configured.</summary>
+        private void BuildMarketCards()
         {
-            currentOfferedCards.Clear();
             foreach (var old in marketCards) if (old != null) Destroy(old.gameObject);
             marketCards.Clear();
+            if (marketCardPrefab == null || marketContainer == null) return;
 
-            for (int i = 0; i < MARKET_SIZE; i++)
+            for (int i = 0; i < supplyRoom.Piles.Count; i++)
             {
-                ActionCardSO rolledCard = draftableCardsPool[Random.Range(0, draftableCardsPool.Count)];
-                currentOfferedCards.Add(rolledCard);
-                isSlotPurchased[i] = false;
-                currentCosts[i] = rolledCard.CalculateDraftValue();
-
-                if (marketCardPrefab == null || marketContainer == null) continue;
+                var pile = supplyRoom.Piles[i];
                 DraftMarketCardView view = Instantiate(marketCardPrefab, marketContainer);
-                int slotIndex = i; // captured for the click callback
-                view.Setup(rolledCard, currentCosts[i], () => TogglePurchase(slotIndex));
+                int index = i; // captured for the click callbacks
+                view.Setup(pile.Card, pile.Price, () => Buy(index), () => Undo(index));
                 marketCards.Add(view);
             }
-
             RefreshAffordability();
         }
 
@@ -118,41 +116,33 @@ namespace ChiefComplaint.Drafting
         // Purchase Logic
         // -------------------------------------------------------------------------
 
-        /// <summary>
-        /// Toggles the purchase state of a market slot.
-        /// On first click: spends Activity Funding and adds the card to the pending cart (greyed button).
-        /// On second click: refunds the Funding and removes the card from the cart.
-        /// </summary>
-        /// <param name="slotIndex">Zero-based index of the market slot (0–4).</param>
-        public void TogglePurchase(int slotIndex)
+        /// <summary>Buys one copy from a pile into the cart, spending its Funding. Ignored if locked, empty or unaffordable.</summary>
+        public void Buy(int pileIndex)
         {
-            ActionCardSO cardToBuy = currentOfferedCards[slotIndex];
-            int cost = currentCosts[slotIndex];
+            if (supplyRoom == null || pileIndex < 0 || pileIndex >= supplyRoom.Piles.Count) return;
+            var pile = supplyRoom.Piles[pileIndex];
+            if (!pile.Unlocked || pile.Stock <= 0) return;
 
-            if (!isSlotPurchased[slotIndex])
+            if (!GameManager.Instance.TrySpendFunding(pile.Price))
             {
-                if (GameManager.Instance.TrySpendFunding(cost))
-                {
-                    pendingPurchases.Add(cardToBuy);
-                    isSlotPurchased[slotIndex] = true;
-
-                    Debug.Log($"Reserved {cardToBuy.cardName} for {cost} Funding!");
-                }
-                else
-                {
-                    Debug.Log("Not enough Funding!");
-                }
+                GameLog.Info("Not enough Funding!");
+                return;
             }
-            else
-            {
-                GameManager.Instance.AddFunding(cost);
-                pendingPurchases.Remove(cardToBuy);
-                isSlotPurchased[slotIndex] = false;
-
-                Debug.Log($"Refunded {cardToBuy.cardName}, gained {cost} Funding back!");
-            }
-
+            supplyRoom.TryReserve(pileIndex);
+            GameLog.Info($"Reserved {pile.Card.cardName} for {pile.Price} Funding.");
             RefreshAffordability();
+            OnSupplyChanged?.Invoke();
+        }
+
+        /// <summary>Returns one copy from the cart to its pile and refunds its Funding.</summary>
+        public void Undo(int pileIndex)
+        {
+            if (supplyRoom == null || !supplyRoom.TryUnreserve(pileIndex)) return;
+            var pile = supplyRoom.Piles[pileIndex];
+            GameManager.Instance.AddFunding(pile.Price);
+            GameLog.Info($"Refunded {pile.Card.cardName}, {pile.Price} Funding back.");
+            RefreshAffordability();
+            OnSupplyChanged?.Invoke();
         }
 
         /// <summary>
@@ -161,12 +151,14 @@ namespace ChiefComplaint.Drafting
         /// </summary>
         public void CloseDraftAndStartShift()
         {
-            foreach (ActionCardSO card in pendingPurchases)
+            boughtBuffer.Clear();
+            supplyRoom?.CommitCart(boughtBuffer);
+            foreach (ActionCardSO card in boughtBuffer)
             {
                 DeckManager.Instance.AddCardToDiscardPile(card);
-                Debug.Log($"COMMITTED: Added {card.cardName} to deck.");
+                GameLog.Info($"COMMITTED: Added {card.cardName} to deck.");
             }
-            pendingPurchases.Clear();
+            boughtBuffer.Clear();
 
             draftPanel.SetActive(false);
             if (endShiftButton != null)
@@ -180,19 +172,27 @@ namespace ChiefComplaint.Drafting
         // Helpers
         // -------------------------------------------------------------------------
 
-        /// <summary>
-        /// Updates each market card for its purchase status and the player's current Activity Funding.
-        /// </summary>
+        /// <summary>Updates every pile's view for its lock state, stock, cart and the player's current Funding.</summary>
         private void RefreshAffordability()
         {
+            if (supplyRoom == null) return;
             int funding = GameManager.Instance != null ? GameManager.Instance.CurrentFunding : 0;
-            for (int i = 0; i < marketCards.Count; i++)
+            for (int i = 0; i < marketCards.Count && i < supplyRoom.Piles.Count; i++)
             {
                 if (marketCards[i] == null) continue;
-                // Mirror the purchase guard: affordable if the Funding balance covers the cost.
-                marketCards[i].SetState(isSlotPurchased[i], funding >= currentCosts[i]);
+                var pile = supplyRoom.Piles[i];
+                marketCards[i].SetPileState(pile.Unlocked, StageLabel(pile.Config.unlockAt), pile.Stock,
+                    pile.Config.maxStock, pile.InCart, funding >= pile.Price);
             }
         }
+
+        /// <summary>Player-facing name of an escalation stage, as used on locked piles.</summary>
+        public static string StageLabel(EscalationType stage) => stage switch
+        {
+            EscalationType.Ambulance => "Ambulances",
+            EscalationType.TraumaFlight => "Trauma Flights",
+            _ => "Walk-Ins"
+        };
     }
 
 }

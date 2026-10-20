@@ -18,6 +18,8 @@ namespace ChiefComplaint.Cards.Effects
         public override bool RequiresPatientTarget => false;
         public override bool RequiresCardTarget => false;
 
+        public override string Describe() =>
+            patientEffect != null && !string.IsNullOrEmpty(patientEffect.Describe()) ? $"Ward: {patientEffect.Describe()} each" : null;
         public override bool CanApply(PatientCardView targetPatient, ActionCardView targetCard)
         {
             if (patientEffect == null) return false;

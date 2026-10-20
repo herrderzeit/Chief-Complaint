@@ -14,6 +14,7 @@ public int repBonusPerRedTapeCleansed = 1;
         public override bool RequiresPatientTarget => false;
         public override bool RequiresCardTarget => false;
 
+        public override string Describe() => "Cleanse Red Tape";
         public override bool CanApply(PatientCardView targetPatient, ActionCardView targetCard) => true;
 
         public override bool Apply(PatientCardView targetPatient, ActionCardView targetCard, bool rngFailed, Vector3 mousePos)

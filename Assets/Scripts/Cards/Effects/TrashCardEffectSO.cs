@@ -12,6 +12,7 @@ namespace ChiefComplaint.Cards.Effects
 public override bool RequiresPatientTarget => false;
         public override bool RequiresCardTarget => true;
 
+        public override string Describe() => "Trash a card in hand";
         public override bool CanApply(PatientCardView targetPatient, ActionCardView targetCard) => targetCard != null;
 
         public override bool Apply(PatientCardView targetPatient, ActionCardView targetCard, bool rngFailed, Vector3 mousePos)

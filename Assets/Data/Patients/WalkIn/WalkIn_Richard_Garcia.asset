@@ -20,9 +20,10 @@ MonoBehaviour:
   - Minor
   escalationPhase: 0
   triageLevel: 4
-  incomingCategories: 03000000
+  incomingCategories: 03000000i
   startingStability: 11
   stabilityDecayPerTurn: 1
-  reputationReward: 1
+  arrivesWithHandover: 0
+  reputationReward: 0
   triggers: []
   portraitSprite: {fileID: 0}

@@ -14,6 +14,7 @@ public int reputationGenerated = 1;
         public override bool RequiresPatientTarget => false;
         public override bool RequiresCardTarget => false;
 
+        public override string Describe() => reputationGenerated >= 0 ? $"+{reputationGenerated} Rep" : $"{reputationGenerated} Rep";
         public override bool CanApply(PatientCardView targetPatient, ActionCardView targetCard) => true;
 
         public override bool Apply(PatientCardView targetPatient, ActionCardView targetCard, bool rngFailed, Vector3 mousePos)

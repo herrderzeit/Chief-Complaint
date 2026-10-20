@@ -68,6 +68,10 @@ namespace ChiefComplaint.Cards.Data
     [Range(0, 5)]
     public int apCost = 0;
 
+    [Min(0)]
+    [Tooltip("Reputation paid when the card is played. All or nothing: the card can't be played unless Reputation is above this cost, and it is only paid if the card's effect lands.")]
+    public int reputationCost = 0;
+
     [Header("Card Draw & Hand Manipulation")]
     [Tooltip("How many cards the player draws when this card is played.")]
     public int cardsToDraw;
@@ -111,6 +115,26 @@ namespace ChiefComplaint.Cards.Data
     /// RedTape cards always return 0. All other results are clamped to a minimum of 2.
     /// </summary>
     /// <returns>The Funding cost to purchase this card during a draft phase.</returns>
+    /// <summary>
+    /// What playing this card on the play zone gives, one result per line (e.g. "+3 AP" / "-2 Rep"), for the
+    /// drag preview. Empty if the card does nothing without a target.
+    /// </summary>
+    public string PlayZonePreview()
+    {
+        var lines = new System.Collections.Generic.List<string>();
+        foreach (var effect in effects)
+        {
+            if (effect == null) continue;
+            string text = effect.DescribeOnPlayZone();
+            if (!string.IsNullOrEmpty(text)) lines.Add(text);
+        }
+        if (cardsToDraw > 0) lines.Add($"+{cardsToDraw} Card{(cardsToDraw == 1 ? "" : "s")}");
+        if (reputationCost > 0) lines.Add($"-{reputationCost} Rep");
+        if (exhaustsOnUse && lines.Count > 0) lines.Add("Exhausts");
+        if (lines.Count > 0 && successChance < 1f) lines.Add($"{Mathf.RoundToInt(successChance * 100f)}% chance");
+        return string.Join("\n", lines);
+    }
+
     public int CalculateDraftValue()
     {
         int cost = cardType switch

@@ -25,7 +25,8 @@ MonoBehaviour:
   incomingCategories: 0000000000000000i
   startingStability: 7
   stabilityDecayPerTurn: 2
-  reputationReward: 5
+  arrivesWithHandover: 0
+  reputationReward: 1
   triggers:
   - condition: 1
     effect: 8
