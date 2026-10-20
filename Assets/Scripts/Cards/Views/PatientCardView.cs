@@ -242,7 +242,7 @@ namespace ChiefComplaint.Cards.Views
 
             if (transform.parent == null || !transform.parent.CompareTag("WardSlot"))
             {
-                GameFeedback.WarnAt("Move to Admission Ward first!", transform.position);
+                GameFeedback.WarnAt("Move to the Ward first!", transform.position);
                 return false;
             }
 
