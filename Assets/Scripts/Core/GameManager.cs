@@ -34,6 +34,8 @@ namespace ChiefComplaint.Core
     /// shift loop, and delegates board/draft phase control to its sub-managers.
     /// </summary>
     [UnityEngine.Scripting.APIUpdating.MovedFrom(true, null, null, null)]
+    // Runs before the other managers so its Instance exists when they register in Awake.
+    [DefaultExecutionOrder(-100)]
     public class GameManager : Singleton<GameManager>
     {
         /// <summary>PlayerPrefs key set once the player has completed or skipped the tutorial.</summary>

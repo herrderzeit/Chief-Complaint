@@ -23,8 +23,9 @@ namespace ChiefComplaint.Bureaucracy
 
         private static readonly Color CitationColour = new Color(1f, 0.55f, 0.2f);
 
-        private void Start()
+        protected override void Awake()
         {
+            base.Awake();
             if (GameManager.Instance != null) GameManager.Instance.OnShiftStarted += HandleShiftStarted;
         }
 

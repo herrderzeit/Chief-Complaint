@@ -55,6 +55,12 @@ namespace ChiefComplaint.Cards.Views
         /// <summary>Raised when this card is destroyed for any reason (death, discharge or scene teardown).</summary>
         public event System.Action<PatientCardView> OnRemoved;
 
+        /// <summary>Raised whenever a symptom is successfully treated, with the department it was treated in.</summary>
+        public static event System.Action<PatientCardView, SymptomCategory> OnSymptomTreated;
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetStatics() => OnSymptomTreated = null;
+
         /// <summary>Raised after stability is restored by a heal, so listeners (e.g. the Code Blue counter) can refresh.</summary>
         public event System.Action<PatientCardView> OnStabilityChanged;
 
@@ -441,6 +447,8 @@ namespace ChiefComplaint.Cards.Views
                 {
                     deptZone.MarkAsUsed();
                 }
+
+                OnSymptomTreated?.Invoke(this, currentDepartment.Value);
 
                 // Stay in the department for the rest of the shift. When the shift ends the patient
                 // is discharged (all symptoms treated) or sent back to their bed.

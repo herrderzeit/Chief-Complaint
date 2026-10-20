@@ -5149,6 +5149,8 @@ GameObject:
   m_Component:
   - component: {fileID: 775658915}
   - component: {fileID: 775658916}
+  - component: {fileID: 775658918}
+  - component: {fileID: 775658917}
   m_Layer: 0
   m_Name: BureaucracyManager
   m_TagString: Untagged
@@ -5185,6 +5187,41 @@ MonoBehaviour:
   m_EditorClassIdentifier: GameScripts::ChiefComplaint.Bureaucracy.CitationManager
   warningsPerShift: 2
   fineAmount: 3
+--- !u!114 &775658917
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 775658914}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08b42d13d59739c4d881311eb73e624d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameScripts::ChiefComplaint.Bureaucracy.MorningBriefing
+  skipFirstShift: 0
+--- !u!114 &775658918
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 775658914}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2bac8062e1ddd004db4e0c4047d4ccfb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameScripts::ChiefComplaint.Bureaucracy.DirectiveManager
+  pool:
+  - {fileID: 11400000, guid: c6207dade09c3ed4f8a967332c1e255f, type: 2}
+  - {fileID: 11400000, guid: 520cf0afbc58d124a96b1906da06b3d6, type: 2}
+  - {fileID: 11400000, guid: 7e7e081e591535b45827f53e9ff1f59b, type: 2}
+  - {fileID: 11400000, guid: 3e08a7bd6cb87c040b6c5306bc206778, type: 2}
+  - {fileID: 11400000, guid: e0846ec3faa697a4b8ee9a67345d913a, type: 2}
+  - {fileID: 11400000, guid: 71697cd849ef03a42a9982122bacf0fa, type: 2}
+  - {fileID: 11400000, guid: d9f122ab55cf94e488dcf8971c495829, type: 2}
+  - {fileID: 11400000, guid: b939682ebafa5b54abe710287087394b, type: 2}
+  firstDirectiveShift: 2
 --- !u!1 &779142174
 GameObject:
   m_ObjectHideFlags: 0

@@ -83,6 +83,28 @@ namespace ChiefComplaint.Tests.EditMode
             Assert.IsFalse(done);
         }
 
+        // ---------------------------------------------------------------- Directives
+
+        [Test]
+        public void DirectivePicker_NeverRepeatsThePreviousDirective()
+        {
+            var a = ScriptableObject.CreateInstance<DirectiveSO>();
+            var b = ScriptableObject.CreateInstance<DirectiveSO>();
+            var pool = new List<DirectiveSO> { a, b };
+            try
+            {
+                for (int i = 0; i < 2; i++)
+                    Assert.AreSame(b, DirectivePicker.Pick(pool, a, n => i % n));
+            }
+            finally { Object.DestroyImmediate(a); Object.DestroyImmediate(b); }
+        }
+
+        [Test]
+        public void DirectivePicker_EmptyPoolGivesNoDirective()
+        {
+            Assert.IsNull(DirectivePicker.Pick(new List<DirectiveSO>(), null));
+        }
+
         // ---------------------------------------------------------------- Cost modifiers
 
         [Test]
