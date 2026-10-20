@@ -367,6 +367,13 @@ namespace ChiefComplaint.Cards.Views
         {
             if (transform.parent == null) return false;
 
+            // 0. Already treated this shift: stays in surgery until the shift ends.
+            if (isInSurgery)
+            {
+                GameFeedback.WarnAt("Patient is in surgery until the shift ends!", transform.position);
+                return false;
+            }
+
             // 1. Must be fully diagnosed before ANY treatment can happen
             if (!isFullyDiagnosed)
             {
@@ -380,7 +387,7 @@ namespace ChiefComplaint.Cards.Views
 
             if (currentDepartment == null)
             {
-                GameFeedback.WarnAt("Move to a Specialty Ward first!", transform.position);
+                GameFeedback.WarnAt("Move to a department first!", transform.position);
                 return false;
             }
 

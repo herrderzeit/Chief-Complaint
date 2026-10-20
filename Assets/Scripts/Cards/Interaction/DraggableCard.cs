@@ -271,6 +271,13 @@ namespace ChiefComplaint.Cards.Interaction
                     }
                 }
 
+                // A playable card with no effects (e.g. Red Tape such as Prior Authorization) is
+                // resolved by paying its AP on the play zone, which lets it exhaust as its text says.
+                if (cardData.effects.Count == 0 && hoveredPlayZone != null)
+                {
+                    effectApplied = true;
+                }
+
                 ClearHighlights();
 
                 // --- 4. Finalise ---
