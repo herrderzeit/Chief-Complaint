@@ -15,7 +15,7 @@ namespace ChiefComplaint.Bureaucracy
     public class AccreditationManager : Singleton<AccreditationManager>
     {
         [Tooltip("Treatments needed in a department to accredit it.")]
-        [Min(1)] public int treatmentsToAccredit = 4;
+        [Min(1)] public int treatmentsToAccredit = 3;
         [Tooltip("AP discount on an accredited department's fallback treatment button.")]
         [Min(0)] public int fallbackDiscount = 1;
 

@@ -237,8 +237,8 @@ namespace ChiefComplaint.Tests.EditMode
         // ---------------------------------------------------------------- Upkeep
 
         [TestCase(0, 0, 1, 0)]
-        [TestCase(2, 3, 1, 3)]   // staff 2 + supplies 1
-        [TestCase(5, 4, 3, 7)]   // staff capped at 3 + supplies 2 + maintenance 2
+        [TestCase(3, 3, 1, 3)]   // staff 2 (3 patients, rounded up) + supplies 1
+        [TestCase(5, 4, 4, 6)]   // staff capped at 2 + supplies 2 + maintenance 2 (every 4th shift)
         public void Upkeep_BillTotals(int patients, int treatments, int shift, int expectedTotal)
         {
             int total = 0;
@@ -249,11 +249,11 @@ namespace ChiefComplaint.Tests.EditMode
         [Test]
         public void Upkeep_PaysInPriorityOrderUntilMoneyRunsOut()
         {
-            var bills = UpkeepRules.BillsFor(3, 4, 3); // staff 3, supplies 2, maintenance 2
+            var bills = UpkeepRules.BillsFor(4, 4, 4); // staff 2, supplies 2, maintenance 2
 
-            var unpaid = UpkeepRules.PayInOrder(bills, 4, out int spent);
+            var unpaid = UpkeepRules.PayInOrder(bills, 3, out int spent);
 
-            Assert.AreEqual(3, spent, "Staff (3) is paid; supplies (2) no longer fits in the remaining 1.");
+            Assert.AreEqual(2, spent, "Staff (2) is paid; supplies (2) no longer fits in the remaining 1.");
             Assert.AreEqual(2, unpaid.Count);
             Assert.AreEqual(BillType.Supplies, unpaid[0].type);
             Assert.AreEqual(BillType.Maintenance, unpaid[1].type);

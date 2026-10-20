@@ -22,7 +22,7 @@ namespace ChiefComplaint.Bureaucracy
         [Tooltip("Funding bonus for passing every criterion.")]
         public int passBonusFunding = 8;
         [Tooltip("Reputation lost for failing an inspection.")]
-        public int failReputationPenalty = 8;
+        public int failReputationPenalty = 5;
 
         public int InspectionNumber { get; private set; } = 1;
         public int NextInspectionShift { get; private set; }

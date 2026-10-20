@@ -5400,7 +5400,7 @@ MonoBehaviour:
   interval: 5
   revealLeadShifts: 2
   passBonusFunding: 8
-  failReputationPenalty: 8
+  failReputationPenalty: 5
 --- !u!114 &775658921
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5459,7 +5459,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 630d42541c56eff42a33383a3007c8b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: GameScripts::ChiefComplaint.Bureaucracy.AccreditationManager
-  treatmentsToAccredit: 4
+  treatmentsToAccredit: 3
   fallbackDiscount: 1
 --- !u!1 &779142174
 GameObject:

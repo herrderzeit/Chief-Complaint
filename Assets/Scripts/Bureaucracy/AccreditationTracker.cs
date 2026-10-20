@@ -6,7 +6,7 @@ namespace ChiefComplaint.Bureaucracy
     /// <summary>Pure accreditation rules: each department is accredited after enough treatments in it.</summary>
     public class AccreditationTracker
     {
-        public int threshold = 4;
+        public int threshold = 3;
 
         private readonly Dictionary<SymptomCategory, int> treatments = new Dictionary<SymptomCategory, int>();
 

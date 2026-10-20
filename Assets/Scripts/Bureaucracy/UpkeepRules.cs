@@ -34,15 +34,15 @@ namespace ChiefComplaint.Bureaucracy
     public static class UpkeepRules
     {
         /// <summary>
-        /// Staff overtime = 1 per patient on the board (max 3); supplies = 1 per 2 treatments this shift;
-        /// maintenance = 2 every 3rd shift. Zero-cost bills are left out. Listed in payment priority order.
+        /// Staff overtime = 1 per 2 patients on the board, rounded up (max 2); supplies = 1 per 2 treatments
+        /// this shift; maintenance = 2 every 4th shift. Zero-cost bills are left out. Listed in payment priority order.
         /// </summary>
         public static List<Bill> BillsFor(int patientsOnBoard, int treatmentsThisShift, int shift)
         {
             var bills = new List<Bill>();
-            int staff = Mathf.Min(3, patientsOnBoard);
+            int staff = Mathf.Min(2, (patientsOnBoard + 1) / 2);
             int supplies = treatmentsThisShift / 2;
-            int maintenance = shift % 3 == 0 ? 2 : 0;
+            int maintenance = shift % 4 == 0 ? 2 : 0;
             if (staff > 0) bills.Add(new Bill { type = BillType.StaffOvertime, amount = staff });
             if (supplies > 0) bills.Add(new Bill { type = BillType.Supplies, amount = supplies });
             if (maintenance > 0) bills.Add(new Bill { type = BillType.Maintenance, amount = maintenance });
