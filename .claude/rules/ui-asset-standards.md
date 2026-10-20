@@ -1,11 +1,11 @@
 ---
 description: Card, slot and sprite size standards for Chief Complaint board assets
 paths:
-  - "Assets/Sprites/**"
+  - "Assets/Art/**"
   - "Assets/Scripts/Board/**"
   - "Assets/Scripts/Cards/**"
   - "Assets/Scripts/UI/**"
-  - "Assets/Editor/Inspectors/UICardGenerator.cs"
+  - "Assets/Editor/Tools/UICardGenerator.cs"
 ---
 
 # UI Asset Standards
