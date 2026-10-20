@@ -53,6 +53,23 @@ namespace ChiefComplaint.Tests
         }
 
         [Test]
+        public void TraumaFlightAssets_ArriveWithHandoverAndStabilityFloor()
+        {
+            const int MinTraumaFlightStability = 4;
+            var paths = AssetDatabase.FindAssets("t:PatientCardSO", new[] { "Assets/Data/Patients/TraumaFlight" })
+                                     .Select(AssetDatabase.GUIDToAssetPath)
+                                     .ToArray();
+            Assert.IsNotEmpty(paths, "No Trauma Flight patients found.");
+
+            foreach (var path in paths)
+            {
+                var patient = AssetDatabase.LoadAssetAtPath<PatientCardSO>(path);
+                Assert.IsTrue(patient.arrivesWithHandover, $"{path}: Trauma Flights arrive with a paramedic handover.");
+                Assert.GreaterOrEqual(patient.startingStability, MinTraumaFlightStability, $"{path}: stability below the Trauma Flight floor.");
+            }
+        }
+
+        [Test]
         public void SymptomAssets_HaveNamesForEveryTier()
         {
             foreach (var path in FindAssetPaths<SymptomCardSO>())

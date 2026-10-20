@@ -132,6 +132,20 @@ namespace ChiefComplaint.Cards.Views
                 }
             }
 
+            // Paramedic handover: the primary (highest-tier) symptom arrives already diagnosed.
+            // Moving it to the front keeps the remaining hidden symptoms sorted by tier.
+            if (patientData.arrivesWithHandover && assignedSymptoms.Count > 0)
+            {
+                int last = assignedSymptoms.Count - 1;
+                var primarySym = assignedSymptoms[last];
+                var primaryTier = assignedTiers[last];
+                assignedSymptoms.RemoveAt(last);
+                assignedTiers.RemoveAt(last);
+                assignedSymptoms.Insert(0, primarySym);
+                assignedTiers.Insert(0, primaryTier);
+                diagnosedCount = 1;
+            }
+
             maxStability = patientData.startingStability;
             decayRate = patientData.stabilityDecayPerTurn;
             currentStability = maxStability;

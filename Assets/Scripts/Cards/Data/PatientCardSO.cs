@@ -103,6 +103,10 @@ namespace ChiefComplaint.Cards.Data
         public int startingStability = 10;
         public int stabilityDecayPerTurn = 1;
 
+        [Header("Arrival")]
+        [Tooltip("Paramedic handover: the primary (highest-tier) symptom is already diagnosed when the patient arrives.")]
+        public bool arrivesWithHandover = false;
+
         [Header("Rewards")]
         public int reputationReward = 2;
 
