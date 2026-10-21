@@ -129,7 +129,15 @@ namespace ChiefComplaint.Board
             Transform emptySlot = BoardView.Instance.GetEmptyTriageSlot(activePatients);
             if (emptySlot == null)
             {
-                GameLog.Warn("Triage River is full!");
+                // Ambulance diversion: the patient goes to another hospital, and Reputation suffers.
+                GameLog.Warn("Triage River is full! Patient diverted.");
+                var gm = GameManager.Instance;
+                if (gm != null && gm.diversionReputationPenalty > 0)
+                {
+                    Vector3 at = BoardView.Instance.triageSlots.Length > 0 ? BoardView.Instance.triageSlots[BoardView.Instance.triageSlots.Length / 2].position : Vector3.zero;
+                    GameFeedback.ShowAt($"Triage full - patient diverted! -{gm.diversionReputationPenalty} Rep", at, GameFeedback.WarningColour);
+                    gm.SpendReputation(gm.diversionReputationPenalty);
+                }
                 return;
             }
 

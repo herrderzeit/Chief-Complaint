@@ -3,7 +3,10 @@
     "rootNamespace": "",
     "references": [
         "GameScripts",
-        "Unity.TextMeshPro"
+        "Unity.TextMeshPro",
+        "Unity.Recorder.Editor",
+        "Unity.Recorder",
+        "Unity.Recorder.Base"
     ],
     "includePlatforms": [
         "Editor"

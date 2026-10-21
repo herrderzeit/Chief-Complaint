@@ -575,17 +575,28 @@ namespace ChiefComplaint.Sim.Engine
 
             // PatientDeckManager.PatientSuccessfullyCured
             PatientsCured++;
-            if (PatientsCured >= Config.AmbulanceCureThreshold && !AmbulancesUnlocked)
+            CheckEscalation();
+            Patients.Remove(p);
+        }
+
+        /// <summary>
+        /// Mirrors <c>PatientDeckManager.CheckProgressionTriggers</c>: a pool unlocks on enough cures, or (if the
+        /// shift threshold is set) when that shift starts, whichever comes first.
+        /// </summary>
+        private void CheckEscalation()
+        {
+            bool ambulanceByShift = Config.AmbulanceShiftThreshold > 0 && Shift >= Config.AmbulanceShiftThreshold;
+            bool traumaByShift = Config.TraumaFlightShiftThreshold > 0 && Shift >= Config.TraumaFlightShiftThreshold;
+            if ((PatientsCured >= Config.AmbulanceCureThreshold || ambulanceByShift) && !AmbulancesUnlocked)
             {
                 activePatientDeck.AddRange(Data.AmbulancePool);
                 AmbulancesUnlocked = true;
             }
-            if (PatientsCured >= Config.TraumaFlightCureThreshold && !TraumaFlightsUnlocked)
+            if ((PatientsCured >= Config.TraumaFlightCureThreshold || traumaByShift) && !TraumaFlightsUnlocked)
             {
                 activePatientDeck.AddRange(Data.TraumaFlightPool);
                 TraumaFlightsUnlocked = true;
             }
-            Patients.Remove(p);
         }
 
         /// <summary>Mirrors <c>PatientCardView.AdvanceShiftDecay</c>.</summary>
@@ -656,6 +667,8 @@ namespace ChiefComplaint.Sim.Engine
             if (TriageCount >= Config.TriageSlots)
             {
                 observer?.OnSpawnSkipped(this, "triage full");
+                // GameManager.DivertPatient: the ambulance goes elsewhere, and the hospital's reputation suffers.
+                if (Config.DiversionReputationPenalty > 0) SpendReputation(Config.DiversionReputationPenalty, "diversion");
                 return;
             }
             if (activePatientDeck.Count == 0)
@@ -751,6 +764,7 @@ namespace ChiefComplaint.Sim.Engine
             if (IsOver) return;
 
             DrawCards(Config.HandSize);
+            CheckEscalation();
             SpawnPatient();
         }
 

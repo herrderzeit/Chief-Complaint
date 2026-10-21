@@ -80,3 +80,6 @@ crashlytics-build.properties
 # Personal notes, not part of the game
 /reports/
 /research_notes/
+
+# Showcase recordings (cc-showcase)
+/Recordings/

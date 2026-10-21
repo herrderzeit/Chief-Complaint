@@ -190,3 +190,20 @@ Final 5000-run confirmation: smart 93.7%, randombuy 70.7%, nobuy 43.3% (single-f
 - **Stock isn't a lever: keep max stock at 4** (or 3 if you want, but it makes no difference in the simulator). I tested stock 4/3/2 on a scratch copy of the project (scene YAML edited in the copy only, run with `--project`). Single-focus was 96.1% at every level, because Funding limits how many copies the bot buys, not stock.
 
 **Not verified:** no play-mode check. Lead: no C#, scene, prefab or test changes from me. The other modified C# and BalanceSim files in the working tree are not mine.
+
+## Stalling fix (QA)
+
+cc-unity-qa-tester, 2026-10-21. Tests only; no production code changed.
+
+**Added**
+- `Assets/Tests/EditMode/EscalationByShiftTests.cs` (12 tests): shift/cure matrix (4,0,5,10)→none; (5,0,5,10)→Amb; (10,0,5,10)→Amb+Trauma; (3,3,5,10)→Amb by cures; (20,0,0,0)→none. Also: each pool goes into `activePatientDeck` exactly once when the cure and shift conditions both hold; the pool lists aren't changed by drawing; `OnEscalationPhaseChanged` fires once per new phase; `GameManager.StartNewShift` passes the shift to `PatientDeckManager` (Ambulances unlock at shift 5, not 4).
+- `Assets/Tests/EditMode/DiversionTests.cs` (7 tests): BoardManager + BoardView with every Triage slot occupied, and GameManager, PatientDeckManager and BoardView singletons set by reflection and restored in TearDown. Covers penalty 1/2/5 charged (event raised), no spawn and no patient drawn from the deck, penalty 0 is free, and repeated diversions bring Reputation to 0, which ends the run.
+- `Tools/BalanceSim.Tests/StallingFixEngineTests.cs` (9 tests): Ambulances unlock at shift 5 (not 4) with no cures, and the Ambulance arrives on shift 5 itself. Also: the Trauma shift threshold works, including on its own; thresholds of 0 mean cures only; cures still unlock early. Diversion: penalty 2 costs 2 and is skipped (recorded under the "diversion" source), 0 is free, and repeated diversions end the run with LossCause "diversion". Balance check `[Trait("Category","Balance")]`: stall bot under 20% over 500 runs with Amb 5 / Trauma 10 / diversion 2.
+
+**Results:** Unity EditMode 240/240 passed. Simulator 58/58 passed. Stall bot over 500 runs: 88.4% with every rule off, 0.0% with Amb 5 / Trauma 10 / diversion 2.
+
+**Gaps for cc-card-engine-specialist**
+- `RunRecorder` sets `AmbulanceUnlockShift`/`TraumaUnlockShift` only in `OnPatientCured`, so unlocks by shift aren't recorded, and the report's "Reached Ambulances / Trauma" columns read 0.0% for the stall bot even though the pools unlock at shift 5/10. An escalation observer event (or a check in `OnShiftEnded`) would fix this.
+- When one check unlocks both pools at once (e.g. jumping past both thresholds), `OnEscalationPhaseChanged` fires once with "Trauma Flights", not once per phase. The test records this current behaviour; say if you want one event per phase.
+- EditMode can't cover a successful spawn into a free slot (BoardView's pool is built in Awake). A PlayMode test would be needed to show a free slot means no penalty and a real spawn.
+- Not verified: no play-mode check of the diversion popup (`GameFeedback.ShowAt` returns early in EditMode with no NotificationManager).

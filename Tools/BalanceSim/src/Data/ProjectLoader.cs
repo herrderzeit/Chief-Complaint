@@ -62,6 +62,7 @@ namespace ChiefComplaint.Sim.Data
                 c.StartingReputation = gameManager.GetInt("currentReputation", c.StartingReputation);
                 c.StartingFunding = gameManager.GetInt("currentFunding", c.StartingFunding);
                 c.InitialPatientCount = gameManager.GetInt("initialPatientCount", c.InitialPatientCount);
+                c.DiversionReputationPenalty = gameManager.GetInt("diversionReputationPenalty", c.DiversionReputationPenalty);
                 c.DeathReputationPenalty = gameManager.GetInt("deathReputationPenalty", c.DeathReputationPenalty);
                 c.DeathAddsRedTape = gameManager.GetBool("deathAddsRedTape", c.DeathAddsRedTape);
                 c.ShiftsToWin = gameManager.GetInt("shiftsToWin", c.ShiftsToWin);
@@ -75,6 +76,8 @@ namespace ChiefComplaint.Sim.Data
             if (patientDeck != null)
             {
                 c.AmbulanceCureThreshold = patientDeck.GetInt("ambulanceCureThreshold", c.AmbulanceCureThreshold);
+                c.AmbulanceShiftThreshold = patientDeck.GetInt("ambulanceShiftThreshold", c.AmbulanceShiftThreshold);
+                c.TraumaFlightShiftThreshold = patientDeck.GetInt("traumaFlightShiftThreshold", c.TraumaFlightShiftThreshold);
                 c.TraumaFlightCureThreshold = patientDeck.GetInt("traumaFlightCureThreshold", c.TraumaFlightCureThreshold);
                 data.WalkInPool = patientDeck.GetRefList("walkInPool").Select(LoadPatient).Where(p => p != null).ToList();
                 data.AmbulancePool = patientDeck.GetRefList("ambulancePool").Select(LoadPatient).Where(p => p != null).ToList();

@@ -71,6 +71,9 @@ namespace ChiefComplaint.Core
         public int initialPatientCount = 2;
         [Tooltip("Reputation lost when a patient dies (Code Blue).")]
         public int deathReputationPenalty = 5;
+
+        [Tooltip("Reputation lost when an arriving patient has to be diverted because every Triage slot is full (0 = free).")]
+        public int diversionReputationPenalty = 2;
         [Tooltip("When a patient dies, a random Red Tape card (incident paperwork) is added to the discard pile.")]
         public bool deathAddsRedTape = true;
         [Tooltip("Surviving this many shifts wins the run. 0 disables the win condition.")]
@@ -222,6 +225,9 @@ namespace ChiefComplaint.Core
             // DeckManager is a Singleton because cards need global access to it;
             // GameManager commands it here during the shift-state transition.
             if (DeckManager.Instance != null) DeckManager.Instance.StartNewShift();
+
+            // Escalation can also be time-based, so check it before this shift's patient arrives.
+            if (PatientDeckManager.Instance != null) PatientDeckManager.Instance.OnShiftStarted(currentShift);
 
             if (boardManager != null) boardManager.SpawnPatient();
         }

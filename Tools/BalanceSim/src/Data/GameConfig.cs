@@ -27,6 +27,11 @@ namespace ChiefComplaint.Sim.Data
         // PatientDeckManager
         public int AmbulanceCureThreshold = 3;
         public int TraumaFlightCureThreshold = 8;
+        // Time-based escalation: the pool also unlocks at the start of this shift (0 = cures only).
+        public int AmbulanceShiftThreshold = 0;
+        public int TraumaFlightShiftThreshold = 0;
+        // GameManager: Reputation lost when an arriving patient is diverted because Triage is full (0 = free).
+        public int DiversionReputationPenalty = 0;
 
         // DeckManager
         public int HandSize = 5;

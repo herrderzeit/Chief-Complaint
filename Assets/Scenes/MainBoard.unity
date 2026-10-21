@@ -1538,6 +1538,7 @@ MonoBehaviour:
   currentShift: 1
   initialPatientCount: 2
   deathReputationPenalty: 5
+  diversionReputationPenalty: 2
   deathAddsRedTape: 1
   shiftsToWin: 15
   walkInFundingReward: 2
@@ -3727,6 +3728,8 @@ MonoBehaviour:
   traumaFlightsCured: 0
   ambulanceCureThreshold: 3
   traumaFlightCureThreshold: 8
+  ambulanceShiftThreshold: 5
+  traumaFlightShiftThreshold: 10
 --- !u!1 &603602263
 GameObject:
   m_ObjectHideFlags: 0

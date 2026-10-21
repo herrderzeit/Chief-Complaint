@@ -59,6 +59,23 @@ namespace ChiefComplaint.Core
         [Tooltip("Total patients cured before the Trauma Flight pool is added to the active deck.")]
         public int traumaFlightCureThreshold = 8;
 
+        [Tooltip("The Ambulance pool also unlocks when this shift starts, even without enough cures (0 = cures only).")]
+        public int ambulanceShiftThreshold = 5;
+        [Tooltip("The Trauma Flight pool also unlocks when this shift starts, even without enough cures (0 = cures only).")]
+        public int traumaFlightShiftThreshold = 10;
+
+        /// <summary>
+        /// Called by GameManager at the start of each shift, so the run escalates over time even if the player
+        /// stops curing patients (which would otherwise keep them on easy Walk-Ins indefinitely).
+        /// </summary>
+        public void OnShiftStarted(int shift)
+        {
+            currentShift = shift;
+            CheckProgressionTriggers();
+        }
+
+        private int currentShift = 1;
+
         protected override void Awake()
         {
             base.Awake();
@@ -243,7 +260,10 @@ namespace ChiefComplaint.Core
         {
             bool escalated = false;
 
-            if (patientsCured >= ambulanceCureThreshold && !ambulanceTriggered)
+            bool ambulanceByShift = ambulanceShiftThreshold > 0 && currentShift >= ambulanceShiftThreshold;
+            bool traumaByShift = traumaFlightShiftThreshold > 0 && currentShift >= traumaFlightShiftThreshold;
+
+            if ((patientsCured >= ambulanceCureThreshold || ambulanceByShift) && !ambulanceTriggered)
             {
                 GameLog.Info("WARNING: Ambulances are arriving! Adding Tier 2 patients.");
                 activePatientDeck.AddRange(ambulancePool);
@@ -251,7 +271,7 @@ namespace ChiefComplaint.Core
                 escalated = true;
             }
 
-            if (patientsCured >= traumaFlightCureThreshold && !traumaTriggered)
+            if ((patientsCured >= traumaFlightCureThreshold || traumaByShift) && !traumaTriggered)
             {
                 GameLog.Info("CRITICAL: Trauma Flights incoming! Adding Tier 3 patients.");
                 activePatientDeck.AddRange(traumaFlightPool);
