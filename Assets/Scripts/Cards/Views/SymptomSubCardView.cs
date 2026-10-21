@@ -47,10 +47,6 @@ namespace ChiefComplaint.Cards.Views
         private Vector3 targetScale;
         private SortingGroup sortingGroup;
         private int originalSortingOrder;
-        private int originalSortingLayerID;
-
-        [Tooltip("Sorting layer used while zoomed, so the card draws over the PlayZone and the rest of the board.")]
-        [SerializeField] private string zoomSortingLayer = "Player Hand";
 
         /// <summary>The symptom card currently zoomed in, if any. Only one may be zoomed at a time.</summary>
         private static SymptomSubCardView currentlyZoomed;
@@ -86,7 +82,6 @@ namespace ChiefComplaint.Cards.Views
             if (sortingGroup != null)
             {
                 originalSortingOrder = sortingGroup.sortingOrder;
-                originalSortingLayerID = sortingGroup.sortingLayerID;
             }
         }
 
@@ -293,12 +288,8 @@ namespace ChiefComplaint.Cards.Views
                     float camY = cam != null ? cam.transform.position.y : 0f;
                     targetWorldPosition = new Vector3(camX, camY, -5f);
 
-                    if (sortingGroup != null)
-                    {
-                        // Move to the hand's layer (above the board and PlayZone) at the maximum order.
-                        sortingGroup.sortingLayerName = zoomSortingLayer;
-                        sortingGroup.sortingOrder = 30000;
-                    }
+                    // Draw above everything else on its own sorting layer.
+                    if (sortingGroup != null) sortingGroup.sortingOrder = 30000;
                 }
                 else
                 {
@@ -327,11 +318,7 @@ namespace ChiefComplaint.Cards.Views
                 transform.SetParent(originalParent);
             }
 
-            if (sortingGroup != null)
-            {
-                sortingGroup.sortingLayerID = originalSortingLayerID;
-                sortingGroup.sortingOrder = originalSortingOrder;
-            }
+            if (sortingGroup != null) sortingGroup.sortingOrder = originalSortingOrder;
         }
     }
 }
