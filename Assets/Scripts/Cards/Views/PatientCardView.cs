@@ -521,6 +521,10 @@ namespace ChiefComplaint.Cards.Views
                     deptZone.MarkAsUsed();
                 }
 
+                // Treating a symptom earns an upgrade token in that department's colour.
+                if (GameManager.Instance != null && currentDepartment.HasValue)
+                    GameManager.Instance.AddUpgradeTokens(currentDepartment.Value);
+
                 GameFeedback.ShowAt(assignedSymptoms.Count == 0 ? $"{treatedName} treated - ready for discharge" : $"{treatedName} treated",
                     transform.position, GameFeedback.CareColour);
 

@@ -139,6 +139,9 @@ namespace ChiefComplaint.Sim.Data
         public List<EffectDef> Effects = new List<EffectDef>();
         public CardDef Upgrade;
         public int UpgradeCost = 5;
+        public int UpgradeTokenCost;              // ActionCardSO.upgradeTokenCost (0 = no tokens)
+        public bool UpgradeTokenAnyColour;        // ActionCardSO.upgradeTokenAnyColour
+        public SymptomCategory UpgradeTokenColour = SymptomCategory.Trauma;
 
         public bool HasTag(CardTag tag) => Tags.Contains(tag);
 

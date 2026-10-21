@@ -44,14 +44,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: GameScripts::ActionCardSO
   cardName: Registered Nurse
   cardType: 0
-  tags: 0a000000
-  rulesText: 'Choose: Restore 4 Stability to a patient OR pause their decay for a
-    shift.'
-  flavorText: A heated blanket, a cup of tea and one eye on the monitors. Sometimes
-    humanity is the best medicine on the trolley.
+  tags: 0a000000i
+  rulesText: 'Choose: Restore 4 Stability to a patient OR pause their decay for a shift.'
+  flavorText: A heated blanket, a cup of tea and one eye on the monitors. Sometimes humanity is the best medicine on the trolley.
   isPlayable: 1
   successChance: 1
   apCost: 0
+  reputationCost: 0
   cardsToDraw: 0
   powerTier: 2
   exhaustsOnUse: 0
@@ -59,7 +58,10 @@ MonoBehaviour:
   effects:
   - {fileID: -3019103424098774660}
   directDraftUpgrade: {fileID: 11400000, guid: 387533e8005b73e4a8ff73bec66fac78, type: 2}
-  draftUpgradeCost: 10
+  draftUpgradeCost: 5
+  upgradeTokenCost: 2
+  upgradeTokenAnyColour: 0
+  upgradeTokenColour: 2
   cardArt: {fileID: 0}
 --- !u!114 &1652682690785801395
 MonoBehaviour:

@@ -153,3 +153,40 @@ All changes made through `unity command eval_file` (no YAML hand-edits). No C#, 
 
 **Not verified**
 - Not tested in play mode with a real drag: the fade timing, the clear on drop, and how it looks beside a dragged card over the zone. Lead: please check this in play mode after saving the scene.
+
+## Agency Nurse tuning (cc-medical-data-scraper, 2026-10-21)
+
+**Problem:** in the single-focus experiment, buying only Agency Nurse won 96.0%, above every other market card (Stat Labs 85.8%, Blood Bank 85.0%).
+
+**Applied** (through `unity command eval_file`, then SaveAssets; no YAML hand-edits) to `Assets/Data/Actions/Draft/Card_AgencyNurse.asset`:
+- `apCost` 1 → **0**
+- Heal sub-asset `Heal3` → **`Heal2`**, `healAmount` 3 → **2**
+- Choice `optionALabel` "Restore 3 Stability" → **"Restore 2 Stability"** (option B "Pause decay" unchanged)
+- `rulesText` → **"Choose: restore 2 Stability to a patient, or pause their decay."**
+- Price (CalculateDraftValue): 5F → **7F** (Staff 4 + T1 1 + free card 2).
+- Unchanged: Staff, T1, successChance 1, no exhaust, flavour text, Open stage.
+
+Design read: it now sits between the starter Nursing Student (0 AP, heal 2 or draw 1) and the Registered Nurse upgrade (0 AP, heal 4 or pause). It's an extra pair of hands that doesn't cost the roster any AP, offering bedside top-up or keeping a patient steady.
+
+**Variants tried** (3000 runs/bot unless noted; nobuy 43.3% and smart 93.7% didn't change across variants):
+
+| Variant | Price | Single-focus | randombuy |
+|---|---|---|---|
+| Original (heal 3 or pause, 1 AP) | 5 | 96.1% | 71.8% |
+| Heal 2 or pause, 1 AP | 5 | 68.1% | 68.2% |
+| Heal 3 or pause, 2 AP | 4 | 65.4% | 72.3% |
+| Heal 3 or pause, 1 AP, exhausts on use | 5 | 76.9% | 68.4% |
+| Heal 3 only (pause removed), 1 AP | 5 | 96.1% | 71.8% |
+| Heal 3 or draw 1, 1 AP | 5 | 74.5% | 69.0% |
+| Heal 3 or pause, 1 AP, exhausts at End Shift | 5 | 62.5% | 67.6% |
+| Heal 3 or pause, 1 AP, 75% success | 5 | 90.9% | 70.4% |
+| **Heal 2 or pause, 0 AP (applied)** | **7** | **86.9%** | **69.8%** |
+| Applied, final run at 5000 runs/bot | 7 | **88.8% ± 1.2%** | 70.7% |
+
+Final 5000-run confirmation: smart 93.7%, randombuy 70.7%, nobuy 43.3% (single-focus baseline 43.2%). Agency Nurse is now 88.8%, below the Nursing Student line (91.2%) and Initial Assessment line (97.9%), and close to Stat Labs (85.8%) and Blood Bank (85.0%). The single-focus bot buys about 3.3 copies (was 4.5).
+
+**Findings:**
+- The bot never picks the pause option: removing it gave the same 96.1%. The power came entirely from heal 3 at 1 AP, so heal amount and AP are the levers.
+- **Stock isn't a lever: keep max stock at 4** (or 3 if you want, but it makes no difference in the simulator). I tested stock 4/3/2 on a scratch copy of the project (scene YAML edited in the copy only, run with `--project`). Single-focus was 96.1% at every level, because Funding limits how many copies the bot buys, not stock.
+
+**Not verified:** no play-mode check. Lead: no C#, scene, prefab or test changes from me. The other modified C# and BalanceSim files in the working tree are not mine.

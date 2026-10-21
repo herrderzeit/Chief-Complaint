@@ -28,11 +28,11 @@ MonoBehaviour:
   cardType: 2
   tags: 
   rulesText: Patient skips their next Stability loss and restores 1 Stability.
-  flavorText: The universal hospital duct tape. It doesn't fix the underlying problem,
-    but it buys you precious time.
+  flavorText: The universal hospital duct tape. It doesn't fix the underlying problem, but it buys you precious time.
   isPlayable: 1
   successChance: 1
   apCost: 1
+  reputationCost: 0
   cardsToDraw: 0
   powerTier: 1
   exhaustsOnUse: 0
@@ -41,7 +41,10 @@ MonoBehaviour:
   - {fileID: -7050927635845791435}
   - {fileID: 2195140639630190864}
   directDraftUpgrade: {fileID: 11400000, guid: 8a1dd651da4b7b24eb4b423a3d22001f, type: 2}
-  draftUpgradeCost: 5
+  draftUpgradeCost: 3
+  upgradeTokenCost: 1
+  upgradeTokenAnyColour: 0
+  upgradeTokenColour: 1
   cardArt: {fileID: 0}
 --- !u!114 &2195140639630190864
 MonoBehaviour:

@@ -33,24 +33,16 @@ MonoBehaviour:
   isPlayable: 1
   successChance: 1
   apCost: 1
-  apGenerated: 0
-  reputationGenerated: 0
-  isEitherOr: 0
-  altApGenerated: 0
-  isDiagnostic: 1
-  diagnosesSymptomTier: 2
-  pausesStabilityClock: 0
-  stabilisationHeal: 0
-  curesSymptomTier: 0
+  reputationCost: 0
   cardsToDraw: 0
-  cleansesRedTape: 0
-  repBonusPerRedTapeCleansed: 0
   powerTier: 2
-  isTrashCard: 0
   exhaustsOnUse: 0
   exhaustsAtShiftEnd: 0
   effects:
   - {fileID: -4032010818685097237}
   directDraftUpgrade: {fileID: 11400000, guid: 71c5c0cd3e58661428ebaf1bf63f4f11, type: 2}
-  draftUpgradeCost: 10
+  draftUpgradeCost: 5
+  upgradeTokenCost: 2
+  upgradeTokenAnyColour: 0
+  upgradeTokenColour: 3
   cardArt: {fileID: 0}

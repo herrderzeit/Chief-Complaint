@@ -29,11 +29,11 @@ MonoBehaviour:
   cardType: 1
   tags: 
   rulesText: Diagnose 1 hidden Tier 1 symptom. Patient must be in the Ward.
-  flavorText: The first step is figuring out what is wrong. The second step is hoping
-    it isn't contagious.
+  flavorText: The first step is figuring out what is wrong. The second step is hoping it isn't contagious.
   isPlayable: 1
   successChance: 1
   apCost: 1
+  reputationCost: 0
   cardsToDraw: 0
   powerTier: 1
   exhaustsOnUse: 0
@@ -41,5 +41,8 @@ MonoBehaviour:
   effects:
   - {fileID: -4634232346131975975}
   directDraftUpgrade: {fileID: 11400000, guid: b4a2e5d9c1f84931a7c6e0b4d2f8e1a5, type: 2}
-  draftUpgradeCost: 5
+  draftUpgradeCost: 3
+  upgradeTokenCost: 1
+  upgradeTokenAnyColour: 0
+  upgradeTokenColour: 3
   cardArt: {fileID: 0}

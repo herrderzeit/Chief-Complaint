@@ -96,6 +96,13 @@ namespace ChiefComplaint.Cards.Data
     [Tooltip("The Funding cost to upgrade to the directDraftUpgrade card.")]
     public int draftUpgradeCost = 5;
 
+    [Tooltip("Upgrade tokens needed for the direct upgrade, on top of Funding. Tokens are earned by treating symptoms in a department.")]
+    [Min(0)] public int upgradeTokenCost = 0;
+    [Tooltip("If set, any token colour pays; otherwise only Upgrade Token Colour does.")]
+    public bool upgradeTokenAnyColour = false;
+    [Tooltip("Department colour of the tokens this upgrade needs.")]
+    public SymptomCategory upgradeTokenColour = SymptomCategory.Trauma;
+
     [Header("Visuals")]
     public Sprite cardArt;
 

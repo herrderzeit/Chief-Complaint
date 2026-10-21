@@ -62,13 +62,23 @@ namespace ChiefComplaint.Drafting
         {
             SwitchTab(0);
             HidePreview();
-            if (GameManager.Instance != null) GameManager.Instance.OnFundingChanged += OnFundingChanged;
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.OnFundingChanged += OnFundingChanged;
+                GameManager.Instance.OnUpgradeTokensChanged += OnUpgradeTokensChanged;
+            }
         }
 
         private void OnDisable()
         {
-            if (GameManager.Instance != null) GameManager.Instance.OnFundingChanged -= OnFundingChanged;
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.OnFundingChanged -= OnFundingChanged;
+                GameManager.Instance.OnUpgradeTokensChanged -= OnUpgradeTokensChanged;
+            }
         }
+
+        private void OnUpgradeTokensChanged(SymptomCategory colour, int count) => OnFundingChanged(0);
 
         private void OnFundingChanged(int newFunding)
         {
@@ -254,6 +264,11 @@ namespace ChiefComplaint.Drafting
             nameHover.OnExit = (data) => HidePreview();
             // -------------------
 
+            // Cost columns: Funding (right-aligned) and tokens (left-aligned), grouped on the right of the row.
+            Transform costGroup = rowObj.transform.Find("CostGroup");
+            TextMeshProUGUI fundingText = FindRowText(rowObj, "CostGroup/FundingText");
+            TextMeshProUGUI tokenText = FindRowText(rowObj, "CostGroup/TokenText");
+
             Button upgradeBtn = rowObj.GetComponentInChildren<Button>();
             if (upgradeBtn != null)
             {
@@ -264,14 +279,11 @@ namespace ChiefComplaint.Drafting
                     TextMeshProUGUI btnText = upgradeBtn.GetComponentInChildren<TextMeshProUGUI>();
                     if (btnText != null) btnText.text = $"Upgrade to {card.directDraftUpgrade.cardName}";
 
-                    if (texts.Length >= 3)
-                    {
-                        // The third text component in the prefab is the cost text
-                        texts[2].text = $"{card.draftUpgradeCost} Funding";
-                        texts[2].gameObject.SetActive(true);
-                    }
+                    if (costGroup != null) costGroup.gameObject.SetActive(true);
+                    if (fundingText != null) fundingText.text = $"{card.draftUpgradeCost} Funding";
+                    if (tokenText != null) tokenText.text = UpgradeTokenRichText(card);
 
-                    bool canAfford = GameManager.Instance != null && GameManager.Instance.CurrentFunding >= card.draftUpgradeCost;
+                    bool canAfford = GameManager.Instance != null && GameManager.Instance.CanAffordUpgrade(card);
                     upgradeBtn.interactable = canAfford;
 
                     // Attach specific hover logic to the button to show the UPGRADED card
@@ -286,13 +298,15 @@ namespace ChiefComplaint.Drafting
                 else
                 {
                     upgradeBtn.gameObject.SetActive(false);
-                    if (texts.Length >= 3) 
-                    {
-                        texts[2].text = "";
-                        texts[2].gameObject.SetActive(false);
-                    }
+                    if (costGroup != null) costGroup.gameObject.SetActive(false);
                 }
             }
+        }
+
+        private static TextMeshProUGUI FindRowText(GameObject row, string path)
+        {
+            Transform t = row.transform.Find(path);
+            return t != null ? t.GetComponent<TextMeshProUGUI>() : null;
         }
 
         private void OnUpgradeClicked(ActionCardSO baseCard)
@@ -302,7 +316,7 @@ namespace ChiefComplaint.Drafting
             if (GameManager.Instance == null || DeckManager.Instance == null) return;
 
             int cost = baseCard.draftUpgradeCost;
-            if (GameManager.Instance.TrySpendFunding(cost))
+            if (GameManager.Instance.TryPayForUpgrade(baseCard))
             {
 
                 if (DeckManager.Instance.drawPile.Contains(baseCard))
@@ -325,6 +339,29 @@ namespace ChiefComplaint.Drafting
                 RefreshUpgradesList(); // Refresh to reflect the removal of the upgraded card
                 HidePreview();
             }
+        }
+
+        /// <summary>Cost line for an upgrade, e.g. "3 Funding + 1 Trauma token" or "5 Funding + 2 tokens (any)".</summary>
+        public static string UpgradeCostText(ActionCardSO card)
+        {
+            string text = $"{card.draftUpgradeCost} Funding";
+            if (card.upgradeTokenCost <= 0) return text;
+            string plural = card.upgradeTokenCost == 1 ? "token" : "tokens";
+            return card.upgradeTokenAnyColour
+                ? $"{text} + {card.upgradeTokenCost} {plural} (any)"
+                : $"{text} + {card.upgradeTokenCost} {UpgradeTokenWallet.ColourName(card.upgradeTokenColour)} {plural}";
+        }
+
+        /// <summary>
+        /// Token part of the upgrade row's cost, e.g. "+ 1 Internal Med" with the colour name tinted like its
+        /// department plate ("+ 2 any" for any-colour costs, empty when no tokens are needed).
+        /// </summary>
+        public static string UpgradeTokenRichText(ActionCardSO card)
+        {
+            if (card.upgradeTokenCost <= 0) return "";
+            if (card.upgradeTokenAnyColour) return $"+ {card.upgradeTokenCost} any";
+            string hex = ColorUtility.ToHtmlStringRGB(DepartmentFallbackButton.DepartmentColour(card.upgradeTokenColour));
+            return $"+ {card.upgradeTokenCost} <color=#{hex}>{UpgradeTokenWallet.ColourName(card.upgradeTokenColour)}</color>";
         }
 
         private void ShowPreview(ActionCardSO card)

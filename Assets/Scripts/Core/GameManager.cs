@@ -50,6 +50,8 @@ namespace ChiefComplaint.Core
         public event System.Action<int> OnReputationChanged;
         /// <summary>Raised whenever the Activity Funding balance changes.</summary>
         public event System.Action<int> OnFundingChanged;
+        /// <summary>Raised when an upgrade-token count changes: (colour, new count of that colour).</summary>
+        public event System.Action<SymptomCategory, int> OnUpgradeTokensChanged;
         public event System.Action<int> OnShiftChanged;
 
         /// <summary>Raised whenever <see cref="CurrentPhase"/> changes.</summary>
@@ -92,6 +94,9 @@ namespace ChiefComplaint.Core
 
         /// <summary>Activity Funding the player can currently spend on drafts and upgrades.</summary>
         public int CurrentFunding => currentFunding;
+
+        /// <summary>Symptom upgrade tokens earned this run (one colour per department).</summary>
+        public UpgradeTokenWallet UpgradeTokens { get; } = new UpgradeTokenWallet();
 
         /// <summary>The current shift number, starting at 1.</summary>
         public int CurrentShift => currentShift;
@@ -290,6 +295,31 @@ namespace ChiefComplaint.Core
             currentFunding += amount;
             OnFundingChanged?.Invoke(currentFunding);
             GameLog.Info($"Gained {amount} Funding! Total: {currentFunding}");
+        }
+
+        /// <summary>Awards upgrade tokens of a department's colour (one per symptom treated there).</summary>
+        public void AddUpgradeTokens(SymptomCategory colour, int amount = 1)
+        {
+            UpgradeTokens.Add(colour, amount);
+            OnUpgradeTokensChanged?.Invoke(colour, UpgradeTokens.Get(colour));
+        }
+
+        /// <summary><c>true</c> if the player has the Funding and upgrade tokens for <paramref name="card"/>'s direct upgrade.</summary>
+        public bool CanAffordUpgrade(ActionCardSO card) =>
+            card != null && card.directDraftUpgrade != null && currentFunding >= card.draftUpgradeCost &&
+            UpgradeTokens.CanPay(card.upgradeTokenCost, card.upgradeTokenAnyColour, card.upgradeTokenColour);
+
+        /// <summary>Pays the Funding and upgrade tokens for <paramref name="card"/>'s direct upgrade, or nothing if either is short.</summary>
+        public bool TryPayForUpgrade(ActionCardSO card)
+        {
+            if (!CanAffordUpgrade(card)) return false;
+            if (card.upgradeTokenCost > 0)
+            {
+                UpgradeTokens.TryPay(card.upgradeTokenCost, card.upgradeTokenAnyColour, card.upgradeTokenColour);
+                // An any-colour cost may draw from several colours, so refresh them all.
+                for (int i = 0; i < 4; i++) OnUpgradeTokensChanged?.Invoke((SymptomCategory)i, UpgradeTokens.Get((SymptomCategory)i));
+            }
+            return TrySpendFunding(card.draftUpgradeCost);
         }
 
         /// <summary>

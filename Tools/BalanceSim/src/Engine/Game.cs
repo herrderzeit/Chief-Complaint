@@ -53,6 +53,8 @@ namespace ChiefComplaint.Sim.Engine
         // Draft (DraftManager)
         // Supply room (DraftManager / SupplyRoom): one entry per Data.SupplyPiles pile.
         public readonly List<bool> PileUnlocked = new List<bool>();
+        /// <summary>Upgrade tokens per SymptomCategory (GameManager.UpgradeTokens), earned one per symptom treated.</summary>
+        public readonly int[] UpgradeTokens = new int[4];
         public readonly List<int> PileStock = new List<int>();
         private readonly List<CardDef> pendingPurchases = new List<CardDef>();
 
@@ -221,7 +223,7 @@ namespace ChiefComplaint.Sim.Engine
             }
             // DeckUpgradeManager lists every distinct card in draw + discard + hand (the hand is empty during the draft).
             foreach (CardDef card in OwnedCards.Distinct())
-                if (card.Upgrade != null && Funding >= card.UpgradeCost)
+                if (card.Upgrade != null && Funding >= card.UpgradeCost && CanPayTokens(card))
                     actions.Add(new GameAction { Kind = ActionKind.Upgrade, Card = card, Cost = card.UpgradeCost });
             actions.Add(GameAction.FinishDraft);
         }
@@ -515,8 +517,28 @@ namespace ChiefComplaint.Sim.Engine
             p.Symptoms.RemoveAt(index);
             if (p.DiagnosedCount > 0) p.DiagnosedCount--;
             usedDepartments.Add(p.Department);
+            UpgradeTokens[(int)p.Department]++; // treating a symptom earns a token of that department's colour
             p.InSurgery = true;
             return true;
+        }
+
+        /// <summary>Mirrors <c>UpgradeTokenWallet.CanPay</c>.</summary>
+        public bool CanPayTokens(CardDef card) =>
+            card.UpgradeTokenCost <= 0 ||
+            (card.UpgradeTokenAnyColour ? UpgradeTokens.Sum() : UpgradeTokens[(int)card.UpgradeTokenColour]) >= card.UpgradeTokenCost;
+
+        /// <summary>Mirrors <c>UpgradeTokenWallet.TryPay</c>: any-colour costs come from the most plentiful colour first.</summary>
+        private void PayTokens(CardDef card)
+        {
+            if (card.UpgradeTokenCost <= 0) return;
+            if (!card.UpgradeTokenAnyColour) { UpgradeTokens[(int)card.UpgradeTokenColour] -= card.UpgradeTokenCost; return; }
+            for (int paid = 0; paid < card.UpgradeTokenCost; paid++)
+            {
+                int most = 0;
+                for (int i = 1; i < UpgradeTokens.Length; i++)
+                    if (UpgradeTokens[i] > UpgradeTokens[most]) most = i;
+                UpgradeTokens[most]--;
+            }
         }
 
         private void ApplyStabilisation(Patient p, int amount)
@@ -806,7 +828,8 @@ namespace ChiefComplaint.Sim.Engine
         {
             if (Phase != Phase.Draft || card.Upgrade == null) return;
             if (!DrawPile.Contains(card) && !DiscardPile.Contains(card) && !Hand.Contains(card)) return;
-            if (!TrySpendFunding(card.UpgradeCost, "upgrade")) return;
+            if (!CanPayTokens(card) || !TrySpendFunding(card.UpgradeCost, "upgrade")) return;
+            PayTokens(card);
             // The upgraded copy is appended to the same pile (so in the draw pile it goes to the bottom).
             if (DrawPile.Remove(card)) DrawPile.Add(card.Upgrade);
             else if (DiscardPile.Remove(card)) DiscardPile.Add(card.Upgrade);

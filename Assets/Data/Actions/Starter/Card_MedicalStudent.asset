@@ -14,13 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ActionCardSO
   cardName: Medical Student
   cardType: 0
-  tags: 09000000
+  tags: 09000000i
   rulesText: Gain 1 AP.
-  flavorText: Eager to help, desperate for sleep, and fuelled entirely by cafeteria
-    coffee.
+  flavorText: Eager to help, desperate for sleep, and fuelled entirely by cafeteria coffee.
   isPlayable: 1
   successChance: 1
   apCost: 0
+  reputationCost: 0
   cardsToDraw: 0
   powerTier: 1
   exhaustsOnUse: 0
@@ -28,7 +28,10 @@ MonoBehaviour:
   effects:
   - {fileID: 7606849462056441060}
   directDraftUpgrade: {fileID: 11400000, guid: aea0b659ba29d294d8853fbeacd4b27e, type: 2}
-  draftUpgradeCost: 5
+  draftUpgradeCost: 3
+  upgradeTokenCost: 1
+  upgradeTokenAnyColour: 1
+  upgradeTokenColour: 0
   cardArt: {fileID: 0}
 --- !u!114 &7606849462056441060
 MonoBehaviour:

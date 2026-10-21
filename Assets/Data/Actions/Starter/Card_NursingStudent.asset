@@ -27,13 +27,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ActionCardSO
   cardName: Nursing Student
   cardType: 0
-  tags: 0a000000
+  tags: 0a000000i
   rulesText: 'Choose one: restore 2 Stability, or draw 1 card.'
-  flavorText: First to the bedside, last to the break room. A kind word goes a long
-    way when the waiting room has been full since Tuesday.
+  flavorText: First to the bedside, last to the break room. A kind word goes a long way when the waiting room has been full since Tuesday.
   isPlayable: 1
   successChance: 1
   apCost: 0
+  reputationCost: 0
   cardsToDraw: 0
   powerTier: 1
   exhaustsOnUse: 0
@@ -41,7 +41,10 @@ MonoBehaviour:
   effects:
   - {fileID: 5712920648889888430}
   directDraftUpgrade: {fileID: 11400000, guid: f053edf4202a7cf4cba72e2cce8863af, type: 2}
-  draftUpgradeCost: 5
+  draftUpgradeCost: 3
+  upgradeTokenCost: 1
+  upgradeTokenAnyColour: 0
+  upgradeTokenColour: 2
   cardArt: {fileID: 0}
 --- !u!114 &4387732606252277167
 MonoBehaviour:

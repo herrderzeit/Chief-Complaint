@@ -212,6 +212,9 @@ namespace ChiefComplaint.Sim.Data
             card.ExhaustsOnUse = doc.GetBool("exhaustsOnUse");
             card.ExhaustsAtShiftEnd = doc.GetBool("exhaustsAtShiftEnd");
             card.UpgradeCost = doc.GetInt("draftUpgradeCost", 5);
+            card.UpgradeTokenCost = doc.GetInt("upgradeTokenCost", 0);
+            card.UpgradeTokenAnyColour = doc.GetBool("upgradeTokenAnyColour");
+            card.UpgradeTokenColour = (SymptomCategory)doc.GetInt("upgradeTokenColour", 0);
 
             foreach (UnityRef effectRef in doc.GetRefList("effects"))
             {

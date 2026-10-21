@@ -29,11 +29,11 @@ MonoBehaviour:
   cardType: 2
   tags: 
   rulesText: Cure 1 diagnosed Tier 1 symptom in its department.
-  flavorText: Fluids, rest, and standard painkillers. The holy trinity of the triage
-    ward.
+  flavorText: Fluids, rest, and standard painkillers. The holy trinity of the triage ward.
   isPlayable: 1
   successChance: 1
   apCost: 1
+  reputationCost: 0
   cardsToDraw: 0
   powerTier: 1
   exhaustsOnUse: 0
@@ -41,5 +41,8 @@ MonoBehaviour:
   effects:
   - {fileID: -7426506608412848317}
   directDraftUpgrade: {fileID: 11400000, guid: 0897b696353fa7e4d9ab94bc3e9fb88a, type: 2}
-  draftUpgradeCost: 5
+  draftUpgradeCost: 3
+  upgradeTokenCost: 1
+  upgradeTokenAnyColour: 0
+  upgradeTokenColour: 0
   cardArt: {fileID: 0}

@@ -29,29 +29,20 @@ MonoBehaviour:
   cardType: 2
   tags: 
   rulesText: Cure 1 symptom (up to Tier-2).
-  flavorText: Targeted therapies for complex ailments. When standard rest and saline
-    just won't cut it.
+  flavorText: Targeted therapies for complex ailments. When standard rest and saline just won't cut it.
   isPlayable: 1
   successChance: 1
   apCost: 2
-  apGenerated: 0
-  reputationGenerated: 0
-  isEitherOr: 0
-  altApGenerated: 0
-  isDiagnostic: 0
-  diagnosesSymptomTier: 3
-  pausesStabilityClock: 0
-  stabilisationHeal: 0
-  curesSymptomTier: 2
+  reputationCost: 0
   cardsToDraw: 0
-  cleansesRedTape: 0
-  repBonusPerRedTapeCleansed: 0
   powerTier: 2
-  isTrashCard: 0
   exhaustsOnUse: 0
   exhaustsAtShiftEnd: 0
   effects:
   - {fileID: -1037246990224821645}
   directDraftUpgrade: {fileID: 11400000, guid: f151b4f7d47ae1c42b011149ebd7f91c, type: 2}
-  draftUpgradeCost: 10
+  draftUpgradeCost: 5
+  upgradeTokenCost: 2
+  upgradeTokenAnyColour: 0
+  upgradeTokenColour: 0
   cardArt: {fileID: 0}

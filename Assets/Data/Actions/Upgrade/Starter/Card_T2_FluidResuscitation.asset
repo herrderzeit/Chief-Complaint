@@ -31,11 +31,11 @@ MonoBehaviour:
   rulesText: 'Pause patient''s stability decay.
 
     Restore 3 Stability.'
-  flavorText: Pushing two bags of normal saline stat. We need their blood pressure
-    back in the land of the living.
+  flavorText: Pushing two bags of normal saline stat. We need their blood pressure back in the land of the living.
   isPlayable: 1
   successChance: 1
   apCost: 1
+  reputationCost: 0
   cardsToDraw: 0
   powerTier: 2
   exhaustsOnUse: 0
@@ -44,7 +44,10 @@ MonoBehaviour:
   - {fileID: 318743872424910703}
   - {fileID: -1960842298502585243}
   directDraftUpgrade: {fileID: 11400000, guid: b631b8c7eece1b54cadfe5288f6fa696, type: 2}
-  draftUpgradeCost: 10
+  draftUpgradeCost: 5
+  upgradeTokenCost: 2
+  upgradeTokenAnyColour: 0
+  upgradeTokenColour: 1
   cardArt: {fileID: 0}
 --- !u!114 &318743872424910703
 MonoBehaviour:
