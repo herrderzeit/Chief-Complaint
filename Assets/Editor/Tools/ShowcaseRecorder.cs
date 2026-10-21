@@ -50,8 +50,9 @@ namespace ChiefComplaint.Editor.Tools
         private static Vector2 pointer = new Vector2(960f, 540f);
         private static bool pointerPressed;
 
-        /// <summary>The project's Input System settings, swapped out for focus-independent ones while the tour plays.</summary>
-        private static InputSettings savedInputSettings;
+        /// <summary>The project's focus settings, set aside while the tour plays with focus-independent input.</summary>
+        private static InputSettings.BackgroundBehavior? savedBackgroundBehaviour;
+        private static InputSettings.EditorInputBehaviorInPlayMode savedEditorInputBehaviour;
 
         static ShowcaseRecorder()
         {
@@ -147,27 +148,28 @@ namespace ChiefComplaint.Editor.Tools
         }
 
         /// <summary>
-        /// Swaps in a temporary copy of the Input System settings that ignores focus: by default the Editor resets
-        /// pointers to (0, 0) whenever Unity or the Game view loses focus, which drops the tour's drags. The
-        /// project's settings asset itself is never changed.
+        /// Makes input ignore focus while the tour plays: by default the Editor resets pointers to (0, 0) whenever
+        /// Unity or the Game view loses focus, which drops the tour's drags. The two values are changed in place
+        /// and put back on exit. Never swap or destroy the settings object itself: the Input System keeps a
+        /// reference to it across play mode and fails with "InputSettings has lost its native object".
         /// </summary>
         private static void UseFocusIndependentInput()
         {
-            if (savedInputSettings != null) return;
-            savedInputSettings = InputSystem.settings;
-            var tourSettings = Object.Instantiate(savedInputSettings);
-            tourSettings.backgroundBehavior = InputSettings.BackgroundBehavior.IgnoreFocus;
-            tourSettings.editorInputBehaviorInPlayMode = InputSettings.EditorInputBehaviorInPlayMode.AllDeviceInputAlwaysGoesToGameView;
-            InputSystem.settings = tourSettings;
+            if (savedBackgroundBehaviour != null) return;
+            var settings = InputSystem.settings;
+            savedBackgroundBehaviour = settings.backgroundBehavior;
+            savedEditorInputBehaviour = settings.editorInputBehaviorInPlayMode;
+            settings.backgroundBehavior = InputSettings.BackgroundBehavior.IgnoreFocus;
+            settings.editorInputBehaviorInPlayMode = InputSettings.EditorInputBehaviorInPlayMode.AllDeviceInputAlwaysGoesToGameView;
         }
 
         private static void RestoreInputSettings()
         {
-            if (savedInputSettings == null) return;
-            var tourSettings = InputSystem.settings;
-            InputSystem.settings = savedInputSettings;
-            savedInputSettings = null;
-            if (tourSettings != null && !EditorUtility.IsPersistent(tourSettings)) Object.DestroyImmediate(tourSettings);
+            if (savedBackgroundBehaviour == null) return;
+            var settings = InputSystem.settings;
+            settings.backgroundBehavior = savedBackgroundBehaviour.Value;
+            settings.editorInputBehaviorInPlayMode = savedEditorInputBehaviour;
+            savedBackgroundBehaviour = null;
         }
 
         private static void Finish()
