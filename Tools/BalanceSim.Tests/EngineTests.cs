@@ -91,6 +91,53 @@ namespace ChiefComplaint.Sim.Tests
         }
 
         [Fact]
+        public void Death_without_own_penalty_costs_exactly_the_flat_penalty()
+        {
+            PatientDef def = Patient(stability: 1, decay: 1);
+            def.Triggers.Add(new PatientTriggerDef { Condition = TriggerCondition.OnDeath, Effect = TriggerEffect.DrawCard, Value = 1 });
+            var data = Content(new CardDef[0], def);
+            data.Config.StartingReputation = 20;
+            data.Config.DeathReputationPenalty = 5;
+            var g = Start(data);
+
+            EndShiftAndSkipDraft(g);
+            Assert.Empty(g.ActivePatients);
+            Assert.False(def.HasOwnDeathPenalty);
+            // An OnDeath trigger that doesn't take Reputation leaves the flat penalty in place.
+            Assert.Equal(20 - 5, g.Reputation);
+        }
+
+        [Fact]
+        public void Death_with_OnDeath_LoseReputation_trigger_replaces_the_flat_penalty()
+        {
+            PatientDef def = Patient(stability: 1, decay: 1);
+            def.Triggers.Add(new PatientTriggerDef { Condition = TriggerCondition.OnDeath, Effect = TriggerEffect.LoseReputation, Value = 4 });
+            var data = Content(new CardDef[0], def);
+            data.Config.StartingReputation = 20;
+            data.Config.DeathReputationPenalty = 5;
+            var g = Start(data);
+
+            EndShiftAndSkipDraft(g);
+            Assert.Empty(g.ActivePatients);
+            Assert.True(def.HasOwnDeathPenalty);
+            Assert.Equal(20 - 4, g.Reputation); // 4 from the trigger, not 4 + 5
+        }
+
+        [Theory]
+        [InlineData(TriggerCondition.OnDeath, TriggerEffect.LoseReputation, true)]
+        [InlineData(TriggerCondition.OnDeath, TriggerEffect.DrawCard, false)]
+        [InlineData(TriggerCondition.OnDeath, TriggerEffect.GainReputation, false)]
+        [InlineData(TriggerCondition.OnTurnEnd, TriggerEffect.LoseReputation, false)]
+        [InlineData(TriggerCondition.OnSpawn, TriggerEffect.LoseReputation, false)]
+        public void HasOwnDeathPenalty_needs_OnDeath_and_LoseReputation(TriggerCondition condition, TriggerEffect effect, bool expected)
+        {
+            PatientDef def = Patient();
+            Assert.False(def.HasOwnDeathPenalty); // no triggers
+            def.Triggers.Add(new PatientTriggerDef { Condition = condition, Effect = effect, Value = 4 });
+            Assert.Equal(expected, def.HasOwnDeathPenalty);
+        }
+
+        [Fact]
         public void Reputation_at_zero_loses_the_run()
         {
             var data = Content(new CardDef[0], Patient(stability: 1, decay: 1));
@@ -231,6 +278,52 @@ namespace ChiefComplaint.Sim.Tests
             Assert.Equal(11, crashCart.DraftValue);
             Assert.Equal(12, licensed.DraftValue);
             Assert.Equal(0, new CardDef { Type = CardType.RedTape }.DraftValue);
+        }
+
+        /// <summary>
+        /// One stable patient on the board, a deep Walk-In pool and a roomy Triage, so no arrival is ever
+        /// skipped (empty deck) or diverted (full Triage) and the count only reflects the spawn rule.
+        /// </summary>
+        private static Game StartForArrivals(int extraPatientEveryNShifts)
+        {
+            PatientDef[] pool = Enumerable.Range(0, 12).Select(_ => Patient(stability: 50)).ToArray();
+            var data = Content(new CardDef[0], pool);
+            data.Config.InitialPatientCount = 1;
+            data.Config.TriageSlots = 20;
+            data.Config.ExtraPatientEveryNShifts = extraPatientEveryNShifts;
+            return Start(data);
+        }
+
+        [Fact]
+        public void Every_third_shift_brings_an_extra_patient()
+        {
+            var g = StartForArrivals(3);
+            Assert.Equal(1, g.Shift);
+            Assert.Single(g.Patients);
+
+            EndShiftAndSkipDraft(g); // shift 2: the usual one arrival
+            Assert.Equal(2, g.Shift);
+            Assert.Equal(2, g.Patients.Count);
+
+            EndShiftAndSkipDraft(g); // shift 3: the usual arrival plus the extra one
+            Assert.Equal(3, g.Shift);
+            Assert.Equal(4, g.Patients.Count);
+
+            EndShiftAndSkipDraft(g); // shift 4: back to one
+            Assert.Equal(5, g.Patients.Count);
+        }
+
+        [Fact]
+        public void Extra_patient_rule_off_adds_exactly_one_patient_per_shift()
+        {
+            var g = StartForArrivals(0);
+            for (int shift = 2; shift <= 7; shift++)
+            {
+                int before = g.Patients.Count;
+                EndShiftAndSkipDraft(g);
+                Assert.Equal(shift, g.Shift);
+                Assert.Equal(before + 1, g.Patients.Count);
+            }
         }
 
         [Fact]

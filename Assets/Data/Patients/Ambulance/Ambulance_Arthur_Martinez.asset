@@ -24,7 +24,7 @@ MonoBehaviour:
   incomingCategories: 0100000003000000i
   startingStability: 7
   stabilityDecayPerTurn: 2
-  arrivesWithHandover: 0
+  arrivesWithHandover: 1
   reputationReward: 1
   triggers: []
   portraitSprite: {fileID: 0}

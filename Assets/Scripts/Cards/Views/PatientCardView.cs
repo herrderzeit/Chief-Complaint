@@ -377,14 +377,15 @@ namespace ChiefComplaint.Cards.Views
                 isCritical = true;
                 isRemoved = true;
 
-                int penalty = GameManager.Instance != null ? GameManager.Instance.deathReputationPenalty : 0;
-                GameLog.Warn($"PATIENT LOST: {patientData.patientName} has died! You lost {penalty} Reputation!");
+                // A patient with its own OnDeath Reputation trigger pays that instead of the flat penalty.
+                int penalty = GameManager.Instance != null && !patientData.HasOwnDeathPenalty ? GameManager.Instance.deathReputationPenalty : 0;
+                GameLog.Warn($"PATIENT LOST: {patientData.patientName} has died!" + (penalty > 0 ? $" You lost {penalty} Reputation!" : ""));
 
                 // Raised before the penalty so listeners (e.g. BoardManager's Code Blue counter) are up to date
                 // even if the penalty ends the run.
                 OnDied?.Invoke(this);
 
-                if (GameManager.Instance != null)
+                if (GameManager.Instance != null && penalty > 0)
                 {
                     // SpendReputation automatically triggers TriggerGameOver if reputation hits zero.
                     GameManager.Instance.SpendReputation(penalty);

@@ -15,20 +15,23 @@ MonoBehaviour:
   cardName: Double Shift
   cardType: 0
   tags: 
-  rulesText: Gain 3 AP. Costs 2 Reputation.
+  rulesText: Gain 3 AP. Costs 1 Reputation. Exhausts.
   flavorText: Sixteen hours in. The coffee has started talking back.
   isPlayable: 1
   successChance: 1
   apCost: 0
-  reputationCost: 2
+  reputationCost: 1
   cardsToDraw: 0
   powerTier: 2
-  exhaustsOnUse: 0
+  exhaustsOnUse: 1
   exhaustsAtShiftEnd: 0
   effects:
   - {fileID: 8845572536304339166}
   directDraftUpgrade: {fileID: 0}
   draftUpgradeCost: 0
+  upgradeTokenCost: 0
+  upgradeTokenAnyColour: 0
+  upgradeTokenColour: 0
   cardArt: {fileID: 0}
 --- !u!114 &8845572536304339166
 MonoBehaviour:

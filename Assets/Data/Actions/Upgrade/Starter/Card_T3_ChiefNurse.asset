@@ -12,23 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 543d84c2e991b1f4a88a90f4df143aac, type: 3}
   m_Name: Pause
   m_EditorClassIdentifier: GameScripts::ChiefComplaint.Cards.Effects.PauseStabilityEffectSO
---- !u!114 &-8034342308564550685
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0ba894ed8d3bda54fa6c197b6c37a823, type: 3}
-  m_Name: Choice
-  m_EditorClassIdentifier: GameScripts::ChiefComplaint.Cards.Effects.ChoiceEffectSO
-  promptTitle: Chief Nurse
-  optionALabel: Heal Ward (+2 each)
-  optionA: {fileID: 3150022580502162594}
-  optionBLabel: Pause Ward decay
-  optionB: {fileID: -7114811943155610463}
 --- !u!114 &-7114811943155610463
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -56,22 +39,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: GameScripts::ActionCardSO
   cardName: Chief Nurse
   cardType: 0
-  tags: 0a000000
-  rulesText: 'Choose: Restore 2 Stability to every Ward patient OR pause decay for
-    every Ward patient.'
-  flavorText: Nobody teaches you how to run a ward at full capacity. Somehow, they
-    keep everyone calm anyway.
+  tags: 0a000000i
+  rulesText: Restore 1 Stability to every Ward patient and pause their decay.
+  flavorText: Nobody teaches you how to run a ward at full capacity. Somehow, they keep everyone calm anyway.
   isPlayable: 1
   successChance: 1
   apCost: 1
+  reputationCost: 0
   cardsToDraw: 0
   powerTier: 3
   exhaustsOnUse: 0
   exhaustsAtShiftEnd: 0
   effects:
-  - {fileID: -8034342308564550685}
+  - {fileID: 3150022580502162594}
+  - {fileID: -7114811943155610463}
   directDraftUpgrade: {fileID: 0}
   draftUpgradeCost: 5
+  upgradeTokenCost: 0
+  upgradeTokenAnyColour: 0
+  upgradeTokenColour: 0
   cardArt: {fileID: 0}
 --- !u!114 &413967406734055755
 MonoBehaviour:
@@ -83,9 +69,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 39cce9e5a0feac84aad5fd12da2c3bd5, type: 3}
-  m_Name: Heal2
+  m_Name: Heal1
   m_EditorClassIdentifier: GameScripts::ChiefComplaint.Cards.Effects.StabilisationHealEffectSO
-  healAmount: 2
+  healAmount: 1
 --- !u!114 &3150022580502162594
 MonoBehaviour:
   m_ObjectHideFlags: 0

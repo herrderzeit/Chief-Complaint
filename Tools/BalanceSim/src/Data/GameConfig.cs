@@ -13,13 +13,13 @@ namespace ChiefComplaint.Sim.Data
     {
         // GameManager
         public int BaseAP = 3;
-        public int StartingReputation = 10;
+        public int StartingReputation = 8;
         public int StartingFunding = 6;
         public int InitialPatientCount = 2;
         public int DeathReputationPenalty = 5;
         public bool DeathAddsRedTape = true;
         public int ShiftsToWin = 15;
-        public int WalkInFundingReward = 4;
+        public int WalkInFundingReward = 3;
         public int AmbulanceFundingReward = 6;
         public int TraumaFlightFundingReward = 8;
         public int CureReputationCap = 3;
@@ -32,6 +32,9 @@ namespace ChiefComplaint.Sim.Data
         public int TraumaFlightShiftThreshold = 0;
         // GameManager: Reputation lost when an arriving patient is diverted because Triage is full (0 = free).
         public int DiversionReputationPenalty = 0;
+
+        // GameManager.extraPatientEveryNShifts: an extra patient arrives at the start of every Nth shift (0 = off).
+        public int ExtraPatientEveryNShifts = 3;
 
         // DeckManager
         public int HandSize = 5;

@@ -206,6 +206,9 @@ namespace ChiefComplaint.Sim.Data
         public bool ArrivesWithHandover;   // paramedic handover: primary symptom arrives diagnosed
         public List<PatientTriggerDef> Triggers = new List<PatientTriggerDef>();
 
+        /// <summary>Mirrors <c>PatientCardSO.HasOwnDeathPenalty</c>: an OnDeath Reputation trigger replaces the flat death penalty.</summary>
+        public bool HasOwnDeathPenalty => Triggers.Exists(t => t.Condition == TriggerCondition.OnDeath && t.Effect == TriggerEffect.LoseReputation);
+
         public override string ToString() => Name;
     }
 

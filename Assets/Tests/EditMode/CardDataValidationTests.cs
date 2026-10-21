@@ -93,10 +93,30 @@ namespace ChiefComplaint.Tests
             }
         }
 
+        [Test]
+        public void PatientAssets_CategoryCountParsesNonZero()
+        {
+            // Guards the raw-YAML parser itself: if Unity changes how it serialises the enum list again,
+            // every patient would silently count 0 and the symptom-limit test above could never fail.
+            var outOfRange = FindAssetPaths<PatientCardSO>()
+                .Select(path => (path, count: CountStoredCategories(path)))
+                .Where(x => x.count < 1 || x.count > MaxSymptomsPerPatient)
+                .Select(x => $"{x.path} ({x.count})")
+                .ToArray();
+
+            Assert.IsEmpty(outOfRange,
+                "Patients whose stored incomingCategories did not parse to 1–" + MaxSymptomsPerPatient +
+                " entries (a 0 usually means the asset format changed and CountStoredCategories needs updating):\n" +
+                string.Join("\n", outOfRange));
+        }
+
+        // Unity packs an enum list as 8 hex digits per entry; since Unity 6.6 it appends a trailing 'i'.
+        private static readonly Regex PackedHexList = new Regex("^((?:[0-9a-fA-F]{8})+)i?$");
+
         /// <summary>
         /// Counts the entries stored under <c>incomingCategories:</c> in the raw YAML. Unity writes an
-        /// enum list as one packed hex string (8 hex characters per entry), but it can also write a
-        /// block list or an empty <c>[]</c>, so all three forms are handled.
+        /// enum list as one packed hex string (8 hex characters per entry, optionally followed by
+        /// <c>i</c>), but it can also write a block list or an empty <c>[]</c>, so all three forms are handled.
         /// </summary>
         private static int CountStoredCategories(string assetPath)
         {
@@ -106,7 +126,8 @@ namespace ChiefComplaint.Tests
 
             string inline = lines[start].Substring(lines[start].IndexOf(':') + 1).Trim();
             if (inline == "[]") return 0;
-            if (Regex.IsMatch(inline, "^[0-9a-fA-F]+$")) return inline.Length / 8;
+            Match packed = PackedHexList.Match(inline);
+            if (packed.Success) return packed.Groups[1].Length / 8;
 
             int count = 0;
             for (int i = start + 1; i < lines.Length && lines[i].TrimStart().StartsWith("- "); i++)

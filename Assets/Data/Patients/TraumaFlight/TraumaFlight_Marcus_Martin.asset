@@ -23,7 +23,7 @@ MonoBehaviour:
   escalationPhase: 2
   triageLevel: 1
   incomingCategories: 000000000000000003000000i
-  startingStability: 4
+  startingStability: 6
   stabilityDecayPerTurn: 3
   arrivesWithHandover: 1
   reputationReward: 3

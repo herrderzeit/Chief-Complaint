@@ -26,6 +26,17 @@ namespace ChiefComplaint.Sim.Tests
         }
 
         [Fact]
+        public void Scene_config_matches_the_decided_tuning()
+        {
+            // Pins the "option A" retune read from MainBoard.unity's GameManager; change deliberately.
+            Assert.Equal(8, Data.Config.StartingReputation);
+            Assert.Equal(3, Data.Config.WalkInFundingReward);
+            Assert.Equal(6, Data.Config.AmbulanceFundingReward);
+            Assert.Equal(8, Data.Config.TraumaFlightFundingReward);
+            Assert.Equal(3, Data.Config.ExtraPatientEveryNShifts);
+        }
+
+        [Fact]
         public void Every_card_effect_is_understood()
         {
             Assert.DoesNotContain(Data.AllCards.Values.SelectMany(c => c.Effects), e => e is UnknownEffect);

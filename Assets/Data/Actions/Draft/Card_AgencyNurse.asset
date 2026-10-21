@@ -10,26 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 39cce9e5a0feac84aad5fd12da2c3bd5, type: 3}
-  m_Name: Heal2
+  m_Name: Heal1
   m_EditorClassIdentifier: GameScripts::ChiefComplaint.Cards.Effects.StabilisationHealEffectSO
-  healAmount: 2
---- !u!114 &-2722157593108328153
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0ba894ed8d3bda54fa6c197b6c37a823, type: 3}
-  m_Name: Choice
-  m_EditorClassIdentifier: GameScripts::ChiefComplaint.Cards.Effects.ChoiceEffectSO
-  promptTitle: Agency Nurse
-  optionALabel: Restore 2 Stability
-  optionA: {fileID: -7801704429822405667}
-  optionBLabel: Pause decay
-  optionB: {fileID: 1223375474917560275}
+  healAmount: 1
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -45,7 +28,7 @@ MonoBehaviour:
   cardName: Agency Nurse
   cardType: 0
   tags: 
-  rulesText: 'Choose: restore 2 Stability to a patient, or pause their decay.'
+  rulesText: Pause a patient's decay and restore 1 Stability.
   flavorText: First shift on this ward, already knows where the good gloves are.
   isPlayable: 1
   successChance: 1
@@ -56,9 +39,13 @@ MonoBehaviour:
   exhaustsOnUse: 0
   exhaustsAtShiftEnd: 0
   effects:
-  - {fileID: -2722157593108328153}
+  - {fileID: 1223375474917560275}
+  - {fileID: -7801704429822405667}
   directDraftUpgrade: {fileID: 0}
   draftUpgradeCost: 0
+  upgradeTokenCost: 0
+  upgradeTokenAnyColour: 0
+  upgradeTokenColour: 0
   cardArt: {fileID: 0}
 --- !u!114 &1223375474917560275
 MonoBehaviour:

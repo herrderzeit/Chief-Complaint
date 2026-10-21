@@ -28,12 +28,34 @@ namespace ChiefComplaint.Tests.EditMode
             Assert.AreEqual(6, gm.CurrentFunding);
         }
 
-        [TestCase(EscalationType.WalkIn, 4)]
+        // The rule: each escalation type pays its own configured reward. Distinct sentinel values
+        // catch a type being mapped to the wrong field, whatever the tuning happens to be.
+        [TestCase(EscalationType.WalkIn, 11)]
+        [TestCase(EscalationType.Ambulance, 22)]
+        [TestCase(EscalationType.TraumaFlight, 33)]
+        public void GetFundingReward_UsesTheConfiguredRewardForEachType(EscalationType type, int expected)
+        {
+            gm.walkInFundingReward = 11;
+            gm.ambulanceFundingReward = 22;
+            gm.traumaFlightFundingReward = 33;
+
+            Assert.AreEqual(expected, gm.GetFundingReward(type), $"{type} should pay its own configured Funding reward.");
+        }
+
+        // Pins the decided "option A" tuning (component defaults; the MainBoard scene is checked by the
+        // BalanceSim ProjectDataTests). Update these numbers deliberately when the tuning changes.
+        [TestCase(EscalationType.WalkIn, 3)]
         [TestCase(EscalationType.Ambulance, 6)]
         [TestCase(EscalationType.TraumaFlight, 8)]
-        public void GetFundingReward_MatchesEscalationType(EscalationType type, int expected)
+        public void GetFundingReward_DefaultTuning(EscalationType type, int expected)
         {
             Assert.AreEqual(expected, gm.GetFundingReward(type));
+        }
+
+        [Test]
+        public void StartingReputation_DefaultTuning_IsEight()
+        {
+            Assert.AreEqual(8, gm.CurrentReputation, "Option A tuning: a run starts on 8 Reputation.");
         }
 
         [Test]

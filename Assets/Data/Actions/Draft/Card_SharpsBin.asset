@@ -27,7 +27,7 @@ MonoBehaviour:
   cardName: Sharps Bin
   cardType: 6
   tags: 
-  rulesText: Drop on a card in your hand to trash it (removed from the run).
+  rulesText: Drop on a card in your hand to trash it (removed from the run). Exhausts.
   flavorText: Points down, lid shut, no regrets.
   isPlayable: 1
   successChance: 1
@@ -35,10 +35,13 @@ MonoBehaviour:
   reputationCost: 0
   cardsToDraw: 0
   powerTier: 1
-  exhaustsOnUse: 0
+  exhaustsOnUse: 1
   exhaustsAtShiftEnd: 0
   effects:
   - {fileID: -4353059634709318146}
   directDraftUpgrade: {fileID: 0}
   draftUpgradeCost: 0
+  upgradeTokenCost: 0
+  upgradeTokenAnyColour: 0
+  upgradeTokenColour: 0
   cardArt: {fileID: 0}

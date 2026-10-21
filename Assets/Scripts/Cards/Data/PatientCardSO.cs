@@ -117,6 +117,22 @@ namespace ChiefComplaint.Cards.Data
         [Header("Visuals")]
         public Sprite portraitSprite;
 
+        /// <summary>
+        /// <c>true</c> when an OnDeath trigger already takes Reputation. That trigger replaces the flat death penalty
+        /// (GameManager.deathReputationPenalty) rather than stacking with it, so one death never costs 9–10 Reputation.
+        /// </summary>
+        public bool HasOwnDeathPenalty
+        {
+            get
+            {
+                if (triggers == null) return false;
+                foreach (PatientTrigger trigger in triggers)
+                    if (trigger.condition == PatientTriggerCondition.OnDeath && trigger.effect == PatientTriggerEffect.LoseReputation)
+                        return true;
+                return false;
+            }
+        }
+
         private void OnValidate()
         {
             if (incomingCategories != null && incomingCategories.Count > 3)

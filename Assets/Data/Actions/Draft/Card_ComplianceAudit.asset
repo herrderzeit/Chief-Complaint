@@ -27,22 +27,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ActionCardSO
   cardName: Compliance Audit
   cardType: 5
-  tags: 05000000
+  tags: 05000000i
   rulesText: 'Exhaust all Red Tape cards in hand/discard (+1 Rep per card).
 
-    Card
-    exhausts on use.'
-  flavorText: It's amazing how quickly missing paperwork materializes when the state
-    auditors show up in the lobby.
+    Card exhausts on use.'
+  flavorText: It's amazing how quickly missing paperwork materializes when the state auditors show up in the lobby.
   isPlayable: 1
   successChance: 1
-  apCost: 2
+  apCost: 1
+  reputationCost: 0
   cardsToDraw: 0
-  powerTier: 3
+  powerTier: 1
   exhaustsOnUse: 1
   exhaustsAtShiftEnd: 0
   effects:
   - {fileID: -6225806383752869896}
   directDraftUpgrade: {fileID: 0}
   draftUpgradeCost: 5
+  upgradeTokenCost: 0
+  upgradeTokenAnyColour: 0
+  upgradeTokenColour: 0
   cardArt: {fileID: 0}

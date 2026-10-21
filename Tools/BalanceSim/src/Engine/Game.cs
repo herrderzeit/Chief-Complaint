@@ -614,7 +614,7 @@ namespace ChiefComplaint.Sim.Engine
                 p.Stability = 0;
                 p.Removed = true;
                 observer?.OnPatientDied(this, p);
-                SpendReputation(Config.DeathReputationPenalty, "death");
+                if (!p.Def.HasOwnDeathPenalty) SpendReputation(Config.DeathReputationPenalty, "death");
                 ExecuteTriggers(p, TriggerCondition.OnDeath);
                 if (Config.DeathAddsRedTape) SpawnRandomRedTape(false);
                 Patients.Remove(p);
@@ -766,6 +766,8 @@ namespace ChiefComplaint.Sim.Engine
             DrawCards(Config.HandSize);
             CheckEscalation();
             SpawnPatient();
+            // GameManager.IsExtraPatientShift: busier shifts every Nth shift.
+            if (Config.ExtraPatientEveryNShifts > 0 && Shift % Config.ExtraPatientEveryNShifts == 0) SpawnPatient();
         }
 
         // =====================================================================

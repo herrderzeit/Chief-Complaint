@@ -61,7 +61,7 @@ namespace ChiefComplaint.Core
         /// <summary>Action Points restored to the player at the start of every shift.</summary>
         public int baseAP = 3;
         [SerializeField] private int currentAP;
-        [SerializeField] private int currentReputation = 10;
+        [SerializeField] private int currentReputation = 8;
         [Tooltip("Activity Funding the run starts with. Spent on draft cards and card upgrades.")]
         [SerializeField] private int currentFunding = 6;
         [SerializeField] private int currentShift = 1;
@@ -69,6 +69,8 @@ namespace ChiefComplaint.Core
         [Header("Run Balance")]
         [Tooltip("Number of patients placed in Triage when a run begins.")]
         public int initialPatientCount = 2;
+        [Tooltip("An extra patient arrives at the start of every Nth shift, on top of the usual one (0 = off).")]
+        [Min(0)] public int extraPatientEveryNShifts = 3;
         [Tooltip("Reputation lost when a patient dies (Code Blue).")]
         public int deathReputationPenalty = 5;
 
@@ -88,7 +90,7 @@ namespace ChiefComplaint.Core
 
         [Header("Activity Funding")]
         [Tooltip("Funding paid for curing a Walk-In patient.")]
-        public int walkInFundingReward = 4;
+        public int walkInFundingReward = 3;
         [Tooltip("Funding paid for curing an Ambulance patient.")]
         public int ambulanceFundingReward = 6;
         [Tooltip("Funding paid for curing a Trauma Flight patient.")]
@@ -236,8 +238,18 @@ namespace ChiefComplaint.Core
             // Escalation can also be time-based, so check it before this shift's patient arrives.
             if (PatientDeckManager.Instance != null) PatientDeckManager.Instance.NotifyShiftStarted(currentShift);
 
-            if (boardManager != null) boardManager.SpawnPatient();
+            if (boardManager != null)
+            {
+                boardManager.SpawnPatient();
+                if (IsExtraPatientShift(currentShift, extraPatientEveryNShifts)) boardManager.SpawnPatient();
+            }
         }
+
+        /// <summary>
+        /// <c>true</c> when an extra patient arrives at the start of <paramref name="shift"/>: every
+        /// <paramref name="everyNShifts"/>th shift (shift 3, 6, 9 … for 3), never when it is 0.
+        /// </summary>
+        public static bool IsExtraPatientShift(int shift, int everyNShifts) => everyNShifts > 0 && shift % everyNShifts == 0;
 
         /// <summary>Opens the inter-shift draft/market panel. Ignored unless a shift is in progress.</summary>
         public void EnterDraftPhase()

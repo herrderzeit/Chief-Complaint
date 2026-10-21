@@ -1533,15 +1533,16 @@ MonoBehaviour:
   gameOverScreen: {fileID: 1163945929}
   baseAP: 3
   currentAP: 0
-  currentReputation: 10
+  currentReputation: 8
   currentFunding: 6
   currentShift: 1
   initialPatientCount: 2
+  extraPatientEveryNShifts: 3
   deathReputationPenalty: 5
   diversionReputationPenalty: 2
   deathAddsRedTape: 1
   shiftsToWin: 15
-  walkInFundingReward: 4
+  walkInFundingReward: 3
   ambulanceFundingReward: 6
   traumaFlightFundingReward: 8
   cureReputationCap: 3
@@ -8781,7 +8782,7 @@ MonoBehaviour:
   supplyPiles:
   - card: {fileID: 11400000, guid: ee101d1dab5110e438b514db5b1e9e20, type: 2}
     unlockAt: 0
-    maxStock: 3
+    maxStock: 2
   - card: {fileID: 11400000, guid: 7c8835115022d0e4eab13901ae7f7d69, type: 2}
     unlockAt: 0
     maxStock: 4
