@@ -33,4 +33,4 @@ Suno has no official API, so the user generates in their browser: you write the 
 
 ## Mode 2: Import (`/cc-suno-music import`)
 
-Follow `docs/audio/import-guide.md` for `Assets/Audio/Music/_Incoming/`: delegate the move, settings, mixer and `MusicDirector` wiring to **cc-audio-specialist**, then do the lead's check and log each track in `docs/audio/suno-log.md`. Report the tracks imported, where they play, what you checked and anything not verified. Don't commit unless asked.
+Load `unity:audio-setup-mixers` and `unity:optimize-audio` (and tell cc-audio-specialist to load them too), then follow `docs/audio/import-guide.md` for `Assets/Audio/Music/_Incoming/`: delegate the move, settings, mixer and `MusicDirector` wiring to **cc-audio-specialist**, then do the lead's check and log each track in `docs/audio/suno-log.md`. Report the tracks imported, where they play, what you checked and anything not verified. Don't commit unless asked.

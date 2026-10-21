@@ -41,7 +41,7 @@ Audio scripts live in `Assets/Scripts/Audio/` (`ChiefComplaint.Audio`) and only 
 ## 6. Check (lead)
 - Read the diff and confirm the `.meta` files moved with the audio.
 - Recompile, check the console and run the EditMode tests.
-- Play mode: trigger each new cue (`unity command eval`), then exit play mode.
+- Play mode: trigger each new cue (`unity command script eval`), then exit play mode.
 - Ask before saving the scene if it may hold the user's own edits.
 
 ## 7. Log

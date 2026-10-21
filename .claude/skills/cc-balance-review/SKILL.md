@@ -16,8 +16,8 @@ If the user named an area (for example "Red Tape cards" or "Trauma Flight patien
 
 ## Step 0: Baseline (do this yourself, first)
 
-1. Run `unity status`. If the Editor is "ready", prefer `unity command` for reading assets (`find_assets`, `get_serialized_fields`). If no Editor is reachable, read the `.asset` YAML directly and say so in the report.
-2. Run the existing EditMode tests (`unity command run_tests --mode EditMode`). Record the totals. Any failing test is reported first, because it may mean a balance assumption is already broken.
+1. Load `unity:unity-cli` for the current command syntax. Run `unity status`. If the Editor is "ready", prefer `unity command` for reading assets (`asset find`, `component get_fields`). If no Editor is reachable, read the `.asset` YAML directly and say so in the report.
+2. Run the existing EditMode tests (`unity command test run --mode EditMode`). Record the totals. Any failing test is reported first, because it may mean a balance assumption is already broken.
 3. Note the current branch and `git log --oneline -5` so the report states what version was reviewed.
 
 ## Step 1: Fan out to the personas (in parallel, read-only)
@@ -34,7 +34,7 @@ Tell every agent: "Cite the asset path or `file:line` for every finding. Say 'no
 
 ## Step 2: Cross-check (do this yourself)
 
-- Use the Card Balance Viewer figures (`Chief Complaint/Windows/Card Balance Viewer`: average AP cost, total AP generation) as a sanity check against the economy agent's claims. If the Editor is connected, `unity command menu` can open it; otherwise note that it was not consulted.
+- Use the Card Balance Viewer figures (`Chief Complaint/Windows/Card Balance Viewer`: average AP cost, total AP generation) as a sanity check against the economy agent's claims. If the Editor is connected, `unity command editor invoke_menu` can open it; otherwise note that it was not consulted.
 - Discard or downgrade any finding that lacks a citation or contradicts the code.
 - Where two agents disagree, read the source yourself and decide, stating which was right.
 

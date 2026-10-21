@@ -34,7 +34,7 @@ I don't know the Speech tab's exact fields. The first time this skill runs, ask 
 
 ## Mode 2: Import (`/cc-suno-speech import`)
 
-Follow `docs/audio/import-guide.md` for `Assets/Audio/Voice/_Incoming/`. Delegate to **cc-audio-specialist**: the move to `Voice/`, voice import settings, Voice mixer routing with music ducking, and `VoicePlayer` wiring with a cooldown per cue. Then do the lead's check, playing each line in play mode, and log each file in `docs/audio/suno-log.md` with the script used. If a line repeats the on-screen popup text word for word, consider shortening one of them. Report what was imported, what triggers each line, what you checked and anything not verified. Don't commit unless asked.
+Load `unity:audio-setup-mixers` and `unity:optimize-audio` (and tell cc-audio-specialist to load them too), then follow `docs/audio/import-guide.md` for `Assets/Audio/Voice/_Incoming/`. Delegate to **cc-audio-specialist**: the move to `Voice/`, voice import settings, Voice mixer routing with music ducking, and `VoicePlayer` wiring with a cooldown per cue. Then do the lead's check, playing each line in play mode, and log each file in `docs/audio/suno-log.md` with the script used. If a line repeats the on-screen popup text word for word, consider shortening one of them. Report what was imported, what triggers each line, what you checked and anything not verified. Don't commit unless asked.
 
 ## Speech tab fields
 

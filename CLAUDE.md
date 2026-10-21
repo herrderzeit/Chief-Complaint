@@ -1,6 +1,27 @@
 # Unity project
 - Before editing any scene, prefab, or asset, run `unity status`. If an Editor is connected (state "ready"), drive it with `unity command <name>` instead of hand-editing .unity/.prefab/.asset YAML.
-- Run `unity command` to see which commands exist; don't assume names.
+- Run `unity command` to see which commands exist; don't assume names. Since Pipeline 0.9 commands are grouped: `unity command <group> <name>`. Examples: `editor status`, `editor.playmode start`/`stop`, `script eval_file --file`, `script recompile`, `test run`/`status`, `console get`, `capture game_view`, `editor invoke_menu --path`, `asset find`. List one group with `unity command --tag <tag>`.
+- Useful since 0.7–0.9:
+  - `editor.playmode set_run_in_background --enable true`: the game keeps running while Unity is unfocused.
+  - `job wait`: wait server-side for a condition instead of polling.
+  - `runtime simulate_pointer` / `simulate_key`: real Input System clicks and drags in play mode.
+  - `job batch`: many edits in one undoable transaction.
+  - `editor status` and `/api/status` report open modal dialogs, which block main-thread commands.
+
+## Unity skills (load with the Skill tool before the matching work)
+
+| Skill | Use for | Also used by |
+|---|---|---|
+| `unity:unity-cli` | `unity command` syntax and flags, tests, console, waiting, play mode | every agent |
+| `unity:unity-package-management` | adding, updating or removing packages | lead |
+| `unity:ui-ugui`, `unity:optimize-text-mesh-pro` | canvases, layouts, TMP fonts and glyphs, auto-size | cc-ui-ux-specialist |
+| `unity:sprite-segment-3x3grid`, `unity:sprite-editor`, `unity:manage-sprite-atlas` | 9-slicing, sprite borders, atlases | cc-ui-ux-specialist |
+| `unity:audio-setup-mixers`, `unity:optimize-audio` | mixer routing, audio import settings | cc-audio-specialist |
+| `unity:generate-editor-search-query` | finding assets or scene objects with Unity Search | cc-medical-data-scraper |
+
+When briefing a subagent, name the `unity:` skill it should load for the task.
+
+**Caution:** `unity:unity-cli` documents the standalone CLI (e.g. `unity test <path>` launches a separate batch-mode Unity). While the Editor is open, use the live Editor commands instead (`unity command test run`, `unity command test status`, and so on; list them with `unity command --tag <tag>`), and never start a batch-mode Unity on this project.
 - If status won't connect, run `unity pipeline list` to check for Safe Mode (compile errors), then fix the C# and restart Unity.
 - Only edit scene/asset files directly when no Editor is reachable, and say so.
 
@@ -37,7 +58,7 @@ The enums `ActionCardType` and `CardTag` are in the **global** namespace (`Actio
 - New card behaviour is a new `CardEffectSO` subclass, not a branch in a manager. Runtime state lives in managers, never in SO assets.
 - Minimise GC allocations in gameplay loops; pool with `UnityEngine.Pool`.
 - Read a file before editing it; Grep for all call sites before renaming a member.
-- After C# edits, `unity command recompile`, then check `console` for errors, before reporting done.
+- After C# edits, `unity command script recompile`, then check `console get` for errors, before reporting done.
 - When rules or numbers change, keep `Tools/BalanceSim` in step with the C# and re-run it (`dotnet run --project Tools/BalanceSim -c Release -- report`).
 
 # The team

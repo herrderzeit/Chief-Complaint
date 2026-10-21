@@ -24,9 +24,11 @@ Create `docs/handoffs/<yyyy-mm-dd>-<feature>.md` from `docs/handoffs/README.md`,
 
 ## Step 2: Core first (you)
 
-Make the schema, events and logic changes yourself: new SO fields or enum values (append enum values; never reorder them), `System.Action` events for UI and audio to hook, manager logic and any new `CardEffectSO`. Keep logic testable (pure helpers, injectable randomness, state getters). Recompile and check `console`. Mirror rule changes in `Tools/BalanceSim`. Note the new fields, events and APIs in the hand-off, since the other roles build on them.
+Make the schema, events and logic changes yourself: new SO fields or enum values (append enum values; never reorder them), `System.Action` events for UI and audio to hook, manager logic and any new `CardEffectSO`. Keep logic testable (pure helpers, injectable randomness, state getters). Recompile and check `console get`. Mirror rule changes in `Tools/BalanceSim`. Note the new fields, events and APIs in the hand-off, since the other roles build on them.
 
 ## Step 3: Fan out (in parallel, one message)
+
+In each brief, name the `unity:` skills the role should load (see the table in `CLAUDE.md`), e.g. `unity:ui-ugui` for new screens or `unity:unity-cli` for tests.
 
 Brief each role that the feature needs; skip the others and say so. Each brief has the hand-off path, the APIs and events from step 2, the files it owns for this task, and what done looks like.
 
@@ -42,7 +44,7 @@ If a role reports it needs something from another role, such as a new event or f
 1. Read every diff. Look for overlapping edits, hand-edited scene or prefab YAML (not allowed while the Editor is connected) and missing `.meta` files.
 2. Recompile, run all EditMode tests, and run PlayMode tests if any were added.
 3. Balance: if the feature touches AP, Reputation, Funding, stability or escalation, run `dotnet run --project Tools/BalanceSim -c Release -- report --runs 2000` before and after, and report the change in win rates. For a big shift, suggest `/cc-balance-review`.
-4. Play-mode check: drive the feature with `unity command eval` (as in earlier play-mode checks) on the main path and at least one edge case. Capture the game view, then exit play mode.
+4. Play-mode check: drive the feature with `unity command script eval` (as in earlier play-mode checks) on the main path and at least one edge case. Capture the game view, then exit play mode.
 5. Ask the user before saving the scene if it may hold their own unsaved edits.
 6. Add a **Result** section to the hand-off.
 

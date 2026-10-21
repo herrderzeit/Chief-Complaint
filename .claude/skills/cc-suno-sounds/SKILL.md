@@ -35,7 +35,7 @@ Suno's **Sounds** tab makes short samples: a text description plus **Type** (One
 
 ## Mode 2: Import (`/cc-suno-sounds import`)
 
-Follow `docs/audio/import-guide.md` for `Assets/Audio/SFX/_Incoming/`. Delegate to **cc-audio-specialist**:
+Load `unity:audio-setup-mixers` and `unity:optimize-audio` (and tell cc-audio-specialist to load them too), then follow `docs/audio/import-guide.md` for `Assets/Audio/SFX/_Incoming/`. Delegate to **cc-audio-specialist**:
 - the move, to `SFX/` or `Stings/`
 - import settings for short SFX, longer SFX, stings or ambience
 - mixer routing: SFX, UI for clicks, or Music for stings

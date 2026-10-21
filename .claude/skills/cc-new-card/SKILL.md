@@ -23,7 +23,7 @@ Create `docs/handoffs/<yyyy-mm-dd>-<card-name>.md` from the template in `docs/ha
 
 ## Step 2: Effect code, only if needed (you)
 
-List `Assets/Scripts/Cards/Effects/` and check whether existing `CardEffectSO` subclasses (alone, or combined through `ChoiceEffectSO` / `EitherOrEffectSO` / `WardWideEffectSO`) can express the card. If not, write a new `CardEffectSO` subclass following the existing ones (strategy pattern, no manager branches), recompile with `unity command recompile`, and check `console` for errors. Mirror any new rule in `Tools/BalanceSim` so the simulator can play the card.
+List `Assets/Scripts/Cards/Effects/` and check whether existing `CardEffectSO` subclasses (alone, or combined through `ChoiceEffectSO` / `EitherOrEffectSO` / `WardWideEffectSO`) can express the card. If not, write a new `CardEffectSO` subclass following the existing ones (strategy pattern, no manager branches), recompile with `unity command script recompile`, and check `console get` for errors. Mirror any new rule in `Tools/BalanceSim` so the simulator can play the card.
 
 ## Step 3: Card asset (cc-medical-data-scraper)
 
@@ -39,6 +39,8 @@ Delegate with the Agent tool (`subagent_type: cc-medical-data-scraper`). The bri
 - **cc-ui-ux-specialist:** only if the card needs something new on screen (a new type icon, a new target highlight, a tooltip). Otherwise skip it and say so.
 
 ## Step 5: Wire up and check (you)
+
+Load `unity:unity-cli` if you need command syntax for the steps below.
 
 1. Add the card to `DraftManager.draftableCardsPool` in `MainBoard.unity` through `unity command` (or to its base card's `directDraftUpgrade` if it is an upgrade). Ask the user before saving the scene if it might hold their own unsaved edits.
 2. Read every diff the subagents made. Recompile, run the EditMode tests, and fix or send back anything wrong.

@@ -10,14 +10,14 @@ disable-model-invocation: true
 You are the lead (see `CLAUDE.md`). Produce a gameplay video and an explanatory Google Doc that the user can send to their project lead for feedback. Use Australian English; write for a reader who knows the game's idea but not the recent work.
 
 ## Step 0: Preconditions
-1. `unity status` must be "ready". Ask the user before saving MainBoard if it has unsaved edits (the tour plays the open scene, saved or not, but the doc should describe committed work).
+1. Load `unity:unity-cli` for the current command syntax. `unity status` must be "ready". Ask the user before saving MainBoard if it has unsaved edits (the tour plays the open scene, saved or not, but the doc should describe committed work).
 2. Note the range: `since` argument, else the most recent tag `showcase-*` (`git tag --list "showcase-*" --sort=-creatordate`), else the last 20 commits. Record `git log --oneline <range>`.
 3. Don't run while subagents are running Unity tests (play mode interrupts them).
 
 ## Step 1: Record the tour
 1. If the game has new mechanics or screens since the tour was last updated, extend the steps in `Assets/Editor/Tools/ShowcaseRecorder.cs` (`BuildSteps`): one short caption per mechanic, driving the real game code the way existing steps do. Recompile and check the console.
-2. Run it: `unity command menu --path "Chief Complaint/Showcase/Record Gameplay Tour"` (check the exact `menu` parameter name with `unity command menu --help`). It enters play mode, records `Recordings/Showcase_<date>/ChiefComplaint_Tour.mp4` (1920×1080, 30 fps) plus one PNG still per step (`01.png`, `02.png`, …), then exits play mode by itself.
-3. Wait until play mode has stopped (`unity command editor_status`), then check the console for "Showcase step … failed" warnings. Look at the stills (Read the PNGs): if a step shows the wrong thing, fix the step and record again.
+2. Run it: `unity command editor invoke_menu --path "Chief Complaint/Showcase/Record Gameplay Tour"`. It enters play mode, records `Recordings/Showcase_<date>/ChiefComplaint_Tour.mp4` (1920×1080, 30 fps) plus one PNG still per step (`01.png`, `02.png`, …), then exits play mode by itself.
+3. Wait until play mode has stopped (`unity command editor status`), then check the console for "Showcase step … failed" warnings. Look at the stills (Read the PNGs): if a step shows the wrong thing, fix the step and record again.
 
 ## Step 2: Write the changes document
 1. Gather the changes: the commit range from Step 0, hand-off files in `docs/handoffs/` touched in that range, and simulator numbers (re-run `dotnet run --project Tools/BalanceSim -c Release -- report --runs 3000` if economy changed). Group by theme, not by commit.
