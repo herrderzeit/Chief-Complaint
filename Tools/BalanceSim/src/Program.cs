@@ -29,6 +29,7 @@ Options:
   --seed <n>         Base seed (default 1). Run i uses seed + i, so results are reproducible
   --bot <name>       random | nobuy | randombuy | smart | stall   (default smart)
   --set k=v          Override a config value, e.g. --set walkInFundingReward=3 (repeatable)
+  --cards <file>     Card overrides from a JSON file, for balance prototypes (see Data/CardOverrides.cs)
   --project <path>   Unity project root (default: found by walking up from the current folder)
   --out <dir>        Output folder for report (default Tools/BalanceSim/out)";
 
@@ -69,6 +70,8 @@ Options:
             string botName = opts.TryGetValue("bot", out string b) ? b : "smart";
 
             GameData data = new ProjectLoader(project).Load();
+            if (opts.TryGetValue("cards", out string cardsFile))
+                foreach (string change in CardOverrides.Apply(data, cardsFile)) Console.Error.WriteLine("override " + change);
             GameConfig config = data.Config.Clone();
             foreach (string kv in sets)
             {

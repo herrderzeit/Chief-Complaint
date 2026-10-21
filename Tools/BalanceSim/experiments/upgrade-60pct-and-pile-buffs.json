@@ -1,0 +1,25 @@
+{
+  "upgradePricePercent": 60,
+  "cards": {
+    "Double Shift": {
+      "reputationCost": 1
+    },
+    "Ward Round": {
+      "apCost": 1
+    },
+    "Damage Control Surgery": {
+      "exhaustsOnUse": false,
+      "apCost": 2
+    },
+    "Compliance Audit": {
+      "apCost": 1,
+      "cleanseRepPerCard": 2
+    },
+    "Shift Handover": {
+      "apCost": 0
+    },
+    "Crash Cart": {
+      "apCost": 1
+    }
+  }
+}
