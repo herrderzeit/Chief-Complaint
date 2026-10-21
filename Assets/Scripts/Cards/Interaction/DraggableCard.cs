@@ -91,6 +91,12 @@ namespace ChiefComplaint.Cards.Interaction
             }
         }
 
+        void OnDisable()
+        {
+            // A card removed mid-drag (e.g. the hand is discarded) never gets OnMouseUp, so clear the glow here.
+            if (isDragging) ShowValidTargets(null);
+        }
+
         void OnEnable()
         {
             isDragging = false;

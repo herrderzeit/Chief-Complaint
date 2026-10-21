@@ -52,6 +52,7 @@ namespace ChiefComplaint.Core
         public int traumaFlightsCured = 0;
         private bool ambulanceTriggered = false;
         private bool traumaTriggered = false;
+        private int currentShift = 1;
 
         [Header("Escalation Thresholds")]
         [Tooltip("Total patients cured before the Ambulance pool is added to the active deck.")]
@@ -68,13 +69,11 @@ namespace ChiefComplaint.Core
         /// Called by GameManager at the start of each shift, so the run escalates over time even if the player
         /// stops curing patients (which would otherwise keep them on easy Walk-Ins indefinitely).
         /// </summary>
-        public void OnShiftStarted(int shift)
+        public void NotifyShiftStarted(int shift)
         {
             currentShift = shift;
             CheckProgressionTriggers();
         }
-
-        private int currentShift = 1;
 
         protected override void Awake()
         {

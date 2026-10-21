@@ -78,15 +78,19 @@ namespace ChiefComplaint.Drafting
             }
         }
 
-        private void OnUpgradeTokensChanged(SymptomCategory colour, int count) => OnFundingChanged(0);
+        // One upgrade can raise several Funding and token events in a row; rebuild the list once, after all of them.
+        private bool upgradesListDirty;
 
-        private void OnFundingChanged(int newFunding)
+        private void OnUpgradeTokensChanged(SymptomCategory colour, int count) => upgradesListDirty = true;
+
+        private void OnFundingChanged(int newFunding) => upgradesListDirty = true;
+
+        private void LateUpdate()
         {
-            // If we are currently looking at the upgrades tab, refresh the list to grey out unaffordable buttons
-            if (upgradesContainer != null && upgradesContainer.activeInHierarchy)
-            {
-                RefreshUpgradesList();
-            }
+            if (!upgradesListDirty) return;
+            upgradesListDirty = false;
+            // Only the visible Upgrades tab needs refreshing; SwitchTab rebuilds it when it opens.
+            if (upgradesContainer != null && upgradesContainer.activeInHierarchy) RefreshUpgradesList();
         }
 
         public void SwitchTab(int tabIndex)
@@ -336,7 +340,8 @@ namespace ChiefComplaint.Drafting
                 }
 
                 Debug.Log($"Upgraded {baseCard.cardName} to {baseCard.directDraftUpgrade.cardName} for {cost} Funding!");
-                RefreshUpgradesList(); // Refresh to reflect the removal of the upgraded card
+                // The upgrade paid Funding and tokens, so the list rebuilds once in LateUpdate.
+                upgradesListDirty = true;
                 HidePreview();
             }
         }

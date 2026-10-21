@@ -115,6 +115,7 @@ namespace ChiefComplaint.Core
         private void Start()
         {
             if (gameOverScreen != null) gameOverScreen.gameObject.SetActive(false);
+            if (boardManager != null) boardManager.OnPatientDiverted += DivertPatient;
 
             if (PlayerPrefs.GetInt(TutorialCompletedKey, 0) == 0)
             {
@@ -227,7 +228,7 @@ namespace ChiefComplaint.Core
             if (DeckManager.Instance != null) DeckManager.Instance.StartNewShift();
 
             // Escalation can also be time-based, so check it before this shift's patient arrives.
-            if (PatientDeckManager.Instance != null) PatientDeckManager.Instance.OnShiftStarted(currentShift);
+            if (PatientDeckManager.Instance != null) PatientDeckManager.Instance.NotifyShiftStarted(currentShift);
 
             if (boardManager != null) boardManager.SpawnPatient();
         }
@@ -301,6 +302,23 @@ namespace ChiefComplaint.Core
             currentFunding += amount;
             OnFundingChanged?.Invoke(currentFunding);
             GameLog.Info($"Gained {amount} Funding! Total: {currentFunding}");
+        }
+
+        protected override void OnDestroy()
+        {
+            if (boardManager != null) boardManager.OnPatientDiverted -= DivertPatient;
+            base.OnDestroy();
+        }
+
+        /// <summary>
+        /// A patient was diverted because Triage was full: costs <see cref="diversionReputationPenalty"/> Reputation.
+        /// Subscribed to <see cref="BoardManager.OnPatientDiverted"/>.
+        /// </summary>
+        public void DivertPatient(Vector3 at)
+        {
+            if (diversionReputationPenalty <= 0) return;
+            GameFeedback.ShowAt($"Triage full - patient diverted! -{diversionReputationPenalty} Rep", at, GameFeedback.WarningColour);
+            SpendReputation(diversionReputationPenalty);
         }
 
         /// <summary>Awards upgrade tokens of a department's colour (one per symptom treated there).</summary>

@@ -61,6 +61,15 @@ namespace ChiefComplaint.Editor.Tools
             SessionState.SetBool(PendingKey, true);
             SessionState.SetString(FolderKey, folder);
             EditorApplication.EnterPlaymode();
+            // If play mode can't start (e.g. compile errors), drop the request so a later Play press isn't recorded.
+            EditorApplication.delayCall += () =>
+            {
+                if (!EditorApplication.isPlayingOrWillChangePlaymode && SessionState.GetBool(PendingKey, false))
+                {
+                    SessionState.SetBool(PendingKey, false);
+                    Debug.LogWarning("Showcase: play mode didn't start, so the tour was cancelled. Fix any compile errors and try again.");
+                }
+            };
         }
 
         /// <summary>Folder of the most recent recording, for scripts and the cc-showcase skill.</summary>
@@ -71,10 +80,21 @@ namespace ChiefComplaint.Editor.Tools
             if (state != PlayModeStateChange.EnteredPlayMode || !SessionState.GetBool(PendingKey, false)) return;
             SessionState.SetBool(PendingKey, false);
             outputFolder = SessionState.GetString(FolderKey, "");
-            BuildSteps();
-            StartRecorder();
+            try
+            {
+                BuildSteps();
+                StartRecorder();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Showcase: couldn't start the recording, so play mode is stopping. {e.Message}");
+                recorder = null;
+                EditorApplication.ExitPlaymode();
+                return;
+            }
             stepIndex = 0;
-            nextStepAt = Time.time + 1.5f; // let the board settle
+            // Let the board settle before the first step.
+            nextStepAt = Time.time + 1.5f;
             EditorApplication.update += Tick;
         }
 

@@ -90,7 +90,7 @@ namespace ChiefComplaint.Tests.EditMode
             pdm.traumaFlightShiftThreshold = traumaShift;
 
             Cure(cures);
-            pdm.OnShiftStarted(shift);
+            pdm.NotifyShiftStarted(shift);
 
             Assert.AreEqual(expectAmbulance, AmbulancesInDeck,
                 $"Ambulance pool in deck at shift {shift} with {cures} cures (shift threshold {ambulanceShift}).");
@@ -108,7 +108,7 @@ namespace ChiefComplaint.Tests.EditMode
             pdm.ambulanceShiftThreshold = 5;
             pdm.traumaFlightShiftThreshold = 10;
 
-            for (int shift = 1; shift <= 4; shift++) pdm.OnShiftStarted(shift);
+            for (int shift = 1; shift <= 4; shift++) pdm.NotifyShiftStarted(shift);
 
             Assert.AreEqual("Walk-Ins", pdm.GetEscalationPhase());
             CollectionAssert.AreEqual(new[] { walkIn }, pdm.activePatientDeck, "Only the opening Walk-In should be in the deck.");
@@ -123,11 +123,11 @@ namespace ChiefComplaint.Tests.EditMode
             pdm.traumaFlightShiftThreshold = 10;
 
             Cure(3);                    // Ambulances by cures
-            pdm.OnShiftStarted(5);      // ...and by shift
-            pdm.OnShiftStarted(6);
-            pdm.OnShiftStarted(10);     // Trauma Flights by shift
+            pdm.NotifyShiftStarted(5);      // ...and by shift
+            pdm.NotifyShiftStarted(6);
+            pdm.NotifyShiftStarted(10);     // Trauma Flights by shift
             Cure(5);                    // ...and by cures (8 total)
-            pdm.OnShiftStarted(11);
+            pdm.NotifyShiftStarted(11);
             Cure(1);
 
             foreach (var a in ambulances)
@@ -143,7 +143,7 @@ namespace ChiefComplaint.Tests.EditMode
             pdm.ambulanceShiftThreshold = 5;
             pdm.traumaFlightShiftThreshold = 10;
 
-            pdm.OnShiftStarted(10);
+            pdm.NotifyShiftStarted(10);
             pdm.DrawRandomPatient();
             pdm.DrawRandomPatient();
 
@@ -163,7 +163,7 @@ namespace ChiefComplaint.Tests.EditMode
 
             for (int shift = 1; shift <= 15; shift++)
             {
-                pdm.OnShiftStarted(shift);
+                pdm.NotifyShiftStarted(shift);
                 if (shift == 7) Cure(3); // a cure after the time unlock must not re-announce Ambulances
             }
             Cure(8);
@@ -180,8 +180,8 @@ namespace ChiefComplaint.Tests.EditMode
             pdm.OnEscalationPhaseChanged += raised.Add;
 
             Cure(3);
-            pdm.OnShiftStarted(5);
-            pdm.OnShiftStarted(6);
+            pdm.NotifyShiftStarted(5);
+            pdm.NotifyShiftStarted(6);
 
             CollectionAssert.AreEqual(new[] { "Ambulances" }, raised);
         }
@@ -195,7 +195,7 @@ namespace ChiefComplaint.Tests.EditMode
             var raised = new List<string>();
             pdm.OnEscalationPhaseChanged += raised.Add;
 
-            pdm.OnShiftStarted(10);
+            pdm.NotifyShiftStarted(10);
 
             CollectionAssert.AreEqual(new[] { "Trauma Flights" }, raised);
             Assert.IsTrue(AmbulancesInDeck && TraumasInDeck, "Both pools should be added when both thresholds are passed at once.");

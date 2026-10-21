@@ -21,6 +21,8 @@ namespace ChiefComplaint.Board
     {
         /// <summary>Raised with the number of patients currently in critical condition (Code Blue).</summary>
         public event System.Action<int> OnCodeBlueCountChanged;
+        /// <summary>Raised when an arriving patient is diverted because every Triage slot is full (world position for feedback).</summary>
+        public event System.Action<Vector3> OnPatientDiverted;
 
         // Board slots and Prefabs have been moved to BoardView.
 
@@ -129,15 +131,10 @@ namespace ChiefComplaint.Board
             Transform emptySlot = BoardView.Instance.GetEmptyTriageSlot(activePatients);
             if (emptySlot == null)
             {
-                // Ambulance diversion: the patient goes to another hospital, and Reputation suffers.
+                // Ambulance diversion: the patient goes to another hospital (GameManager applies the penalty).
                 GameLog.Warn("Triage River is full! Patient diverted.");
-                var gm = GameManager.Instance;
-                if (gm != null && gm.diversionReputationPenalty > 0)
-                {
-                    Vector3 at = BoardView.Instance.triageSlots.Length > 0 ? BoardView.Instance.triageSlots[BoardView.Instance.triageSlots.Length / 2].position : Vector3.zero;
-                    GameFeedback.ShowAt($"Triage full - patient diverted! -{gm.diversionReputationPenalty} Rep", at, GameFeedback.WarningColour);
-                    gm.SpendReputation(gm.diversionReputationPenalty);
-                }
+                var slots = BoardView.Instance.triageSlots;
+                OnPatientDiverted?.Invoke(slots.Length > 0 ? slots[slots.Length / 2].position : Vector3.zero);
                 return;
             }
 

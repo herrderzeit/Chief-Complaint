@@ -47,6 +47,8 @@ namespace ChiefComplaint.Tests.EditMode
             Override(view);
 
             board = NewComponent<BoardManager>("DiversionTestsBoardManager");
+            // GameManager.Start does this in play; Start doesn't run in EditMode.
+            board.OnPatientDiverted += gm.DivertPatient;
 
             // Occupy every Triage slot: a live patient parented to each slot, registered on the board.
             var registry = (List<PatientCardView>)board.ActivePatients;
