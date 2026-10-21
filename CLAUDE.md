@@ -58,6 +58,8 @@ The enums `ActionCardType` and `CardTag` are in the **global** namespace (`Actio
 - New card behaviour is a new `CardEffectSO` subclass, not a branch in a manager. Runtime state lives in managers, never in SO assets.
 - Minimise GC allocations in gameplay loops; pool with `UnityEngine.Pool`.
 - Read a file before editing it; Grep for all call sites before renaming a member.
+- **Unity 6.6 APIs (no deprecated calls):** find objects with `Object.FindAnyObjectByType<T>()` (optionally `FindObjectsInactive.Include`) and `Object.FindObjectsByType<T>()` / `FindObjectsByType<T>(FindObjectsInactive)`. Never use `FindFirstObjectByType`, `FindObjectOfType`, `FindObjectsOfType` or any overload taking `FindObjectsSortMode`: all are deprecated. Prefer a cached or serialised reference over any Find.
+- **Input goes through the Input System actions:** read the pointer, Select, Zoom and Pause from `ChiefComplaint.Utils.GameInput` (the "Gameplay" map in `Assets/Settings/InputSystem_Actions.inputactions`; add new actions there with the Input Actions Editor). Board objects receive clicks and drags by implementing `IBoardPointerHandler` (dispatched by `BoardPointer`). Never use `OnMouseDown`/`OnMouseUp`/`OnMouseDrag`/`OnMouseEnter`/`OnMouseExit`, `UnityEngine.Input`, or `Mouse.current`/`Keyboard.current` in gameplay code.
 - After C# edits, `unity command script recompile`, then check `console get` for errors, before reporting done.
 - When rules or numbers change, keep `Tools/BalanceSim` in step with the C# and re-run it (`dotnet run --project Tools/BalanceSim -c Release -- report`).
 

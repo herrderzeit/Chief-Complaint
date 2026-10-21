@@ -267,7 +267,9 @@ block-name__element-name--modifier-name
 | `Update` polling | Wastes CPU cycles | Use events, coroutines, or triggers |
 | `SendMessage` / `BroadcastMessage` | Slow, no compile-time checking | Use C# events or direct references |
 | `Invoke` / `InvokeRepeating` | String-based, no refactoring support | Use coroutines or `Timer` patterns |
-| `FindObjectOfType` in hot paths | Very slow O(n) search | Cache reference or use events |
+| `FindAnyObjectByType` / `FindObjectsByType` in hot paths | Very slow O(n) search | Cache reference or use events |
+| Deprecated Find APIs (`FindFirstObjectByType`, `FindObjectOfType`, `FindObjectsOfType`, any `FindObjectsSortMode` overload) | Deprecated in Unity 6.x; relies on instance-ID ordering | `FindAnyObjectByType<T>()`, `FindObjectsByType<T>()` / `FindObjectsByType<T>(FindObjectsInactive)` |
+| `OnMouse*` messages, `UnityEngine.Input`, `Mouse.current` in gameplay code | Legacy input / bypasses the Input Actions asset | Implement `IBoardPointerHandler`; read `GameInput` (Gameplay action map) |
 | `PlayerPrefs` for game state | No validation, easy to tamper | Use proper save system with serialization |
 
 ---

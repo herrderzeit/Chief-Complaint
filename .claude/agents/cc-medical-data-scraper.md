@@ -36,6 +36,7 @@ Asset locations: `Assets/Data/` (for example `Assets/Data/Actions/RedTape/`, `As
 ## Working Rules
 
 - Read an existing asset or the SO source before generating rows, to avoid schema mismatches.
+- In any `unity command script eval` code, use `Object.FindAnyObjectByType<T>()` / `Object.FindObjectsByType<T>()`, never the deprecated `FindFirstObjectByType`, `FindObjectOfType` or `FindObjectsSortMode` overloads.
 - Show bulk data as a CSV block first so the user can review it before it is written anywhere.
 - Search existing card names before creating new ones to avoid duplicates.
 - Never edit C# yourself. Flag needed field or enum changes to cc-card-engine-specialist.

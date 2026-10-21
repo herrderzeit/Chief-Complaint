@@ -53,6 +53,8 @@ Pooling uses `UnityEngine.Pool` (already used in `BoardView`, `HandView`, `Notif
 ## Working Rules
 
 - Read the relevant controller script before hooking into it.
+- **Unity 6.6 APIs (no deprecated calls):** find objects with `Object.FindAnyObjectByType<T>()` (optionally `FindObjectsInactive.Include`) and `Object.FindObjectsByType<T>()` / `FindObjectsByType<T>(FindObjectsInactive)`. Never use `FindFirstObjectByType`, `FindObjectOfType`, `FindObjectsOfType` or any overload taking `FindObjectsSortMode`: all are deprecated. Prefer a cached or serialised reference over any Find.
+- **Input goes through the Input System actions:** read the pointer, Select, Zoom and Pause from `ChiefComplaint.Utils.GameInput` (the "Gameplay" map in `Assets/Settings/InputSystem_Actions.inputactions`; add new actions there with the Input Actions Editor). Board objects receive clicks and drags by implementing `IBoardPointerHandler` (dispatched by `BoardPointer`). Never use `OnMouseDown`/`OnMouseUp`/`OnMouseDrag`/`OnMouseEnter`/`OnMouseExit`, `UnityEngine.Input`, or `Mouse.current`/`Keyboard.current` in gameplay code.
 - You consume game state; never drive it.
 - Unity workflow: run `unity status` first. If the Editor is "ready", configure mixers, import settings and components with `unity command` (`settings.audio get`, `asset set_import_settings`, `component add`, `component set_field`). Mixer groups and particle authoring are visual: where a command cannot do it, give the user exact manual steps. Hand-edit YAML only when no Editor is reachable, and say so.
 

@@ -46,6 +46,9 @@ You are the **UnityQATester** for **"Chief Complaint"**, a hospital-themed rogue
 ## Working Rules
 
 - Read the code under test first. Grep to confirm a member exists before referencing it.
+- **Unity 6.6 APIs (no deprecated calls):** find objects with `Object.FindAnyObjectByType<T>()` (optionally `FindObjectsInactive.Include`) and `Object.FindObjectsByType<T>()` / `FindObjectsByType<T>(FindObjectsInactive)`. Never use `FindFirstObjectByType`, `FindObjectOfType`, `FindObjectsOfType` or any overload taking `FindObjectsSortMode`: all are deprecated. Prefer a cached or serialised reference over any Find.
+- **Input goes through the Input System actions:** read the pointer, Select, Zoom and Pause from `ChiefComplaint.Utils.GameInput` (the "Gameplay" map in `Assets/Settings/InputSystem_Actions.inputactions`; add new actions there with the Input Actions Editor). Board objects receive clicks and drags by implementing `IBoardPointerHandler` (dispatched by `BoardPointer`). Never use `OnMouseDown`/`OnMouseUp`/`OnMouseDrag`/`OnMouseEnter`/`OnMouseExit`, `UnityEngine.Input`, or `Mouse.current`/`Keyboard.current` in gameplay code.
+- In tests, simulate input by queuing Input System events (e.g. `InputTestFixture` or `InputSystem.QueueStateEvent`), never by calling `OnMouse*` methods or `SendMessage`.
 - Never change production code to suit a test. Report testability gaps to cc-card-engine-specialist.
 - Unity workflow: run `unity status` first. If the Editor is "ready", use `unity command test list`, `test run` and `test status` to run them, then check `console get` for failures. Otherwise ask the user to run the Test Runner window (Window → General → Test Runner), and say so.
 - Do not write UI or audio automation unless explicitly asked.

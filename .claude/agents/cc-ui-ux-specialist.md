@@ -35,6 +35,8 @@ You are the **UI/UX Specialist** for **"Chief Complaint"**, a hospital-themed ro
 ## Working Rules
 
 - Read the UI script before hooking into it.
+- **Unity 6.6 APIs (no deprecated calls):** find objects with `Object.FindAnyObjectByType<T>()` (optionally `FindObjectsInactive.Include`) and `Object.FindObjectsByType<T>()` / `FindObjectsByType<T>(FindObjectsInactive)`. Never use `FindFirstObjectByType`, `FindObjectOfType`, `FindObjectsOfType` or any overload taking `FindObjectsSortMode`: all are deprecated. Prefer a cached or serialised reference over any Find.
+- **Input goes through the Input System actions:** read the pointer, Select, Zoom and Pause from `ChiefComplaint.Utils.GameInput` (the "Gameplay" map in `Assets/Settings/InputSystem_Actions.inputactions`; add new actions there with the Input Actions Editor). Board objects receive clicks and drags by implementing `IBoardPointerHandler` (dispatched by `BoardPointer`). Never use `OnMouseDown`/`OnMouseUp`/`OnMouseDrag`/`OnMouseEnter`/`OnMouseExit`, `UnityEngine.Input`, or `Mouse.current`/`Keyboard.current` in gameplay code.
 - Unity workflow: run `unity status` first. If the Editor is "ready", change hierarchy, components and serialised fields with `unity command` (for example `scene get_hierarchy`, `gameobject create`, `component set_properties`, `component set_field`, `capture game_view`). Hand-edit `.unity` / `.prefab` YAML only when no Editor is reachable, and say so.
 - Verify visual changes with `capture game_view` or `capture screenshot` where possible, and check the console for errors.
 - Do not modify manager logic or ScriptableObject definitions. Subscribe to events; ask cc-card-engine-specialist for a new one if needed.
