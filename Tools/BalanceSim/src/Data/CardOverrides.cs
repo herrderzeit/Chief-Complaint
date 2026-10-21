@@ -17,6 +17,9 @@ namespace ChiefComplaint.Sim.Data
     /// </code>
     /// <c>upgradePricePercent</c> sets every upgrade's Funding cost to that percentage of the upgraded card's market
     /// price (rounded, at least 1); a card's own <c>upgradeCost</c> override wins over it.
+    /// Patients can be changed one by one (<c>"patients": { "Arthur Miller": { "arrivesWithHandover": false } }</c>)
+    /// or a whole pool at once (<c>"pools": { "Ambulance": { "decayPerTurn": 3 } }</c>, pools Walk-In, Ambulance,
+    /// Trauma Flight); single-patient entries are applied after pools.
     /// </summary>
     public static class CardOverrides
     {
@@ -43,6 +46,36 @@ namespace ChiefComplaint.Sim.Data
                 }
             }
 
+            if (root.TryGetProperty("pools", out JsonElement pools))
+            {
+                foreach (JsonProperty entry in pools.EnumerateObject())
+                {
+                    List<PatientDef> pool = entry.Name.Replace(" ", "").Replace("-", "").ToLowerInvariant() switch
+                    {
+                        "walkin" => data.WalkInPool,
+                        "ambulance" => data.AmbulancePool,
+                        "traumaflight" => data.TraumaFlightPool,
+                        _ => throw new ArgumentException($"--cards: unknown pool '{entry.Name}'.")
+                    };
+                    foreach (PatientDef patient in pool.Distinct())
+                        foreach (JsonProperty field in entry.Value.EnumerateObject())
+                            SetPatient(patient, field.Name, field.Value);
+                    log.Add($"pool {entry.Name}: {entry.Value.GetRawText()}");
+                }
+            }
+
+            if (root.TryGetProperty("patients", out JsonElement patients))
+            {
+                foreach (JsonProperty entry in patients.EnumerateObject())
+                {
+                    PatientDef patient = AllPatients(data).FirstOrDefault(p => string.Equals(p.Name, entry.Name, StringComparison.OrdinalIgnoreCase))
+                        ?? throw new ArgumentException($"--cards: no patient named '{entry.Name}'.");
+                    foreach (JsonProperty field in entry.Value.EnumerateObject())
+                        SetPatient(patient, field.Name, field.Value);
+                    log.Add($"patient {patient.Name}: {entry.Value.GetRawText()}");
+                }
+            }
+
             if (root.TryGetProperty("upgradePricePercent", out JsonElement pct))
             {
                 double percent = pct.GetDouble();
@@ -56,6 +89,22 @@ namespace ChiefComplaint.Sim.Data
                 }
             }
             return log;
+        }
+
+        private static IEnumerable<PatientDef> AllPatients(GameData data) =>
+            data.WalkInPool.Concat(data.AmbulancePool).Concat(data.TraumaFlightPool).Distinct();
+
+        private static void SetPatient(PatientDef patient, string field, JsonElement value)
+        {
+            switch (field)
+            {
+                case "arrivesWithHandover": patient.ArrivesWithHandover = value.GetBoolean(); break;
+                case "startingStability": patient.StartingStability = value.GetInt32(); break;
+                case "decayPerTurn": patient.DecayPerTurn = value.GetInt32(); break;
+                case "reputationReward": patient.ReputationReward = value.GetInt32(); break;
+                case "triageLevel": patient.TriageLevel = value.GetInt32(); break;
+                default: throw new ArgumentException($"--cards: patient field '{field}' can't be overridden (on {patient.Name}).");
+            }
         }
 
         private static CardDef Find(GameData data, string name) =>
