@@ -60,7 +60,7 @@ namespace ChiefComplaint.UI
 
         /// <summary>
         /// Spawns a floating text notification at a specific screen-space position
-        /// (e.g. <c>UnityEngine.InputSystem.Mouse.current.position.ReadValue()</c>) converted to world space by the prefab's placement.
+        /// (e.g. <c>GameInput.PointerScreenPosition</c>) converted to world space by the prefab's placement.
         /// </summary>
         /// <param name="message">The text to display.</param>
         /// <param name="screenPosition">The screen-space position to place the notification.</param>

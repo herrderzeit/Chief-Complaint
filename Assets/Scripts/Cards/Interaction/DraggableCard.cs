@@ -22,7 +22,7 @@ namespace ChiefComplaint.Cards.Interaction
     /// </list>
     /// </summary>
     [UnityEngine.Scripting.APIUpdating.MovedFrom(true, null, null, null)]
-    public class DraggableCard : MonoBehaviour
+    public class DraggableCard : MonoBehaviour, IBoardPointerHandler
     {
         public static event System.Action<ActionCardSO> OnCardDragStarted;
         public static event System.Action OnCardDragEnded;
@@ -93,7 +93,7 @@ namespace ChiefComplaint.Cards.Interaction
 
         void OnDisable()
         {
-            // A card removed mid-drag (e.g. the hand is discarded) never gets OnMouseUp, so clear the glow here.
+            // A card removed mid-drag (e.g. the hand is discarded) never gets PointerUp, so clear the glow here.
             if (isDragging) ShowValidTargets(null);
         }
 
@@ -130,19 +130,19 @@ namespace ChiefComplaint.Cards.Interaction
             transform.localPosition -= new Vector3(0, 0, -2.0f);
         }
 
-        void OnMouseEnter()
+        public void PointerEnter()
         {
             isHovering = true;
             if (!isDragging) ApplyHoverState();
         }
 
-        void OnMouseExit()
+        public void PointerExit()
         {
             isHovering = false;
             if (!isDragging) RemoveHoverState();
         }
 
-        void OnMouseDown()
+        public void PointerDown()
         {
             if (GameManager.Instance != null && !GameManager.Instance.CanInteract) return;
 
@@ -166,7 +166,7 @@ namespace ChiefComplaint.Cards.Interaction
             }
         }
 
-        void OnMouseDrag()
+        public void PointerDrag()
         {
             if (isDragging)
             {
@@ -243,7 +243,7 @@ namespace ChiefComplaint.Cards.Interaction
             }
         }
 
-        void OnMouseUp()
+        public void PointerUp()
         {
             if (!isDragging) return;
             isDragging = false;
@@ -393,12 +393,8 @@ namespace ChiefComplaint.Cards.Interaction
         /// <returns>Mouse position in world space.</returns>
         private Vector3 GetMouseWorldPosition()
         {
-            var mouse = UnityEngine.InputSystem.Mouse.current;
             Camera cam = CameraUtil.Main;
-            if (mouse == null || cam == null) return transform.position;
-            Vector3 mousePos = mouse.position.ReadValue();
-            mousePos.z = Mathf.Abs(cam.transform.position.z);
-            return cam.ScreenToWorldPoint(mousePos);
+            return cam != null ? GameInput.PointerWorldPosition(cam) : transform.position;
         }
     }
 }

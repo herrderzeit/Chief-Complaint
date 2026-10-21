@@ -50,6 +50,9 @@ namespace ChiefComplaint.Editor.Tools
         private static Vector2 pointer = new Vector2(960f, 540f);
         private static bool pointerPressed;
 
+        /// <summary>The project's Input System settings, swapped out for focus-independent ones while the tour plays.</summary>
+        private static InputSettings savedInputSettings;
+
         static ShowcaseRecorder()
         {
             EditorApplication.playModeStateChanged += OnPlayModeChanged;
@@ -85,6 +88,7 @@ namespace ChiefComplaint.Editor.Tools
 
         private static void OnPlayModeChanged(PlayModeStateChange state)
         {
+            if (state == PlayModeStateChange.ExitingPlayMode) RestoreInputSettings();
             if (state != PlayModeStateChange.EnteredPlayMode || !SessionState.GetBool(PendingKey, false)) return;
             SessionState.SetBool(PendingKey, false);
             outputFolder = SessionState.GetString(FolderKey, "");
@@ -104,8 +108,10 @@ namespace ChiefComplaint.Editor.Tools
             pendingStillPath = null;
             inputQueue.Clear();
             pointerPressed = false;
-            // Input respects Game view focus in the Editor, so make sure the Game view has it.
+            // Input respects Game view focus in the Editor, so make sure the Game view has it, and keep the
+            // simulated pointer alive even if the user clicks into another window while the tour records.
             EditorApplication.ExecuteMenuItem("Window/General/Game");
+            UseFocusIndependentInput();
             // Let the board settle before the first step.
             nextStepAt = Time.time + 1.5f;
             EditorApplication.update += Tick;
@@ -138,6 +144,30 @@ namespace ChiefComplaint.Editor.Tools
             recorder = new RecorderController(controllerSettings);
             recorder.PrepareRecording();
             recorder.StartRecording();
+        }
+
+        /// <summary>
+        /// Swaps in a temporary copy of the Input System settings that ignores focus: by default the Editor resets
+        /// pointers to (0, 0) whenever Unity or the Game view loses focus, which drops the tour's drags. The
+        /// project's settings asset itself is never changed.
+        /// </summary>
+        private static void UseFocusIndependentInput()
+        {
+            if (savedInputSettings != null) return;
+            savedInputSettings = InputSystem.settings;
+            var tourSettings = Object.Instantiate(savedInputSettings);
+            tourSettings.backgroundBehavior = InputSettings.BackgroundBehavior.IgnoreFocus;
+            tourSettings.editorInputBehaviorInPlayMode = InputSettings.EditorInputBehaviorInPlayMode.AllDeviceInputAlwaysGoesToGameView;
+            InputSystem.settings = tourSettings;
+        }
+
+        private static void RestoreInputSettings()
+        {
+            if (savedInputSettings == null) return;
+            var tourSettings = InputSystem.settings;
+            InputSystem.settings = savedInputSettings;
+            savedInputSettings = null;
+            if (tourSettings != null && !EditorUtility.IsPersistent(tourSettings)) Object.DestroyImmediate(tourSettings);
         }
 
         private static void Finish()
@@ -406,9 +436,9 @@ namespace ChiefComplaint.Editor.Tools
         private static GameManager Gm() => GameManager.Instance;
         private static BoardManager Bm() => GameManager.Instance.boardManager;
         private static BoardView Board() => BoardView.Instance;
-        private static DraftManager Draft() => Object.FindFirstObjectByType<DraftManager>(FindObjectsInactive.Include);
-        private static DeckUpgradeManager Upgrades() => Object.FindFirstObjectByType<DeckUpgradeManager>(FindObjectsInactive.Include);
-        private static PlayZoneView PlayZone() => Object.FindFirstObjectByType<PlayZoneView>();
+        private static DraftManager Draft() => Object.FindAnyObjectByType<DraftManager>(FindObjectsInactive.Include);
+        private static DeckUpgradeManager Upgrades() => Object.FindAnyObjectByType<DeckUpgradeManager>(FindObjectsInactive.Include);
+        private static PlayZoneView PlayZone() => Object.FindAnyObjectByType<PlayZoneView>();
         private static IReadOnlyList<PatientCardView> Patients() => Bm().ActivePatients;
 
         private static Vector2 At(Component c) => At(c.transform.position);
@@ -450,7 +480,10 @@ namespace ChiefComplaint.Editor.Tools
             return go.transform;
         }
 
-        /// <summary>A point on the visible top edge of the hand card named <paramref name="cardName"/> (hand cards only peek up).</summary>
+        /// <summary>
+        /// A point on the hand card named <paramref name="cardName"/>, low enough to stay on the card when it lifts
+        /// and grows on hover (aiming at its top edge chases the card upwards onto the board behind it).
+        /// </summary>
         private static Vector2 HandCard(string cardName)
         {
             var active = HandView.Instance.activeCards;
@@ -461,7 +494,7 @@ namespace ChiefComplaint.Editor.Tools
                 var col = active[i].GetComponent<Collider2D>();
                 Bounds b = col != null ? col.bounds : new Bounds(active[i].transform.position, Vector3.one);
                 Vector2 top = At(new Vector3(b.center.x, b.max.y, b.center.z));
-                return new Vector2(top.x, Mathf.Max(8f, top.y - 30f));
+                return new Vector2(top.x, Mathf.Clamp(top.y - 30f, 8f, 30f));
             }
             throw new InvalidOperationException($"{cardName} isn't in the hand.");
         }
@@ -472,7 +505,7 @@ namespace ChiefComplaint.Editor.Tools
         private static SymptomSubCardView Symptom(PatientCardView patient)
         {
             var sub = patient.GetComponentInChildren<SymptomSubCardView>();
-            return sub != null ? sub : Object.FindFirstObjectByType<SymptomSubCardView>();
+            return sub != null ? sub : Object.FindAnyObjectByType<SymptomSubCardView>();
         }
 
         private static DepartmentSlot DepartmentFor(PatientCardView patient)

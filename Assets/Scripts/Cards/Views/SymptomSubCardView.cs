@@ -19,7 +19,7 @@ namespace ChiefComplaint.Cards.Views
     /// Smoothly animates both scale and world position each frame.
     /// </summary>
     [UnityEngine.Scripting.APIUpdating.MovedFrom(true, null, null, null)]
-    public class SymptomSubCardView : MonoBehaviour
+    public class SymptomSubCardView : MonoBehaviour, IBoardPointerHandler
     {
         [Header("Visual References")]
         public TextMeshPro symptomNameText;
@@ -228,38 +228,38 @@ namespace ChiefComplaint.Cards.Views
         private Vector3 mouseDownPos;
         private bool isDraggingParent = false;
 
-        void OnMouseDown()
+        /// <summary>The owning patient's drag handler, or null (e.g. on a ghost, whose drag script is removed).</summary>
+        private DraggablePatient ParentDrag()
         {
-            var mouse = UnityEngine.InputSystem.Mouse.current;
-            mouseDownPos = mouse != null ? (Vector3)mouse.position.ReadValue() : Vector3.zero;
+            if (parentPatient == null) return null;
+            var drag = parentPatient.GetComponent<DraggablePatient>();
+            return drag != null && drag.isActiveAndEnabled ? drag : null;
+        }
+
+        public void PointerDown()
+        {
+            mouseDownPos = GameInput.PointerScreenPosition;
             isDraggingParent = false;
         }
 
-        void OnMouseDrag()
+        public void PointerDrag()
         {
-            var mouse = UnityEngine.InputSystem.Mouse.current;
-            if (isZoomed || mouse == null) return;
+            if (isZoomed) return;
 
             // If the mouse has moved enough, consider it a drag rather than a click
-            if (!isDraggingParent && Vector3.Distance(mouseDownPos, mouse.position.ReadValue()) > 5f)
+            if (!isDraggingParent && Vector3.Distance(mouseDownPos, GameInput.PointerScreenPosition) > 5f)
             {
                 isDraggingParent = true;
                 
                 // Now that we confirmed it's a drag, tell the parent to start dragging
-                if (parentPatient != null)
-                {
-                    parentPatient.SendMessage("OnMouseDown", SendMessageOptions.DontRequireReceiver);
-                }
+                ParentDrag()?.PointerDown();
             }
 
             // Forward drag to the patient card
-            if (isDraggingParent && parentPatient != null)
-            {
-                parentPatient.SendMessage("OnMouseDrag", SendMessageOptions.DontRequireReceiver);
-            }
+            if (isDraggingParent) ParentDrag()?.PointerDrag();
         }
 
-        void OnMouseUp()
+        public void PointerUp()
         {
             // If we didn't drag the card, it's a click!
             if (!isDraggingParent)
@@ -308,10 +308,7 @@ namespace ChiefComplaint.Cards.Views
             else
             {
                 // We were dragging, so tell the parent to drop
-                if (parentPatient != null)
-                {
-                    parentPatient.SendMessage("OnMouseUp", SendMessageOptions.DontRequireReceiver);
-                }
+                ParentDrag()?.PointerUp();
             }
         }
 

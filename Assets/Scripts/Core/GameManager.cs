@@ -140,8 +140,7 @@ namespace ChiefComplaint.Core
 
         private void Update()
         {
-            var keyboard = UnityEngine.InputSystem.Keyboard.current;
-            if (keyboard != null && keyboard.escapeKey.wasPressedThisFrame)
+            if (GameInput.Pause.WasPressedThisFrame())
             {
                 HandleEscape();
             }

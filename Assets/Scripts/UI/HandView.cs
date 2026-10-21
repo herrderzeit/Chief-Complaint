@@ -140,11 +140,10 @@ namespace ChiefComplaint.UI
             bool shouldLift = false;
             if (!isDraggingCard && activeCards.Count > 0)
             {
-                var mouse = UnityEngine.InputSystem.Mouse.current;
                 Camera cam = CameraUtil.Main;
-                if (mouse != null && cam != null)
+                if (cam != null)
                 {
-                    Vector3 viewportPos = cam.ScreenToViewportPoint(mouse.position.ReadValue());
+                    Vector3 viewportPos = cam.ScreenToViewportPoint(GameInput.PointerScreenPosition);
                     shouldLift = viewportPos.y < liftTriggerHeight && viewportPos.y >= 0f
                               && viewportPos.x > liftTriggerSideMargin && viewportPos.x < 1f - liftTriggerSideMargin;
                 }

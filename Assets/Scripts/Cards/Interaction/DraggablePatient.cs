@@ -19,7 +19,7 @@ namespace ChiefComplaint.Cards.Interaction
     /// </summary>
     [RequireComponent(typeof(PatientCardView))]
     [UnityEngine.Scripting.APIUpdating.MovedFrom(true, null, null, null)]
-    public class DraggablePatient : MonoBehaviour
+    public class DraggablePatient : MonoBehaviour, IBoardPointerHandler
     {
         private bool isDragging = false;
         private Vector3 offset;
@@ -88,7 +88,7 @@ namespace ChiefComplaint.Cards.Interaction
             return System.Array.Empty<PatientCardView>();
         }
 
-        void OnMouseDown()
+        public void PointerDown()
         {
             // While a patient is being picked (e.g. Team Assessment), a click selects instead of dragging.
             if (PatientPicker.IsPicking) { PatientPicker.TryPick(patientView); return; }
@@ -112,12 +112,12 @@ namespace ChiefComplaint.Cards.Interaction
             HighlightDropTargets();
         }
 
-        void OnMouseDrag()
+        public void PointerDrag()
         {
             if (isDragging) transform.position = GetMouseWorldPosition() + offset;
         }
 
-        void OnMouseUp()
+        public void PointerUp()
         {
             if (!isDragging) return;
             isDragging = false;
@@ -436,12 +436,8 @@ namespace ChiefComplaint.Cards.Interaction
         /// <returns>Mouse position in world space.</returns>
         private Vector3 GetMouseWorldPosition()
         {
-            var mouse = UnityEngine.InputSystem.Mouse.current;
             Camera cam = CameraUtil.Main;
-            if (mouse == null || cam == null) return transform.position;
-            Vector3 mousePos = mouse.position.ReadValue();
-            mousePos.z = Mathf.Abs(cam.transform.position.z);
-            return cam.ScreenToWorldPoint(mousePos);
+            return cam != null ? GameInput.PointerWorldPosition(cam) : transform.position;
         }
     }
 }

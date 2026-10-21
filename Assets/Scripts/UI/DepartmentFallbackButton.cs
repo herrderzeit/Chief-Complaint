@@ -19,7 +19,7 @@ namespace ChiefComplaint.UI
     /// </summary>
     [RequireComponent(typeof(Collider2D))]
     [UnityEngine.Scripting.APIUpdating.MovedFrom(true, null, null, null)]
-    public class DepartmentFallbackButton : MonoBehaviour
+    public class DepartmentFallbackButton : MonoBehaviour, IBoardPointerHandler
     {
         public DepartmentSlot departmentSlot;
 
@@ -156,20 +156,17 @@ namespace ChiefComplaint.UI
         {
             if (tooltipRoot == null || buttonSprite == null) return;
             bool over = false;
-            var mouse = UnityEngine.InputSystem.Mouse.current;
             Camera cam = CameraUtil.Main;
-            if (mouse != null && cam != null && GameManager.Instance.CanInteract)
+            if (cam != null && GameManager.Instance.CanInteract)
             {
-                Vector3 w = cam.ScreenToWorldPoint(mouse.position.ReadValue());
-                Bounds b = buttonSprite.bounds;
-                over = w.x >= b.min.x && w.x <= b.max.x && w.y >= b.min.y && w.y <= b.max.y;
+                over = GameInput.IsPointerOver(buttonSprite.bounds, cam);
             }
             hoverTime = over ? hoverTime + Time.deltaTime : 0f;
             bool show = over && hoverTime >= tooltipDelay;
             if (tooltipRoot.activeSelf != show) tooltipRoot.SetActive(show);
         }
 
-        private void OnMouseDown()
+        public void PointerDown()
         {
             if (!isInteractable || currentPatient == null || targetTier == null) return;
             if (!GameManager.Instance.CanInteract) return; // board locked (draft, choice prompt, pause)

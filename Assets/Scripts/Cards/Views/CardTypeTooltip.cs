@@ -48,13 +48,9 @@ namespace ChiefComplaint.Cards.Views
 
         private bool IsMouseOverIcon()
         {
-            var mouse = UnityEngine.InputSystem.Mouse.current;
             Camera cam = CameraUtil.Main;
-            if (mouse == null || cam == null || icon.sprite == null) return false;
-
-            Vector3 world = cam.ScreenToWorldPoint(mouse.position.ReadValue());
-            Bounds b = icon.bounds;
-            return world.x >= b.min.x && world.x <= b.max.x && world.y >= b.min.y && world.y <= b.max.y;
+            if (cam == null || icon.sprite == null) return false;
+            return GameInput.IsPointerOver(icon.bounds, cam);
         }
     }
 }
