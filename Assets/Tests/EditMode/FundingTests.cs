@@ -28,7 +28,7 @@ namespace ChiefComplaint.Tests.EditMode
             Assert.AreEqual(6, gm.CurrentFunding);
         }
 
-        [TestCase(EscalationType.WalkIn, 2)]
+        [TestCase(EscalationType.WalkIn, 4)]
         [TestCase(EscalationType.Ambulance, 6)]
         [TestCase(EscalationType.TraumaFlight, 8)]
         public void GetFundingReward_MatchesEscalationType(EscalationType type, int expected)

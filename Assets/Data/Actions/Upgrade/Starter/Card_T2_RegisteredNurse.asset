@@ -58,7 +58,7 @@ MonoBehaviour:
   effects:
   - {fileID: -3019103424098774660}
   directDraftUpgrade: {fileID: 11400000, guid: 387533e8005b73e4a8ff73bec66fac78, type: 2}
-  draftUpgradeCost: 5
+  draftUpgradeCost: 8
   upgradeTokenCost: 2
   upgradeTokenAnyColour: 0
   upgradeTokenColour: 2

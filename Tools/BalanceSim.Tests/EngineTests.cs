@@ -30,9 +30,9 @@ namespace ChiefComplaint.Sim.Tests
             int rep = g.Reputation, funding = g.Funding;
             g.Apply(GameAction.EndShift);
             Assert.True(p.Removed);
-            // Full stability: rep reward 1 (capped at 3) + 1 bonus; Walk-In funding 2 + 1 bonus.
+            // Full stability: rep reward 1 (capped at 3) + 1 bonus; Walk-In funding + 1 bonus.
             Assert.Equal(rep + 2, g.Reputation);
-            Assert.Equal(funding + 3, g.Funding);
+            Assert.Equal(funding + g.Config.WalkInFundingReward + 1, g.Funding);
             Assert.Equal(1, g.PatientsCured);
         }
 
@@ -151,7 +151,7 @@ namespace ChiefComplaint.Sim.Tests
             int rep = g.Reputation, funding = g.Funding;
             g.Apply(GameAction.EndShift);
             Assert.Equal(rep + 0, g.Reputation);      // 1 - 1
-            Assert.Equal(funding + 1, g.Funding);      // 2 - 1
+            Assert.Equal(funding + g.Config.WalkInFundingReward - 1, g.Funding); // Walk-In funding - 1
         }
 
         [Fact]

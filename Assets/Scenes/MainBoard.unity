@@ -1541,7 +1541,7 @@ MonoBehaviour:
   diversionReputationPenalty: 2
   deathAddsRedTape: 1
   shiftsToWin: 15
-  walkInFundingReward: 2
+  walkInFundingReward: 4
   ambulanceFundingReward: 6
   traumaFlightFundingReward: 8
   cureReputationCap: 3

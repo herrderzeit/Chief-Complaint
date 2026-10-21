@@ -88,7 +88,7 @@ namespace ChiefComplaint.Core
 
         [Header("Activity Funding")]
         [Tooltip("Funding paid for curing a Walk-In patient.")]
-        public int walkInFundingReward = 2;
+        public int walkInFundingReward = 4;
         [Tooltip("Funding paid for curing an Ambulance patient.")]
         public int ambulanceFundingReward = 6;
         [Tooltip("Funding paid for curing a Trauma Flight patient.")]

@@ -19,7 +19,7 @@ namespace ChiefComplaint.Sim.Data
         public int DeathReputationPenalty = 5;
         public bool DeathAddsRedTape = true;
         public int ShiftsToWin = 15;
-        public int WalkInFundingReward = 2;
+        public int WalkInFundingReward = 4;
         public int AmbulanceFundingReward = 6;
         public int TraumaFlightFundingReward = 8;
         public int CureReputationCap = 3;
