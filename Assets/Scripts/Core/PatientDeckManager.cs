@@ -61,9 +61,23 @@ namespace ChiefComplaint.Core
         public int traumaFlightCureThreshold = 8;
 
         [Tooltip("The Ambulance pool also unlocks when this shift starts, even without enough cures (0 = cures only).")]
-        public int ambulanceShiftThreshold = 5;
+        [SerializeField] private int ambulanceShiftThreshold = 5;
         [Tooltip("The Trauma Flight pool also unlocks when this shift starts, even without enough cures (0 = cures only).")]
-        public int traumaFlightShiftThreshold = 10;
+        [SerializeField] private int traumaFlightShiftThreshold = 10;
+
+        /// <summary>Shift at which Ambulances unlock even without enough cures (0 = cures only).</summary>
+        public int AmbulanceShiftThreshold
+        {
+            get => ambulanceShiftThreshold;
+            set => ambulanceShiftThreshold = Mathf.Max(0, value);
+        }
+
+        /// <summary>Shift at which Trauma Flights unlock even without enough cures (0 = cures only).</summary>
+        public int TraumaFlightShiftThreshold
+        {
+            get => traumaFlightShiftThreshold;
+            set => traumaFlightShiftThreshold = Mathf.Max(0, value);
+        }
 
         /// <summary>
         /// Called by GameManager at the start of each shift, so the run escalates over time even if the player
@@ -257,7 +271,6 @@ namespace ChiefComplaint.Core
         /// </summary>
         private void CheckProgressionTriggers()
         {
-            bool escalated = false;
 
             bool ambulanceByShift = ambulanceShiftThreshold > 0 && currentShift >= ambulanceShiftThreshold;
             bool traumaByShift = traumaFlightShiftThreshold > 0 && currentShift >= traumaFlightShiftThreshold;
@@ -267,7 +280,7 @@ namespace ChiefComplaint.Core
                 GameLog.Info("WARNING: Ambulances are arriving! Adding Tier 2 patients.");
                 activePatientDeck.AddRange(ambulancePool);
                 ambulanceTriggered = true;
-                escalated = true;
+                OnEscalationPhaseChanged?.Invoke("Ambulances");
             }
 
             if ((patientsCured >= traumaFlightCureThreshold || traumaByShift) && !traumaTriggered)
@@ -275,12 +288,7 @@ namespace ChiefComplaint.Core
                 GameLog.Info("CRITICAL: Trauma Flights incoming! Adding Tier 3 patients.");
                 activePatientDeck.AddRange(traumaFlightPool);
                 traumaTriggered = true;
-                escalated = true;
-            }
-
-            if (escalated)
-            {
-                OnEscalationPhaseChanged?.Invoke(GetEscalationPhase());
+                OnEscalationPhaseChanged?.Invoke("Trauma Flights");
             }
         }
 

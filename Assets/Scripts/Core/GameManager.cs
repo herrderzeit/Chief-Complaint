@@ -73,7 +73,14 @@ namespace ChiefComplaint.Core
         public int deathReputationPenalty = 5;
 
         [Tooltip("Reputation lost when an arriving patient has to be diverted because every Triage slot is full (0 = free).")]
-        public int diversionReputationPenalty = 2;
+        [SerializeField] private int diversionReputationPenalty = 2;
+
+        /// <summary>Reputation lost per diverted patient (0 = diversion is free).</summary>
+        public int DiversionReputationPenalty
+        {
+            get => diversionReputationPenalty;
+            set => diversionReputationPenalty = Mathf.Max(0, value);
+        }
         [Tooltip("When a patient dies, a random Red Tape card (incident paperwork) is added to the discard pile.")]
         public bool deathAddsRedTape = true;
         [Tooltip("Surviving this many shifts wins the run. 0 disables the win condition.")]
@@ -311,7 +318,7 @@ namespace ChiefComplaint.Core
         }
 
         /// <summary>
-        /// A patient was diverted because Triage was full: costs <see cref="diversionReputationPenalty"/> Reputation.
+        /// A patient was diverted because Triage was full: costs <see cref="DiversionReputationPenalty"/> Reputation.
         /// Subscribed to <see cref="BoardManager.OnPatientDiverted"/>.
         /// </summary>
         public void DivertPatient(Vector3 at)

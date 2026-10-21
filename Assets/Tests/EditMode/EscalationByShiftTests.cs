@@ -86,8 +86,8 @@ namespace ChiefComplaint.Tests.EditMode
         public void Escalation_UnlocksByShiftOrCures(int shift, int cures, int ambulanceShift, int traumaShift,
             bool expectAmbulance, bool expectTrauma)
         {
-            pdm.ambulanceShiftThreshold = ambulanceShift;
-            pdm.traumaFlightShiftThreshold = traumaShift;
+            pdm.AmbulanceShiftThreshold = ambulanceShift;
+            pdm.TraumaFlightShiftThreshold = traumaShift;
 
             Cure(cures);
             pdm.NotifyShiftStarted(shift);
@@ -105,8 +105,8 @@ namespace ChiefComplaint.Tests.EditMode
         [Test]
         public void Escalation_ShiftJustBelowThreshold_StaysOnWalkIns()
         {
-            pdm.ambulanceShiftThreshold = 5;
-            pdm.traumaFlightShiftThreshold = 10;
+            pdm.AmbulanceShiftThreshold = 5;
+            pdm.TraumaFlightShiftThreshold = 10;
 
             for (int shift = 1; shift <= 4; shift++) pdm.NotifyShiftStarted(shift);
 
@@ -119,8 +119,8 @@ namespace ChiefComplaint.Tests.EditMode
         [Test]
         public void Pools_AreAddedExactlyOnce_WhenCureAndShiftConditionsAreBothMet()
         {
-            pdm.ambulanceShiftThreshold = 5;
-            pdm.traumaFlightShiftThreshold = 10;
+            pdm.AmbulanceShiftThreshold = 5;
+            pdm.TraumaFlightShiftThreshold = 10;
 
             Cure(3);                    // Ambulances by cures
             pdm.NotifyShiftStarted(5);      // ...and by shift
@@ -140,8 +140,8 @@ namespace ChiefComplaint.Tests.EditMode
         [Test]
         public void Unlocking_DoesNotMutateThePoolLists()
         {
-            pdm.ambulanceShiftThreshold = 5;
-            pdm.traumaFlightShiftThreshold = 10;
+            pdm.AmbulanceShiftThreshold = 5;
+            pdm.TraumaFlightShiftThreshold = 10;
 
             pdm.NotifyShiftStarted(10);
             pdm.DrawRandomPatient();
@@ -156,8 +156,8 @@ namespace ChiefComplaint.Tests.EditMode
         [Test]
         public void OnEscalationPhaseChanged_FiresOncePerNewPhase()
         {
-            pdm.ambulanceShiftThreshold = 5;
-            pdm.traumaFlightShiftThreshold = 10;
+            pdm.AmbulanceShiftThreshold = 5;
+            pdm.TraumaFlightShiftThreshold = 10;
             var raised = new List<string>();
             pdm.OnEscalationPhaseChanged += raised.Add;
 
@@ -174,8 +174,8 @@ namespace ChiefComplaint.Tests.EditMode
         [Test]
         public void OnEscalationPhaseChanged_CureUnlockThenShift_DoesNotFireAgain()
         {
-            pdm.ambulanceShiftThreshold = 5;
-            pdm.traumaFlightShiftThreshold = 0;
+            pdm.AmbulanceShiftThreshold = 5;
+            pdm.TraumaFlightShiftThreshold = 0;
             var raised = new List<string>();
             pdm.OnEscalationPhaseChanged += raised.Add;
 
@@ -187,17 +187,17 @@ namespace ChiefComplaint.Tests.EditMode
         }
 
         [Test]
-        public void OnEscalationPhaseChanged_JumpingStraightPastBothThresholds_FiresOnceWithTheHighestPhase()
+        public void OnEscalationPhaseChanged_JumpingStraightPastBothThresholds_FiresOncePerPhaseInOrder()
         {
-            // Documents current behaviour: one CheckProgressionTriggers call that unlocks both pools raises one event.
-            pdm.ambulanceShiftThreshold = 5;
-            pdm.traumaFlightShiftThreshold = 10;
+            // One CheckProgressionTriggers call that unlocks both pools raises one event per phase, in order.
+            pdm.AmbulanceShiftThreshold = 5;
+            pdm.TraumaFlightShiftThreshold = 10;
             var raised = new List<string>();
             pdm.OnEscalationPhaseChanged += raised.Add;
 
             pdm.NotifyShiftStarted(10);
 
-            CollectionAssert.AreEqual(new[] { "Trauma Flights" }, raised);
+            CollectionAssert.AreEqual(new[] { "Ambulances", "Trauma Flights" }, raised);
             Assert.IsTrue(AmbulancesInDeck && TraumasInDeck, "Both pools should be added when both thresholds are passed at once.");
         }
 
@@ -206,8 +206,8 @@ namespace ChiefComplaint.Tests.EditMode
         [Test]
         public void GameManagerStartNewShift_ReportsTheShift_SoAmbulancesArriveAtShiftFive()
         {
-            pdm.ambulanceShiftThreshold = 5;
-            pdm.traumaFlightShiftThreshold = 10;
+            pdm.AmbulanceShiftThreshold = 5;
+            pdm.TraumaFlightShiftThreshold = 10;
             previousPdmInstance = PatientDeckManager.Instance;
             pdmOverridden = true;
             SetInstance(pdm);

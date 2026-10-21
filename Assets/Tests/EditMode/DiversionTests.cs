@@ -13,7 +13,7 @@ namespace ChiefComplaint.Tests.EditMode
     /// <summary>
     /// Covers ambulance diversion (the stalling-exploit fix): when every Triage slot is occupied,
     /// <see cref="BoardManager.SpawnPatient"/> turns the patient away and charges
-    /// <see cref="GameManager.diversionReputationPenalty"/> instead of spawning.
+    /// <see cref="GameManager.DiversionReputationPenalty"/> instead of spawning.
     /// </summary>
     [Category("Board")]
     public class DiversionTests
@@ -95,7 +95,7 @@ namespace ChiefComplaint.Tests.EditMode
         [TestCase(5)]
         public void SpawnPatient_TriageFull_ChargesTheDiversionPenalty(int penalty)
         {
-            gm.diversionReputationPenalty = penalty;
+            gm.DiversionReputationPenalty = penalty;
             int before = gm.CurrentReputation;
             int? raised = null;
             gm.OnReputationChanged += v => raised = v;
@@ -109,7 +109,7 @@ namespace ChiefComplaint.Tests.EditMode
         [Test]
         public void SpawnPatient_TriageFull_NothingSpawnsAndNoPatientIsDrawn()
         {
-            gm.diversionReputationPenalty = 2;
+            gm.DiversionReputationPenalty = 2;
 
             board.SpawnPatient();
 
@@ -121,7 +121,7 @@ namespace ChiefComplaint.Tests.EditMode
         [Test]
         public void SpawnPatient_TriageFull_ZeroPenalty_IsFree()
         {
-            gm.diversionReputationPenalty = 0;
+            gm.DiversionReputationPenalty = 0;
             int before = gm.CurrentReputation;
             bool raised = false;
             gm.OnReputationChanged += _ => raised = true;
@@ -136,7 +136,7 @@ namespace ChiefComplaint.Tests.EditMode
         [Test]
         public void SpawnPatient_TriageFull_RepeatedDiversionsEndTheRun()
         {
-            gm.diversionReputationPenalty = 2;
+            gm.DiversionReputationPenalty = 2;
             gm.SpendReputation(gm.CurrentReputation - 4); // leave 4 Reputation
 
             board.SpawnPatient();

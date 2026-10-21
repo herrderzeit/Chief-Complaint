@@ -50,7 +50,7 @@ namespace ChiefComplaint.Cards.Views
         private int originalSortingLayerID;
 
         [Tooltip("Sorting layer used while zoomed, so the card draws over the PlayZone and the rest of the board.")]
-        public string zoomSortingLayer = "Player Hand";
+        [SerializeField] private string zoomSortingLayer = "Player Hand";
 
         /// <summary>The symptom card currently zoomed in, if any. Only one may be zoomed at a time.</summary>
         private static SymptomSubCardView currentlyZoomed;
@@ -264,6 +264,14 @@ namespace ChiefComplaint.Cards.Views
             // If we didn't drag the card, it's a click!
             if (!isDraggingParent)
             {
+                // While a patient is being picked (Team Assessment), clicking the symptom card picks its patient;
+                // otherwise the symptom card, which sits over the middle of the patient card, swallows the click.
+                if (PatientPicker.IsPicking && parentPatient != null)
+                {
+                    PatientPicker.TryPick(parentPatient);
+                    return;
+                }
+
                 if (!isRevealed) return;
 
                 // Another symptom card is already zoomed: close that one first.

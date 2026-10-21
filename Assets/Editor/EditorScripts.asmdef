@@ -6,7 +6,8 @@
         "Unity.TextMeshPro",
         "Unity.Recorder.Editor",
         "Unity.Recorder",
-        "Unity.Recorder.Base"
+        "Unity.Recorder.Base",
+        "Unity.InputSystem"
     ],
     "includePlatforms": [
         "Editor"

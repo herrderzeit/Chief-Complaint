@@ -86,6 +86,7 @@ namespace ChiefComplaint.Cards.Views
         private bool hoverHighlighted;
         private bool targetable;
         private Color? outlineBaseColour;
+        private SpriteRenderer outlineRenderer;
 
         [Header("Visual Feedback")]
         /// <summary>
@@ -835,11 +836,14 @@ namespace ChiefComplaint.Cards.Views
         private void RefreshOutline()
         {
             if (highlightOutline == null) return;
-            var outline = highlightOutline.GetComponent<SpriteRenderer>();
-            if (outline != null && outlineBaseColour == null) outlineBaseColour = outline.color;
+            if (outlineRenderer == null)
+            {
+                outlineRenderer = highlightOutline.GetComponent<SpriteRenderer>();
+                if (outlineRenderer != null) outlineBaseColour = outlineRenderer.color;
+            }
 
             highlightOutline.SetActive(hoverHighlighted || targetable);
-            if (outline != null) outline.color = hoverHighlighted ? outlineBaseColour.Value : targetableOutlineColour;
+            if (outlineRenderer != null) outlineRenderer.color = hoverHighlighted ? outlineBaseColour.Value : targetableOutlineColour;
         }
 
         /// <summary><c>true</c> if a diagnosis of up to <paramref name="maxTier"/> would reveal a symptom now (mirrors <see cref="TryDiagnoseNext"/>).</summary>
