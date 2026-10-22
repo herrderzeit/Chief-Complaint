@@ -38,6 +38,7 @@ namespace ChiefComplaint.Sim.Tests
             Assert.Equal(8, Data.Config.TraumaFlightFundingReward);
             Assert.Equal(3, Data.Config.ExtraPatientEveryNShifts);
             Assert.Equal(14, Data.Config.MaxReputation);
+            Assert.Equal(2, Data.Config.CureReputationCap);
         }
 
         [Fact]

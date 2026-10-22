@@ -10,6 +10,15 @@ namespace ChiefComplaint.Tests.EditMode
     {
         private GameObject go;
         private PatientDeckManager patientDeckManager;
+        // Every ScriptableObject made at runtime, destroyed in TearDown so none leak between tests.
+        private readonly List<ScriptableObject> createdAssets = new List<ScriptableObject>();
+
+        private T NewAsset<T>() where T : ScriptableObject
+        {
+            var asset = ScriptableObject.CreateInstance<T>();
+            createdAssets.Add(asset);
+            return asset;
+        }
 
         [SetUp]
         public void Setup()
@@ -21,7 +30,7 @@ namespace ChiefComplaint.Tests.EditMode
             patientDeckManager.internalDeck = new List<SymptomCardSO>();
             for (int i = 0; i < 5; i++)
             {
-                var sym = ScriptableObject.CreateInstance<SymptomCardSO>();
+                var sym = NewAsset<SymptomCardSO>();
                 sym.specialtyCategory = SymptomCategory.Internal;
                 patientDeckManager.internalDeck.Add(sym);
             }
@@ -31,13 +40,15 @@ namespace ChiefComplaint.Tests.EditMode
         public void Teardown()
         {
             Object.DestroyImmediate(go);
+            foreach (var asset in createdAssets) if (asset != null) Object.DestroyImmediate(asset);
+            createdAssets.Clear();
         }
 
         [Test]
         public void GenerateSymptomsForPatient_AssignsCorrectTiersBasedOnTriage()
         {
             // Triage 1 -> Tier 3
-            var criticalPatient = ScriptableObject.CreateInstance<PatientCardSO>();
+            var criticalPatient = NewAsset<PatientCardSO>();
             criticalPatient.triageLevel = 1;
             criticalPatient.incomingCategories = new List<SymptomCategory> { SymptomCategory.Internal };
 
@@ -47,7 +58,7 @@ namespace ChiefComplaint.Tests.EditMode
             Assert.AreEqual(SymptomTier.Tier3, symptoms[0].Tier, "Triage 1 patient should get Tier 3 primary symptom.");
 
             // Triage 4 -> Tier 1
-            var minorPatient = ScriptableObject.CreateInstance<PatientCardSO>();
+            var minorPatient = NewAsset<PatientCardSO>();
             minorPatient.triageLevel = 4;
             minorPatient.incomingCategories = new List<SymptomCategory> { SymptomCategory.Internal };
 
@@ -60,7 +71,7 @@ namespace ChiefComplaint.Tests.EditMode
         [Test]
         public void GenerateSymptomsForPatient_MultipleCategories_SubsequentAreTier1()
         {
-            var patient = ScriptableObject.CreateInstance<PatientCardSO>();
+            var patient = NewAsset<PatientCardSO>();
             patient.triageLevel = 2; // Tier 2 primary
             patient.incomingCategories = new List<SymptomCategory> { SymptomCategory.Internal, SymptomCategory.Internal };
 

@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Reflection;
-using System.Text.RegularExpressions;
 using ChiefComplaint.Board;
 using ChiefComplaint.Cards.Data;
 using ChiefComplaint.Cards.Views;
@@ -8,7 +7,6 @@ using ChiefComplaint.Core;
 using ChiefComplaint.Utils;
 using NUnit.Framework;
 using UnityEngine;
-using UnityEngine.TestTools;
 
 namespace ChiefComplaint.Tests.EditMode
 {
@@ -42,7 +40,7 @@ namespace ChiefComplaint.Tests.EditMode
             Assert.AreEqual(StartingReputation, gm.CurrentReputation, "Fixture error: starting Reputation not set.");
             Override(gm);
 
-            // No BoardView: the dead card then falls back to Destroy(gameObject), which only logs in EditMode.
+            // No BoardView: the dead card is destroyed outright (DestroyImmediate outside play mode).
             Override<BoardView>(null);
             Override<DeckManager>(null);
 
@@ -89,12 +87,11 @@ namespace ChiefComplaint.Tests.EditMode
             bool died = false;
             view.OnDied += _ => died = true;
 
-            // EditMode cannot Destroy; the fallback logs this error, which is expected and harmless here.
-            LogAssert.Expect(LogType.Error, new Regex("Destroy may not be called from edit mode"));
             view.AdvanceShiftDecay(); // stability 1 - decay 2 -> death
 
             Assert.IsTrue(died, "Fixture error: the patient should have died this shift.");
             Assert.IsTrue(view.isRemoved);
+            Assert.IsTrue(view == null, "With no BoardView the dead card's GameObject is destroyed straight away.");
         }
 
         [Test]

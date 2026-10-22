@@ -403,7 +403,7 @@ namespace ChiefComplaint.Cards.Views
 
                 OnRemoved?.Invoke(this);
                 if (BoardView.Instance != null) BoardView.Instance.ReleasePatientCard(this);
-                else Destroy(gameObject);
+                else DestroyCard();
                 return;
             }
 
@@ -695,7 +695,14 @@ namespace ChiefComplaint.Cards.Views
 
             OnRemoved?.Invoke(this);
             if (BoardView.Instance != null) BoardView.Instance.ReleasePatientCard(this);
-            else Destroy(gameObject);
+            else DestroyCard();
+        }
+
+        /// <summary>Destroys this card when there is no pool to return it to (Destroy in play, DestroyImmediate in the Editor).</summary>
+        private void DestroyCard()
+        {
+            if (Application.isPlaying) Destroy(gameObject);
+            else DestroyImmediate(gameObject);
         }
 
         /// <summary>Display name of the symptom at <paramref name="index"/> at its assigned tier.</summary>

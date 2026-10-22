@@ -292,7 +292,7 @@ namespace ChiefComplaint.Sim.Engine
 
             if (!rngFailed && card.CardsToDraw > 0) DrawCards(card.CardsToDraw, reshuffleDiscard: false);
             SpendAP(card.ApCost);
-            if (card.ReputationCost > 0) SpendReputation(card.ReputationCost, "card:" + card.Name);
+            if (card.ReputationCost > 0 && !rngFailed) SpendReputation(card.ReputationCost, "card:" + card.Name);
             Hand.Remove(card);
             if (!card.ExhaustsOnUse) DiscardPile.Add(card);
             observer?.OnCardPlayed(this, card, target);

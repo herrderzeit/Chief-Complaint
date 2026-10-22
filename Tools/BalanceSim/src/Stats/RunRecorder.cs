@@ -54,7 +54,13 @@ namespace ChiefComplaint.Sim.Stats
         public readonly RunRecord Record = new RunRecord();
         private int deaths;
 
-        public override void OnPatientArrived(Game game, Patient patient) => Record.Arrivals[(int)patient.Pool]++;
+        public override void OnPatientArrived(Game game, Patient patient)
+        {
+            Record.Arrivals[(int)patient.Pool]++;
+            // Escalation also unlocks by shift (5 and 10), not only by cures, so record the unlock when it's first seen.
+            if (Record.AmbulanceUnlockShift == 0 && game.AmbulancesUnlocked) Record.AmbulanceUnlockShift = game.Shift;
+            if (Record.TraumaUnlockShift == 0 && game.TraumaFlightsUnlocked) Record.TraumaUnlockShift = game.Shift;
+        }
 
         public override void OnSpawnSkipped(Game game, string reason)
         {

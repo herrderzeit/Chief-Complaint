@@ -315,6 +315,7 @@ namespace ChiefComplaint.Cards.Interaction
                 }
 
                 // Apply all strategy effects
+                string skippedEffect = null;
                 foreach (var effect in cardData.effects)
                 {
                     if (effect.CanApply(hoveredPatient, hoveredCard))
@@ -324,6 +325,17 @@ namespace ChiefComplaint.Cards.Interaction
                             effectApplied = true;
                         }
                     }
+                    else if (skippedEffect == null)
+                    {
+                        // Remember the first part that couldn't apply (e.g. a pause on an already paused patient).
+                        skippedEffect = effect.Describe() ?? "Part of this card";
+                    }
+                }
+
+                // A card with several effects still plays when only some apply; say which part did nothing.
+                if (effectApplied && skippedEffect != null && cardData.effects.Count > 1)
+                {
+                    GameFeedback.WarnAt($"{skippedEffect}: no effect", GetMouseWorldPosition() + Vector3.up * 0.6f);
                 }
 
                 // A playable card with no effects (e.g. Red Tape such as Prior Authorization) is
@@ -345,9 +357,9 @@ namespace ChiefComplaint.Cards.Interaction
                     }
 
                     GameManager.Instance.SpendAP(cardData.apCost);
-                    if (cardData.reputationCost > 0)
+                    if (cardData.reputationCost > 0 && !rngFailed)
                     {
-                        // Paid only now that an effect has landed, so a fizzled card costs no Reputation.
+                        // Paid only now that an effect has landed (and its roll succeeded), so a fizzled card costs no Reputation.
                         GameManager.Instance.SpendReputation(cardData.reputationCost);
                         GameFeedback.ShowAt($"-{cardData.reputationCost} Rep", GetMouseWorldPosition(), GameFeedback.WarningColour);
                     }

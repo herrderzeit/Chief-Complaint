@@ -114,6 +114,39 @@ namespace ChiefComplaint.Tests.EditMode
             CollectionAssert.AreEqual(new[] { walkIn }, pdm.activePatientDeck, "Only the opening Walk-In should be in the deck.");
         }
 
+        // ------------------------------------------------------------------ cure thresholds (time rule off)
+
+        [TestCase(2, "Walk-Ins", TestName = "Cures2_StillWalkIns")]
+        [TestCase(3, "Ambulances", TestName = "Cures3_AmbulancesUnlock")]
+        [TestCase(7, "Ambulances", TestName = "Cures7_StillAmbulances")]
+        [TestCase(8, "Trauma Flights", TestName = "Cures8_TraumaFlightsUnlock")]
+        public void Escalation_CureThresholdBoundaries(int cures, string expectedPhase)
+        {
+            // Shift thresholds 0 switch the time rule off, so only cures can escalate.
+            pdm.AmbulanceShiftThreshold = 0;
+            pdm.TraumaFlightShiftThreshold = 0;
+
+            Cure(cures);
+
+            Assert.AreEqual(expectedPhase, pdm.GetEscalationPhase(),
+                $"After {cures} cures (thresholds {pdm.ambulanceCureThreshold} / {pdm.traumaFlightCureThreshold}).");
+            Assert.AreEqual(cures >= 3, AmbulancesInDeck, $"Ambulance pool in deck after {cures} cures.");
+            Assert.AreEqual(cures >= 8, TraumasInDeck, $"Trauma Flight pool in deck after {cures} cures.");
+        }
+
+        [Test]
+        public void ComponentDefaults_MatchTheDecidedThresholds()
+        {
+            var go = new GameObject("EscalationTestsDefaultsPatientDeckManager");
+            created.Add(go);
+            var fresh = go.AddComponent<PatientDeckManager>();
+
+            Assert.AreEqual(3, fresh.ambulanceCureThreshold, "Ambulances unlock after 3 cures by default.");
+            Assert.AreEqual(8, fresh.traumaFlightCureThreshold, "Trauma Flights unlock after 8 cures by default.");
+            Assert.AreEqual(5, fresh.AmbulanceShiftThreshold, "Ambulances unlock at shift 5 by default.");
+            Assert.AreEqual(10, fresh.TraumaFlightShiftThreshold, "Trauma Flights unlock at shift 10 by default.");
+        }
+
         // ------------------------------------------------------------------ exactly once
 
         [Test]

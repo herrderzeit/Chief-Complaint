@@ -1546,7 +1546,7 @@ MonoBehaviour:
   walkInFundingReward: 3
   ambulanceFundingReward: 6
   traumaFlightFundingReward: 8
-  cureReputationCap: 3
+  cureReputationCap: 2
 --- !u!1001 &178885641
 PrefabInstance:
   m_ObjectHideFlags: 0

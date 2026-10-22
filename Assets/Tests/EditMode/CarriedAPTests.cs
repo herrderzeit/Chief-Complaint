@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Reflection;
-using System.Text.RegularExpressions;
 using ChiefComplaint.Board;
 using ChiefComplaint.Cards.Data;
 using ChiefComplaint.Cards.Views;
@@ -8,7 +7,6 @@ using ChiefComplaint.Core;
 using ChiefComplaint.Utils;
 using NUnit.Framework;
 using UnityEngine;
-using UnityEngine.TestTools;
 
 namespace ChiefComplaint.Tests.EditMode
 {
@@ -34,7 +32,7 @@ namespace ChiefComplaint.Tests.EditMode
         {
             gm = NewComponent<GameManager>("CarriedAPTestsGameManager");
             Override(gm);
-            // No BoardView: the discharged card falls back to Destroy(gameObject), which only logs in EditMode,
+            // No BoardView: the discharged card is destroyed outright (DestroyImmediate outside play mode),
             // and SpawnPatient does nothing. No deck or patient deck: the shift step is the AP and the board alone.
             Override<BoardView>(null);
             Override<DeckManager>(null);
@@ -92,8 +90,6 @@ namespace ChiefComplaint.Tests.EditMode
 
         private void EndShift()
         {
-            // EditMode cannot Destroy the discharged card; the fallback logs this error, which is expected here.
-            LogAssert.Expect(LogType.Error, new Regex("Destroy may not be called from edit mode"));
             gm.EnterDraftPhase();
         }
 

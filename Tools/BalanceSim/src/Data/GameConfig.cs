@@ -22,7 +22,7 @@ namespace ChiefComplaint.Sim.Data
         public int WalkInFundingReward = 3;
         public int AmbulanceFundingReward = 6;
         public int TraumaFlightFundingReward = 8;
-        public int CureReputationCap = 3;
+        public int CureReputationCap = 2;
 
         // PatientDeckManager
         public int AmbulanceCureThreshold = 3;

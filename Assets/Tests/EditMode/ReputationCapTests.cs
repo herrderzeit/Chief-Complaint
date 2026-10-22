@@ -11,7 +11,7 @@ namespace ChiefComplaint.Tests.EditMode
     /// Covers the Reputation cap: <see cref="GameManager.ApplyReputationCap"/> (pure maths), the clamp inside
     /// <see cref="GameManager.AddReputation"/>, and the decided tuning of <see cref="GameManager.maxReputation"/>
     /// (component default and the MainBoard scene value, both 14), plus the starting Reputation (7) and the
-    /// diversion penalty (3) from the final balance pass.
+    /// diversion penalty (3) from the final balance pass, and the cure Reputation cap (2, component default and scene).
     /// </summary>
     [Category("Economy")]
     public class ReputationCapTests
@@ -20,6 +20,7 @@ namespace ChiefComplaint.Tests.EditMode
         private const int DecidedCap = 14;
         private const int DecidedStartingReputation = 7;
         private const int DecidedDiversionPenalty = 3;
+        private const int DecidedCureReputationCap = 2;
 
         // reputation after the gain, cap, reputation before the gain -> expected
         [TestCase(30, 0, 10, 30, Description = "Cap 0 is off: no clamp at all")]
@@ -173,6 +174,34 @@ namespace ChiefComplaint.Tests.EditMode
                 Assert.AreEqual(DecidedCap - 4, gm.CurrentReputation, "The cap only limits gains.");
             }
             finally { Object.DestroyImmediate(go); }
+        }
+
+        [Test]
+        public void CureReputationCap_ComponentDefault_IsTwo()
+        {
+            var gm = NewGameManager(out var go);
+            try
+            {
+                Assert.AreEqual(DecidedCureReputationCap, gm.cureReputationCap, "Decided tuning: a cure awards at most 2 Reputation (was 3).");
+            }
+            finally { Object.DestroyImmediate(go); }
+        }
+
+        [Test]
+        public void CureReputationCap_SceneValue_IsTwo()
+        {
+            Scene scene = SceneManager.GetSceneByPath(ScenePath);
+            bool openedHere = !scene.isLoaded;
+            if (openedHere) scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Additive);
+            try
+            {
+                var gm = scene.GetRootGameObjects().SelectMany(g => g.GetComponentsInChildren<GameManager>(true)).First();
+                Assert.AreEqual(DecidedCureReputationCap, gm.cureReputationCap, "MainBoard's GameManager.cureReputationCap should be 2.");
+            }
+            finally
+            {
+                if (openedHere) EditorSceneManager.CloseScene(scene, true);
+            }
         }
     }
 }
