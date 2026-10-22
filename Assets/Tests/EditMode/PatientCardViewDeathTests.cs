@@ -150,5 +150,65 @@ namespace ChiefComplaint.Tests.EditMode
             Assert.AreEqual(StartingReputation - FlatPenalty, gm.CurrentReputation,
                 $"A LoseReputation trigger of {value} must not make a death free: the flat {FlatPenalty} applies.");
         }
+
+        [Test]
+        public void Death_WithNegativeLoseReputationTrigger_CostsTheFlatPenaltyAndGivesNothingBack()
+        {
+            const int value = -3;
+            patient.triggers.Add(new PatientTrigger
+            {
+                condition = PatientTriggerCondition.OnDeath,
+                effect = PatientTriggerEffect.LoseReputation,
+                effectValue = value,
+            });
+
+            InitialiseAndKill();
+
+            Assert.AreEqual(StartingReputation - FlatPenalty, gm.CurrentReputation,
+                $"A LoseReputation trigger of {value} is clamped to 0: the death pays the flat {FlatPenalty} " +
+                $"and the trigger must not hand back {-value} Reputation.");
+        }
+
+        // The remaining tests drive OnSpawn triggers, which run at the end of InitialiseCard (no death needed).
+        private void InitialiseOnly()
+        {
+            var symptom = ScriptableObject.CreateInstance<SymptomCardSO>();
+            symptom.specialtyCategory = SymptomCategory.Internal;
+            created.Add(symptom);
+            view.InitialiseCard(patient, new List<SymptomCardSO> { symptom }, new List<SymptomTier> { SymptomTier.Tier1 }, null);
+        }
+
+        [Test]
+        public void OnSpawn_NegativeGainReputationTrigger_LeavesReputationUnchanged()
+        {
+            patient.triggers.Add(new PatientTrigger
+            {
+                condition = PatientTriggerCondition.OnSpawn,
+                effect = PatientTriggerEffect.GainReputation,
+                effectValue = -2,
+            });
+
+            InitialiseOnly();
+
+            Assert.AreEqual(StartingReputation, gm.CurrentReputation,
+                "A GainReputation trigger of -2 is clamped to 0 and must never take Reputation.");
+        }
+
+        [Test]
+        public void OnSpawn_NegativeLoseAPTrigger_DoesNotAddAP()
+        {
+            gm.GainAP(3 - gm.CurrentAP);
+            Assert.AreEqual(3, gm.CurrentAP, "Fixture error: starting AP not set.");
+            patient.triggers.Add(new PatientTrigger
+            {
+                condition = PatientTriggerCondition.OnSpawn,
+                effect = PatientTriggerEffect.LoseAP,
+                effectValue = -2,
+            });
+
+            InitialiseOnly();
+
+            Assert.AreEqual(3, gm.CurrentAP, "A LoseAP trigger of -2 is clamped to 0 and must never give AP.");
+        }
     }
 }

@@ -224,11 +224,14 @@ namespace ChiefComplaint.Tests
             var card = LoadCard("Draft/Card_DoubleShift");
             Assert.AreEqual(0, card.apCost);
             Assert.AreEqual(1, card.powerTier);
-            Assert.AreEqual(1, card.reputationCost);
+            Assert.AreEqual(ActionCardType.Staff, card.cardType);
+            Assert.AreEqual(0, card.reputationCost, "Double Shift no longer costs Reputation.");
+            Assert.AreEqual(1, card.cardsToDraw, "Double Shift draws 1 card.");
             Assert.IsTrue(card.exhaustsOnUse, "Double Shift exhausts on use.");
             Assert.AreEqual(1, card.effects.Count);
             Assert.AreEqual(3, ((ChiefComplaint.Cards.Effects.GainAPEffectSO)card.effects[0]).apGenerated, "Double Shift gains 3 AP.");
-            Assert.AreEqual(7, card.CalculateDraftValue(), "Double Shift price.");
+            Assert.AreEqual("Gain 3 AP. Draw 1 card. Exhausts.", card.rulesText);
+            Assert.AreEqual(9, card.CalculateDraftValue(), "Double Shift price.");
         }
 
         [Test]

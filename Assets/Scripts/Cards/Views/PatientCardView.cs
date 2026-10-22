@@ -603,19 +603,21 @@ namespace ChiefComplaint.Cards.Views
                 if (trigger.condition == condition)
                 {
                     GameLog.Info($"Trigger Executed: {patientData.patientName} [{condition}] -> {trigger.effect}");
+                    // Gain/Lose triggers only move in their named direction: a negative value does nothing.
+                    int amount = Mathf.Max(0, trigger.effectValue);
                     switch (trigger.effect)
                     {
                         case PatientTriggerEffect.GainAP:
-                            if (GameManager.Instance != null) GameManager.Instance.GainAP(trigger.effectValue);
+                            if (GameManager.Instance != null) GameManager.Instance.GainAP(amount);
                             break;
                         case PatientTriggerEffect.LoseAP:
-                            if (GameManager.Instance != null) GameManager.Instance.SpendAP(trigger.effectValue);
+                            if (GameManager.Instance != null) GameManager.Instance.SpendAP(amount);
                             break;
                         case PatientTriggerEffect.GainReputation:
-                            if (GameManager.Instance != null) GameManager.Instance.AddReputation(trigger.effectValue);
+                            if (GameManager.Instance != null) GameManager.Instance.AddReputation(amount);
                             break;
                         case PatientTriggerEffect.LoseReputation:
-                            if (GameManager.Instance != null) GameManager.Instance.SpendReputation(trigger.effectValue);
+                            if (GameManager.Instance != null) GameManager.Instance.SpendReputation(amount);
                             break;
                         case PatientTriggerEffect.DrawCard:
                             if (DeckManager.Instance != null) DeckManager.Instance.DrawCards(trigger.effectValue);

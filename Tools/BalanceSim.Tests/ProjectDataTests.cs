@@ -142,7 +142,7 @@ namespace ChiefComplaint.Sim.Tests
         [Theory]
         // name, AP, tier (-1 = not pinned), reputation cost, exhausts, price (-1 = not pinned)
         [InlineData("Agency Nurse", 0, 1, 0, true, 7)]
-        [InlineData("Double Shift", 0, 1, 1, true, 7)]
+        [InlineData("Double Shift", 0, 1, 0, true, 9)]
         [InlineData("Sharps Bin", 1, 1, 0, true, -1)]
         [InlineData("Ward Round", 1, 2, 0, false, -1)]
         [InlineData("Compliance Audit", 1, 1, 0, true, -1)]
@@ -162,6 +162,8 @@ namespace ChiefComplaint.Sim.Tests
         public void Double_Shift_Compliance_Audit_and_Sharps_Bin_effects()
         {
             Assert.Equal(3, Card("Double Shift").Effects.OfType<GainApEffect>().Single().Amount);
+            Assert.Equal(1, Card("Double Shift").CardsToDraw);
+            Assert.Equal(CardType.Staff, Card("Double Shift").Type);
             Assert.Equal(1, Card("Compliance Audit").Effects.OfType<CleanseRedTapeEffect>().Single().RepPerCard);
             Assert.Equal(CardType.Supply, Card("Sharps Bin").Type);
             Assert.Single(Card("Sharps Bin").Effects.OfType<TrashEffect>());

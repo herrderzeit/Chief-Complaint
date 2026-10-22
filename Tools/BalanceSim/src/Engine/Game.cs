@@ -632,10 +632,11 @@ namespace ChiefComplaint.Sim.Engine
                 string source = condition == TriggerCondition.OnDeath ? "death-trigger" : "patient-trigger";
                 switch (t.Effect)
                 {
-                    case TriggerEffect.GainAP: GainAP(t.Value); break;
-                    case TriggerEffect.LoseAP: SpendAP(t.Value); break;
-                    case TriggerEffect.GainReputation: AddReputation(t.Value, source); break;
-                    case TriggerEffect.LoseReputation: SpendReputation(t.Value, source); break;
+                    // Mirrors PatientCardView.ExecuteTriggers: Gain/Lose values below 0 do nothing.
+                    case TriggerEffect.GainAP: GainAP(Math.Max(0, t.Value)); break;
+                    case TriggerEffect.LoseAP: SpendAP(Math.Max(0, t.Value)); break;
+                    case TriggerEffect.GainReputation: AddReputation(Math.Max(0, t.Value), source); break;
+                    case TriggerEffect.LoseReputation: SpendReputation(Math.Max(0, t.Value), source); break;
                     case TriggerEffect.DrawCard: DrawCards(t.Value); break;
                     case TriggerEffect.ChangeStability: ApplyStabilisation(p, t.Value); break;
                     case TriggerEffect.AddCardToDiscard:

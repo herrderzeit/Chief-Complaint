@@ -123,6 +123,43 @@ namespace ChiefComplaint.Sim.Tests
             Assert.Equal(20 - 4, g.Reputation); // 4 from the trigger, not 4 + 5
         }
 
+        [Fact]
+        public void Death_with_negative_OnDeath_LoseReputation_trigger_pays_the_flat_penalty_and_gives_nothing_back()
+        {
+            PatientDef def = Patient(stability: 1, decay: 1);
+            def.Triggers.Add(new PatientTriggerDef { Condition = TriggerCondition.OnDeath, Effect = TriggerEffect.LoseReputation, Value = -3 });
+            var data = Content(new CardDef[0], def);
+            data.Config.StartingReputation = 20;
+            data.Config.DeathReputationPenalty = 5;
+            var g = Start(data);
+
+            EndShiftAndSkipDraft(g);
+            Assert.Empty(g.ActivePatients);
+            // Mirrors PatientCardView: -3 clamps to 0, so the flat 5 applies and no Reputation is handed back.
+            Assert.Equal(20 - 5, g.Reputation);
+        }
+
+        [Theory]
+        // Start sets AP and Reputation before the opening patients spawn, so OnSpawn triggers are visible straight away.
+        // Positive values are controls showing the trigger really fires; negative values are clamped to 0.
+        [InlineData(TriggerEffect.GainReputation, -2, 0, 0)]
+        [InlineData(TriggerEffect.GainReputation, 2, 0, 2)]
+        [InlineData(TriggerEffect.LoseReputation, -2, 0, 0)]
+        [InlineData(TriggerEffect.LoseAP, -2, 0, 0)]
+        [InlineData(TriggerEffect.LoseAP, 2, -2, 0)]
+        [InlineData(TriggerEffect.GainAP, -2, 0, 0)]
+        public void OnSpawn_AP_and_Reputation_triggers_only_move_in_their_named_direction(TriggerEffect effect, int value, int apDelta, int repDelta)
+        {
+            PatientDef def = Patient();
+            def.Triggers.Add(new PatientTriggerDef { Condition = TriggerCondition.OnSpawn, Effect = effect, Value = value });
+            var data = Content(new CardDef[0], def);
+            data.Config.StartingReputation = 10; // below the cap, so a gain would show
+            var g = Start(data);
+
+            Assert.Equal(data.Config.BaseAP + apDelta, g.AP);
+            Assert.Equal(10 + repDelta, g.Reputation);
+        }
+
         [Theory]
         [InlineData(TriggerCondition.OnDeath, TriggerEffect.LoseReputation, true)]
         [InlineData(TriggerCondition.OnDeath, TriggerEffect.DrawCard, false)]
