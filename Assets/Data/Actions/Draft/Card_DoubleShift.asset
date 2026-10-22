@@ -22,7 +22,7 @@ MonoBehaviour:
   apCost: 0
   reputationCost: 1
   cardsToDraw: 0
-  powerTier: 2
+  powerTier: 1
   exhaustsOnUse: 1
   exhaustsAtShiftEnd: 0
   effects:

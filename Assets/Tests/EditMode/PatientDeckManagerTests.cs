@@ -70,5 +70,16 @@ namespace ChiefComplaint.Tests.EditMode
             Assert.AreEqual(SymptomTier.Tier2, symptoms[0].Tier, "Primary symptom should be Tier 2.");
             Assert.AreEqual(SymptomTier.Tier1, symptoms[1].Tier, "Secondary symptom should default to Tier 1.");
         }
+
+        // The full ESI mapping (mirrored by the simulator's Game.TierFromTriage).
+        [TestCase(1, SymptomTier.Tier3)]
+        [TestCase(2, SymptomTier.Tier2)]
+        [TestCase(3, SymptomTier.Tier2)]
+        [TestCase(4, SymptomTier.Tier1)]
+        [TestCase(5, SymptomTier.Tier1)]
+        public void DetermineTierFromTriage_MapsEveryTriageLevel(int triage, SymptomTier expected)
+        {
+            Assert.AreEqual(expected, PatientDeckManager.DetermineTierFromTriage(triage), $"Triage {triage}");
+        }
     }
 }

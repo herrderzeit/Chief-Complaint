@@ -207,7 +207,7 @@ namespace ChiefComplaint.Sim.Data
         public List<PatientTriggerDef> Triggers = new List<PatientTriggerDef>();
 
         /// <summary>Mirrors <c>PatientCardSO.HasOwnDeathPenalty</c>: an OnDeath Reputation trigger replaces the flat death penalty.</summary>
-        public bool HasOwnDeathPenalty => Triggers.Exists(t => t.Condition == TriggerCondition.OnDeath && t.Effect == TriggerEffect.LoseReputation);
+        public bool HasOwnDeathPenalty => Triggers.Exists(t => t.Condition == TriggerCondition.OnDeath && t.Effect == TriggerEffect.LoseReputation && t.Value > 0);
 
         public override string ToString() => Name;
     }

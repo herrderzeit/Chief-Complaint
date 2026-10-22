@@ -233,7 +233,7 @@ namespace ChiefComplaint.Core
         /// </summary>
         /// <param name="triage">ESI triage level (1 = most severe, 5 = least severe).</param>
         /// <returns>The corresponding <see cref="SymptomTier"/> for the primary symptom.</returns>
-        private SymptomTier DetermineTierFromTriage(int triage)
+        public static SymptomTier DetermineTierFromTriage(int triage)
         {
             if (triage == 1) return SymptomTier.Tier3;
             if (triage == 2 || triage == 3) return SymptomTier.Tier2;

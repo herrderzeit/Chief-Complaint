@@ -873,8 +873,11 @@ namespace ChiefComplaint.Sim.Engine
 
         private void AddReputation(int amount, string source)
         {
+            // Mirrors GameManager.ApplyReputationCap: gains stop at MaxReputation (0 = no cap).
+            int before = Reputation;
             Reputation += amount;
-            if (amount != 0) observer?.OnReputationChanged(this, amount, source);
+            if (Config.MaxReputation > 0 && Reputation > Config.MaxReputation) Reputation = Math.Max(Config.MaxReputation, before);
+            if (Reputation != before) observer?.OnReputationChanged(this, Reputation - before, source);
         }
 
         private void SpendReputation(int amount, string source)

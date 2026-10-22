@@ -28,7 +28,7 @@ MonoBehaviour:
   cardName: Agency Nurse
   cardType: 0
   tags: 
-  rulesText: Pause a patient's decay and restore 1 Stability.
+  rulesText: Pause a patient's decay and restore 1 Stability. Exhausts.
   flavorText: First shift on this ward, already knows where the good gloves are.
   isPlayable: 1
   successChance: 1
@@ -36,7 +36,7 @@ MonoBehaviour:
   reputationCost: 0
   cardsToDraw: 0
   powerTier: 1
-  exhaustsOnUse: 0
+  exhaustsOnUse: 1
   exhaustsAtShiftEnd: 0
   effects:
   - {fileID: 1223375474917560275}

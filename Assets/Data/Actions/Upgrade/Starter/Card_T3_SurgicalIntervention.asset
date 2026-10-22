@@ -19,27 +19,19 @@ MonoBehaviour:
   flavorText: Scrub in and prep the OR. We are going in.
   isPlayable: 1
   successChance: 1
-  apCost: 3
-  apGenerated: 0
-  reputationGenerated: 0
-  isEitherOr: 0
-  altApGenerated: 0
-  isDiagnostic: 0
-  diagnosesSymptomTier: 3
-  pausesStabilityClock: 0
-  stabilisationHeal: 0
-  curesSymptomTier: 3
+  apCost: 2
+  reputationCost: 0
   cardsToDraw: 0
-  cleansesRedTape: 0
-  repBonusPerRedTapeCleansed: 0
   powerTier: 3
-  isTrashCard: 0
   exhaustsOnUse: 0
   exhaustsAtShiftEnd: 0
   effects:
   - {fileID: 1283441738042261202}
   directDraftUpgrade: {fileID: 0}
   draftUpgradeCost: 5
+  upgradeTokenCost: 0
+  upgradeTokenAnyColour: 0
+  upgradeTokenColour: 0
   cardArt: {fileID: 0}
 --- !u!114 &1283441738042261202
 MonoBehaviour:

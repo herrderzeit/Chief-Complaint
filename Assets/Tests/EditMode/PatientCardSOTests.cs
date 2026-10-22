@@ -65,6 +65,22 @@ namespace ChiefComplaint.Tests.EditMode
             Assert.IsFalse(patient.HasOwnDeathPenalty, $"An OnDeath {effect} trigger must not waive the flat death penalty.");
         }
 
+        [TestCase(0)]
+        [TestCase(-1)]
+        [TestCase(-5)]
+        public void HasOwnDeathPenalty_OnDeathLoseReputationOfZeroOrLess_IsFalse(int value)
+        {
+            patient.triggers = new List<PatientTrigger> { Trigger(PatientTriggerCondition.OnDeath, PatientTriggerEffect.LoseReputation, value) };
+            Assert.IsFalse(patient.HasOwnDeathPenalty, $"A trigger of {value} must not waive the flat penalty (a death is never free).");
+        }
+
+        [Test]
+        public void HasOwnDeathPenalty_OnDeathLoseReputationOfOne_IsTrue()
+        {
+            patient.triggers = new List<PatientTrigger> { Trigger(PatientTriggerCondition.OnDeath, PatientTriggerEffect.LoseReputation, 1) };
+            Assert.IsTrue(patient.HasOwnDeathPenalty);
+        }
+
         [TestCase(PatientTriggerCondition.OnTurnEnd)]
         [TestCase(PatientTriggerCondition.OnSpawn)]
         [TestCase(PatientTriggerCondition.OnCured)]

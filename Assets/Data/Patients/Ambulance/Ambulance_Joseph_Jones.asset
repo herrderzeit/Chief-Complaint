@@ -27,5 +27,9 @@ MonoBehaviour:
   stabilityDecayPerTurn: 2
   arrivesWithHandover: 0
   reputationReward: 1
-  triggers: []
+  triggers:
+  - condition: 2
+    effect: 4
+    effectValue: 3
+    cardReference: {fileID: 0}
   portraitSprite: {fileID: 0}

@@ -35,6 +35,8 @@ namespace ChiefComplaint.Sim.Data
 
         // GameManager.extraPatientEveryNShifts: an extra patient arrives at the start of every Nth shift (0 = off).
         public int ExtraPatientEveryNShifts = 3;
+        // GameManager.maxReputation: Reputation gains stop here (0 = no cap).
+        public int MaxReputation = 16;
 
         // DeckManager
         public int HandSize = 5;

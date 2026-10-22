@@ -37,7 +37,9 @@ namespace ChiefComplaint.Tests.EditMode
             gm = NewComponent<GameManager>("DeathTestsGameManager");
             gm.deathReputationPenalty = FlatPenalty;
             gm.deathAddsRedTape = false; // keep the test independent of DeckManager
+            gm.maxReputation = 0; // StartingReputation sits above the default cap of 16; the cap is not under test here
             gm.AddReputation(StartingReputation - gm.CurrentReputation);
+            Assert.AreEqual(StartingReputation, gm.CurrentReputation, "Fixture error: starting Reputation not set.");
             Override(gm);
 
             // No BoardView: the dead card then falls back to Destroy(gameObject), which only logs in EditMode.
@@ -130,6 +132,23 @@ namespace ChiefComplaint.Tests.EditMode
 
             Assert.AreEqual(StartingReputation - TriggerPenalty, gm.CurrentReputation,
                 $"The OnDeath trigger replaces the flat penalty: expected a loss of {TriggerPenalty}, not {TriggerPenalty + FlatPenalty}.");
+        }
+
+        [Test]
+        public void Death_WithZeroValueLoseReputationTrigger_StillCostsTheFlatPenalty()
+        {
+            const int value = 0;
+            patient.triggers.Add(new PatientTrigger
+            {
+                condition = PatientTriggerCondition.OnDeath,
+                effect = PatientTriggerEffect.LoseReputation,
+                effectValue = value,
+            });
+
+            InitialiseAndKill();
+
+            Assert.AreEqual(StartingReputation - FlatPenalty, gm.CurrentReputation,
+                $"A LoseReputation trigger of {value} must not make a death free: the flat {FlatPenalty} applies.");
         }
     }
 }

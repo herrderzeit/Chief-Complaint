@@ -113,17 +113,38 @@ namespace ChiefComplaint.Tests.EditMode
             Assert.AreEqual(8, view.currentStability);
         }
 
-        [Test]
-        public void AdvanceShiftDecay_InWard_HalvesDecayRoundedUp()
+        // Odd decay rates are what tell "rounded up" apart from "rounded down" or "unchanged":
+        // a decay of 2 alone could never catch a floor-instead-of-ceiling regression.
+        [TestCase(1, 1, Description = "Minimum 1: half of 1 rounds up to 1")]
+        [TestCase(2, 1)]
+        [TestCase(3, 2, Description = "1.5 rounds up to 2")]
+        [TestCase(4, 2)]
+        [TestCase(5, 3, Description = "2.5 rounds up to 3")]
+        public void AdvanceShiftDecay_InWard_HalvesRoundedUp(int decay, int expectedLoss)
         {
+            patient.stabilityDecayPerTurn = decay;
             Initialise(SymptomTier.Tier1);
             var ward = new GameObject("Ward").transform;
+            created.Add(ward.gameObject);
             view.assignedWardSlot = ward;
 
-            view.AdvanceShiftDecay(); // decay 2 -> ward decay 1
+            view.AdvanceShiftDecay();
 
-            Assert.AreEqual(9, view.currentStability);
-            Object.DestroyImmediate(ward.gameObject);
+            Assert.AreEqual(10 - expectedLoss, view.currentStability,
+                $"Ward decay for a base decay of {decay} should be {expectedLoss} (half, rounded up).");
+        }
+
+        [TestCase(1)]
+        [TestCase(3)]
+        [TestCase(5)]
+        public void AdvanceShiftDecay_OutsideWard_TakesFullDecay(int decay)
+        {
+            patient.stabilityDecayPerTurn = decay;
+            Initialise(SymptomTier.Tier1);
+
+            view.AdvanceShiftDecay();
+
+            Assert.AreEqual(10 - decay, view.currentStability, "Outside a Ward the full decay applies.");
         }
 
         [Test]

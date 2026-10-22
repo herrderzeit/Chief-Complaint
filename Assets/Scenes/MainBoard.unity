@@ -1538,6 +1538,7 @@ MonoBehaviour:
   currentShift: 1
   initialPatientCount: 2
   extraPatientEveryNShifts: 3
+  maxReputation: 16
   deathReputationPenalty: 5
   diversionReputationPenalty: 2
   deathAddsRedTape: 1

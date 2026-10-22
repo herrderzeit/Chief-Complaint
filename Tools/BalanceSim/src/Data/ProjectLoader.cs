@@ -63,6 +63,7 @@ namespace ChiefComplaint.Sim.Data
                 c.StartingFunding = gameManager.GetInt("currentFunding", c.StartingFunding);
                 c.InitialPatientCount = gameManager.GetInt("initialPatientCount", c.InitialPatientCount);
                 c.ExtraPatientEveryNShifts = gameManager.GetInt("extraPatientEveryNShifts", c.ExtraPatientEveryNShifts);
+                c.MaxReputation = gameManager.GetInt("maxReputation", c.MaxReputation);
                 c.DiversionReputationPenalty = gameManager.GetInt("diversionReputationPenalty", c.DiversionReputationPenalty);
                 c.DeathReputationPenalty = gameManager.GetInt("deathReputationPenalty", c.DeathReputationPenalty);
                 c.DeathAddsRedTape = gameManager.GetBool("deathAddsRedTape", c.DeathAddsRedTape);

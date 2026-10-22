@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using ChiefComplaint.Sim.Bots;
@@ -34,6 +36,156 @@ namespace ChiefComplaint.Sim.Tests
             Assert.Equal(6, Data.Config.AmbulanceFundingReward);
             Assert.Equal(8, Data.Config.TraumaFlightFundingReward);
             Assert.Equal(3, Data.Config.ExtraPatientEveryNShifts);
+            Assert.Equal(16, Data.Config.MaxReputation);
+        }
+
+        [Fact]
+        public void MaxReputation_default_matches_the_decided_tuning()
+        {
+            // The fallback used when the scene has no maxReputation must agree with GameManager's default.
+            Assert.Equal(16, new GameConfig().MaxReputation);
+        }
+
+        // ------------------------------------------------------------------ patient pools
+
+        private static List<PatientDef> Pool(EscalationType phase) => phase switch
+        {
+            EscalationType.Ambulance => Data.AmbulancePool,
+            EscalationType.TraumaFlight => Data.TraumaFlightPool,
+            _ => Data.WalkInPool,
+        };
+
+        [Theory]
+        [InlineData(EscalationType.WalkIn, 10, 12, 1, 4, 5)]
+        [InlineData(EscalationType.Ambulance, 6, 9, 2, 2, 3)]
+        [InlineData(EscalationType.TraumaFlight, 6, 8, 3, 1, 2)]
+        public void Patient_pool_matches_its_band(EscalationType phase, int minStab, int maxStab, int decay, int minTriage, int maxTriage)
+        {
+            List<PatientDef> pool = Pool(phase);
+            Assert.NotEmpty(pool);
+            foreach (PatientDef p in pool)
+            {
+                Assert.True(p.Phase == phase, $"{p.Name}: escalationPhase {p.Phase} in the {phase} pool");
+                Assert.True(p.StartingStability >= minStab && p.StartingStability <= maxStab, $"{p.Name}: stability {p.StartingStability}");
+                Assert.True(p.DecayPerTurn == decay, $"{p.Name}: decay {p.DecayPerTurn}");
+                Assert.True(p.TriageLevel >= minTriage && p.TriageLevel <= maxTriage, $"{p.Name}: triage {p.TriageLevel}");
+            }
+        }
+
+        [Theory]
+        [InlineData(EscalationType.Ambulance, 3, 8)]
+        [InlineData(EscalationType.Ambulance, 2, 7)]
+        [InlineData(EscalationType.TraumaFlight, 1, 9)]
+        [InlineData(EscalationType.TraumaFlight, 2, 6)]
+        public void Pool_triage_counts_match_the_decided_roster(EscalationType phase, int triage, int count)
+        {
+            Assert.Equal(count, Pool(phase).Count(p => p.TriageLevel == triage));
+        }
+
+        [Fact]
+        public void Handover_only_on_the_two_Arthurs_and_every_Trauma_Flight()
+        {
+            Assert.Equal(new[] { "Arthur Martinez", "Arthur Miller" },
+                Data.AmbulancePool.Where(p => p.ArrivesWithHandover).Select(p => p.Name).OrderBy(n => n).ToArray());
+            Assert.All(Data.TraumaFlightPool, p => Assert.True(p.ArrivesWithHandover, p.Name));
+            Assert.All(Data.WalkInPool, p => Assert.False(p.ArrivesWithHandover, p.Name));
+        }
+
+        [Fact]
+        public void Death_cost_ladder_by_triage()
+        {
+            foreach (PatientDef p in Data.AmbulancePool.Concat(Data.TraumaFlightPool))
+            {
+                var deaths = p.Triggers.Where(t => t.Condition == TriggerCondition.OnDeath && t.Effect == TriggerEffect.LoseReputation).ToList();
+                Assert.True(deaths.Count == 1, $"{p.Name}: {deaths.Count} OnDeath LoseReputation triggers");
+                int expected = p.TriageLevel switch { 1 => 5, 2 => 4, 3 => 3, _ => -1 };
+                Assert.True(deaths[0].Value == expected, $"{p.Name} (triage {p.TriageLevel}): death cost {deaths[0].Value}, expected {expected}");
+                Assert.True(p.HasOwnDeathPenalty, p.Name);
+            }
+            Assert.All(Data.WalkInPool, p => Assert.False(p.HasOwnDeathPenalty, p.Name));
+            Assert.All(Data.WalkInPool, p => Assert.DoesNotContain(p.Triggers,
+                t => t.Condition == TriggerCondition.OnDeath && t.Effect == TriggerEffect.LoseReputation));
+        }
+
+        // ------------------------------------------------------------------ cards
+
+        [Fact]
+        public void Upgrades_cost_sixty_percent_of_the_target_and_the_source_tier_in_tokens()
+        {
+            var sources = Data.AllCards.Values.Where(c => c.Upgrade != null).ToList();
+            Assert.NotEmpty(sources);
+            foreach (CardDef c in sources)
+            {
+                int expected = (int)Math.Round(0.6m * c.Upgrade.DraftValue, MidpointRounding.AwayFromZero);
+                Assert.True(c.UpgradeCost == expected,
+                    $"{c.Name}: upgrade cost {c.UpgradeCost}, expected {expected} (target {c.Upgrade.Name} price {c.Upgrade.DraftValue})");
+                Assert.True(c.UpgradeTokenCost == c.PowerTier, $"{c.Name}: token cost {c.UpgradeTokenCost}, tier {c.PowerTier}");
+            }
+        }
+
+        private static CardDef Card(string name) => Data.AllCards.Values.First(c => c.Name == name);
+
+        [Theory]
+        [InlineData("Registered Nurse", 2, false)]
+        [InlineData("Chief Nurse", 1, true)]
+        [InlineData("Agency Nurse", 1, false)]
+        public void Nurse_cards_heal_and_pause_without_a_choice(string name, int heal, bool wardWide)
+        {
+            CardDef card = Card(name);
+            Assert.Equal(2, card.Effects.Count);
+            Assert.DoesNotContain(card.Effects, e => e is ChoiceEffect);
+            var inner = card.Effects.Select(e => wardWide ? Assert.IsType<WardWideEffect>(e).PatientEffect : e).ToList();
+            Assert.Single(inner.OfType<PauseEffect>());
+            Assert.Equal(heal, inner.OfType<HealEffect>().Single().Amount);
+        }
+
+        [Theory]
+        // name, AP, tier (-1 = not pinned), reputation cost, exhausts, price (-1 = not pinned)
+        [InlineData("Agency Nurse", 0, 1, 0, true, 7)]
+        [InlineData("Double Shift", 0, 1, 1, true, 7)]
+        [InlineData("Sharps Bin", 1, 1, 0, true, -1)]
+        [InlineData("Ward Round", 1, 2, 0, false, -1)]
+        [InlineData("Compliance Audit", 1, 1, 0, true, -1)]
+        [InlineData("Specialised Care", 1, -1, 0, false, 7)]
+        [InlineData("Surgical Intervention", 2, -1, 0, false, 11)]
+        public void Decided_card_stats(string name, int ap, int tier, int repCost, bool exhausts, int price)
+        {
+            CardDef card = Card(name);
+            Assert.Equal(ap, card.ApCost);
+            if (tier > 0) Assert.Equal(tier, card.PowerTier);
+            Assert.Equal(repCost, card.ReputationCost);
+            Assert.Equal(exhausts, card.ExhaustsOnUse);
+            if (price >= 0) Assert.Equal(price, card.DraftValue);
+        }
+
+        [Fact]
+        public void Double_Shift_Compliance_Audit_and_Sharps_Bin_effects()
+        {
+            Assert.Equal(3, Card("Double Shift").Effects.OfType<GainApEffect>().Single().Amount);
+            Assert.Equal(1, Card("Compliance Audit").Effects.OfType<CleanseRedTapeEffect>().Single().RepPerCard);
+            Assert.Equal(CardType.Supply, Card("Sharps Bin").Type);
+            Assert.Single(Card("Sharps Bin").Effects.OfType<TrashEffect>());
+        }
+
+        [Fact]
+        public void Supply_room_piles_in_order_with_unlock_and_stock()
+        {
+            var expected = new (string card, EscalationType unlockAt, int maxStock)[]
+            {
+                ("Sharps Bin", EscalationType.WalkIn, 2),
+                ("Agency Nurse", EscalationType.WalkIn, 4),
+                ("Shift Handover", EscalationType.WalkIn, 3),
+                ("Ward Round", EscalationType.WalkIn, 2),
+                ("Stat Labs", EscalationType.Ambulance, 3),
+                ("Grateful Patient", EscalationType.Ambulance, 2),
+                ("Compliance Audit", EscalationType.Ambulance, 2),
+                ("Blood Bank", EscalationType.Ambulance, 3),
+                ("Double Shift", EscalationType.Ambulance, 3),
+                ("Crash Cart", EscalationType.TraumaFlight, 2),
+                ("Trauma Team", EscalationType.TraumaFlight, 2),
+                ("Damage Control Surgery", EscalationType.TraumaFlight, 2),
+            };
+            Assert.Equal(expected, Data.SupplyPiles.Select(p => (p.Card.Name, p.UnlockAt, p.MaxStock)).ToArray());
         }
 
         [Fact]

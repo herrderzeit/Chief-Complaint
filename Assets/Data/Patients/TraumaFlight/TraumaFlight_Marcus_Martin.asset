@@ -30,6 +30,6 @@ MonoBehaviour:
   triggers:
   - condition: 2
     effect: 4
-    effectValue: 4
+    effectValue: 5
     cardReference: {fileID: 0}
   portraitSprite: {fileID: 0}

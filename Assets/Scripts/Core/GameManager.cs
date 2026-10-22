@@ -71,6 +71,8 @@ namespace ChiefComplaint.Core
         public int initialPatientCount = 2;
         [Tooltip("An extra patient arrives at the start of every Nth shift, on top of the usual one (0 = off).")]
         [Min(0)] public int extraPatientEveryNShifts = 3;
+        [Tooltip("Reputation can't be raised above this (0 = no cap), so a strong run can't bank an unlimited buffer.")]
+        [Min(0)] public int maxReputation = 16;
         [Tooltip("Reputation lost when a patient dies (Code Blue).")]
         public int deathReputationPenalty = 5;
 
@@ -382,10 +384,18 @@ namespace ChiefComplaint.Core
         /// <param name="amount">Reputation points to add.</param>
         public void AddReputation(int amount)
         {
-            currentReputation += amount;
+            int before = currentReputation;
+            currentReputation = ApplyReputationCap(currentReputation + amount, maxReputation, before);
             OnReputationChanged?.Invoke(currentReputation);
-            GameLog.Info($"Gained {amount} Reputation! Total: {currentReputation}");
+            GameLog.Info($"Gained {currentReputation - before} Reputation! Total: {currentReputation}");
         }
+
+        /// <summary>
+        /// Clamps a Reputation gain to <paramref name="cap"/> (0 = no cap). A total already above the cap (e.g. the cap
+        /// was lowered mid-run) is never reduced by a gain.
+        /// </summary>
+        public static int ApplyReputationCap(int reputation, int cap, int before) =>
+            cap > 0 && reputation > cap ? Mathf.Max(cap, before) : reputation;
 
         /// <summary>
         /// Deducts Reputation (e.g. malpractice penalties) and refreshes the UI.

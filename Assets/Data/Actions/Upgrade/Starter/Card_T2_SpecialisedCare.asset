@@ -32,7 +32,7 @@ MonoBehaviour:
   flavorText: Targeted therapies for complex ailments. When standard rest and saline just won't cut it.
   isPlayable: 1
   successChance: 1
-  apCost: 2
+  apCost: 1
   reputationCost: 0
   cardsToDraw: 0
   powerTier: 2

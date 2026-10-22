@@ -120,6 +120,7 @@ namespace ChiefComplaint.Cards.Data
         /// <summary>
         /// <c>true</c> when an OnDeath trigger already takes Reputation. That trigger replaces the flat death penalty
         /// (GameManager.deathReputationPenalty) rather than stacking with it, so one death never costs 9–10 Reputation.
+        /// A trigger of 0 or less doesn't count, so a death can never be free.
         /// </summary>
         public bool HasOwnDeathPenalty
         {
@@ -127,7 +128,8 @@ namespace ChiefComplaint.Cards.Data
             {
                 if (triggers == null) return false;
                 foreach (PatientTrigger trigger in triggers)
-                    if (trigger.condition == PatientTriggerCondition.OnDeath && trigger.effect == PatientTriggerEffect.LoseReputation)
+                    if (trigger.condition == PatientTriggerCondition.OnDeath && trigger.effect == PatientTriggerEffect.LoseReputation
+                        && trigger.effectValue > 0)
                         return true;
                 return false;
             }
