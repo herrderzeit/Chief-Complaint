@@ -25,7 +25,7 @@ namespace ChiefComplaint.Cards.Effects
                 return true;
             }
 
-            DeckManager.Instance.DrawCards(cardsToDraw);
+            DeckManager.Instance.DrawCards(cardsToDraw, reshuffleDiscard: false);
             GameFeedback.ShowAt(GameFeedback.Cards(cardsToDraw), mousePos, GameFeedback.CardColour);
             return true;
         }

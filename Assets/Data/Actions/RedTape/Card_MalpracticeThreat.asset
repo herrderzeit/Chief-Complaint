@@ -14,15 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ActionCardSO
   cardName: Malpractice Threat
   cardType: 4
-  tags: 06000000
-  rulesText: 'Lose 2 Reputation.
-
-    Card exhausts on use.'
-  flavorText: A patient's family is screaming in the lobby. Appease them quickly,
-    or it's going on the news.
+  tags: 06000000i
+  rulesText: 'Play to clear: lose 2 Reputation. Exhausts.'
+  flavorText: A patient's family is screaming in the lobby. Appease them quickly, or it's going on the news.
   isPlayable: 1
   successChance: 1
   apCost: 0
+  reputationCost: 0
   cardsToDraw: 0
   powerTier: 1
   exhaustsOnUse: 1
@@ -30,7 +28,10 @@ MonoBehaviour:
   effects:
   - {fileID: 6420951617577806322}
   directDraftUpgrade: {fileID: 0}
-  draftUpgradeCost: 5
+  draftUpgradeCost: 0
+  upgradeTokenCost: 0
+  upgradeTokenAnyColour: 0
+  upgradeTokenColour: 0
   cardArt: {fileID: 0}
 --- !u!114 &6420951617577806322
 MonoBehaviour:

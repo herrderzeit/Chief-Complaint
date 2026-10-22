@@ -17,7 +17,6 @@ MonoBehaviour:
   age: 67
   clinicalTags:
   - Vascular
-  - Cardiac
   - Haemorrhage
   - Critical
   escalationPhase: 2

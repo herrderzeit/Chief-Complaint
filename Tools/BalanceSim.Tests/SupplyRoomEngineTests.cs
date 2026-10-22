@@ -200,18 +200,29 @@ namespace ChiefComplaint.Sim.Tests
         // ------------------------------------------------------------------ Team Assessment
 
         [Fact]
-        public void Team_assessment_is_wasted_when_the_only_patient_is_in_triage()
+        public void Team_assessment_waits_while_the_only_patient_is_in_triage_and_starts_on_the_next_staff_card()
         {
-            var data = Content(new[] { Doctor(), Nurse() }, Patient(EscalationType.WalkIn, 5, 10, 1, SymptomCategory.Trauma, SymptomCategory.Internal));
+            var data = Content(new[] { Doctor(), Nurse(), Doctor() }, Patient(EscalationType.WalkIn, 5, 10, 1, SymptomCategory.Trauma, SymptomCategory.Internal));
             var g = Start(data);
             Patient p = g.Patients.Single();
+            Assert.Equal(3, g.Hand.Count);
 
             g.PlayCard(g.Hand.First(c => c.HasTag(CardTag.Doctor)), null);
             g.PlayCard(g.Hand.First(c => c.HasTag(CardTag.Nurse)), null);
 
+            // Nobody in a Ward bed: the assessment is not offered, and not used up either.
             Assert.Equal(Phase.Shift, g.Phase);
-            Assert.True(g.SynergyUsedThisShift);
+            Assert.False(g.SynergyUsedThisShift);
             Assert.Equal(0, p.DiagnosedCount);
+
+            g.Apply(Find(g, ActionKind.Admit));
+            g.PlayCard(g.Hand.First(c => c.HasTag(CardTag.Doctor)), null);
+
+            Assert.Equal(Phase.TeamAssessment, g.Phase);
+            Assert.True(g.SynergyUsedThisShift);
+            g.Apply(Find(g, ActionKind.TeamAssess));
+            Assert.Equal(1, p.DiagnosedCount);
+            Assert.Equal(Phase.Shift, g.Phase);
         }
 
         [Fact]

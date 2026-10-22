@@ -21,6 +21,12 @@ namespace ChiefComplaint.Core
         private int pendingTier;          // > 0 while waiting for a choice prompt to close
         private Vector3 pendingPosition;
 
+        /// <summary><c>true</c> once this shift's Team Assessment has started (it can't be used up with no one to assess).</summary>
+        public bool UsedThisShift => usedThisShift;
+
+        /// <summary>Tier of a Team Assessment waiting to start (0 = none).</summary>
+        public int PendingTier => pendingTier;
+
         /// <summary>Creates the manager when a board scene loads, so no scene setup is needed.</summary>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Bootstrap()
@@ -52,6 +58,9 @@ namespace ChiefComplaint.Core
             usedThisShift = false;
         }
 
+        /// <summary>Records a played card (normally fed by <see cref="DraggableCard.OnCardPlayed"/>; public for tests).</summary>
+        public void RegisterPlayedCard(ActionCardSO card, Vector3 position) => HandleCardPlayed(card, position);
+
         private void HandleCardPlayed(ActionCardSO card, Vector3 position)
         {
             if (usedThisShift || card == null || card.tags == null) return;
@@ -65,7 +74,10 @@ namespace ChiefComplaint.Core
             pendingPosition = position;
         }
 
-        private void Update()
+        private void Update() => StartPendingAssessment();
+
+        /// <summary>Starts a waiting Team Assessment unless a "choose one" prompt is still open (run every frame; public for tests).</summary>
+        public void StartPendingAssessment()
         {
             // Wait until any "choose one" prompt (e.g. a nurse card's choice) has been answered.
             if (pendingTier == 0 || ChoicePrompt.IsOpen) return;
@@ -85,6 +97,8 @@ namespace ChiefComplaint.Core
 
             if (eligible.Count == 0)
             {
+                // Not used up: the next Doctor or Nurse card this shift tries again once someone is in a Ward bed.
+                usedThisShift = false;
                 GameFeedback.ShowAt("Team ready - no one to assess", position, GameFeedback.CareColour);
                 return;
             }

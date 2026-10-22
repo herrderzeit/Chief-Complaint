@@ -41,5 +41,8 @@ MonoBehaviour:
   effects:
   - {fileID: -9126909604860248107}
   directDraftUpgrade: {fileID: 0}
-  draftUpgradeCost: 5
+  draftUpgradeCost: 0
+  upgradeTokenCost: 0
+  upgradeTokenAnyColour: 0
+  upgradeTokenColour: 0
   cardArt: {fileID: 0}

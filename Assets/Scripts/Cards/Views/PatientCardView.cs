@@ -358,6 +358,8 @@ namespace ChiefComplaint.Cards.Views
             {
                 stabilityClockPaused = false;
                 GameLog.Info($"{patientData.patientName}'s stability clock was paused! No decay this shift.");
+                // A pause stops decay, not the patient's own end-of-shift effects.
+                ExecuteTriggers(PatientTriggerCondition.OnTurnEnd);
                 UpdateVisuals();
                 return;
             }
@@ -620,7 +622,7 @@ namespace ChiefComplaint.Cards.Views
                             if (GameManager.Instance != null) GameManager.Instance.SpendReputation(amount);
                             break;
                         case PatientTriggerEffect.DrawCard:
-                            if (DeckManager.Instance != null) DeckManager.Instance.DrawCards(trigger.effectValue);
+                            if (DeckManager.Instance != null) DeckManager.Instance.DrawCards(amount, reshuffleDiscard: false);
                             break;
                         case PatientTriggerEffect.ChangeStability:
                             ApplyStabilisation(trigger.effectValue);

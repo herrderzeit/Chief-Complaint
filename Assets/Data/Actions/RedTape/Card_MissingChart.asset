@@ -14,20 +14,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ActionCardSO
   cardName: Missing Chart
   cardType: 4
-  tags: 05000000
+  tags: 05000000i
   rulesText: 'Unplayable.
 
     Card exhausts if in hand at end of shift.'
-  flavorText: The physical file is gone, and the EHR system is down for maintenance.
-    You're flying blind.
+  flavorText: The physical file is gone, and the EHR system is down for maintenance. You're flying blind.
   isPlayable: 0
   successChance: 1
   apCost: 0
+  reputationCost: 0
   cardsToDraw: 0
   powerTier: 1
   exhaustsOnUse: 0
   exhaustsAtShiftEnd: 1
   effects: []
   directDraftUpgrade: {fileID: 0}
-  draftUpgradeCost: 5
+  draftUpgradeCost: 0
+  upgradeTokenCost: 0
+  upgradeTokenAnyColour: 0
+  upgradeTokenColour: 0
   cardArt: {fileID: 0}

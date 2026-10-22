@@ -14,8 +14,8 @@ namespace ChiefComplaint.UI
     /// <summary>
     /// "Page the on-call team": a clickable plate under each department slot. Spends raw AP to treat a
     /// diagnosed patient's symptom in that department without a Treatment card. The cost scales with the
-    /// symptom tier (2/3/4 AP), always 1 AP more than the matching card, because calling a team in is slower
-    /// than having a prepared order.
+    /// symptom tier (see <see cref="PagingRules"/>), always 1 AP more than the matching card, because calling a
+    /// team in is slower than having a prepared order.
     /// </summary>
     [RequireComponent(typeof(Collider2D))]
     [UnityEngine.Scripting.APIUpdating.MovedFrom(true, null, null, null)]
@@ -120,16 +120,7 @@ namespace ChiefComplaint.UI
             }
         }
 
-        private int GetAPCostForTier(SymptomTier tier)
-        {
-            return tier switch
-            {
-                SymptomTier.Tier1 => 2,
-                SymptomTier.Tier2 => 3,
-                SymptomTier.Tier3 => 4,
-                _ => 4
-            };
-        }
+        private int GetAPCostForTier(SymptomTier tier) => PagingRules.ApCost(tier);
 
         private void DisableButton(string text) => ApplyStyle(false, text);
 

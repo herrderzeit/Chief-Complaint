@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SymptomCardSO
   specialtyCategory: 0
   clinicalTags:
-  - Musculoskeletal
+  - Chest
   - Polytrauma
   - MVA
   tier1Name: Rib Contusion

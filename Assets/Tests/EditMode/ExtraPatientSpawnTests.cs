@@ -148,6 +148,52 @@ namespace ChiefComplaint.Tests.EditMode
         }
 
         [Test]
+        public void StartNewShift_FinalShift_BringsNoExtraPatient()
+        {
+            gm.extraPatientEveryNShifts = 3;
+            gm.shiftsToWin = 6;
+            // Shift 6 is both an extra-patient shift and the final one: only the usual arrival.
+            var expected = new[] { (2, 1), (3, 2), (4, 1), (5, 1), (6, 1) };
+
+            foreach (var (shift, count) in expected)
+            {
+                int got = ArrivalsForNextShift();
+                Assert.AreEqual(shift, gm.CurrentShift, "Fixture error: the shift counter did not advance.");
+                Assert.AreEqual(count, got, $"Shift {shift} of 6 should bring {count} patient(s) with extraPatientEveryNShifts = 3.");
+            }
+            Assert.IsTrue(gm.IsFinalShift);
+        }
+
+        [TestCase(6, 5, false)]
+        [TestCase(6, 6, true)]
+        [TestCase(0, 6, false)]
+        public void IsFinalShift_NeedsAWinConditionAndTheLastShift(int shiftsToWin, int reachShift, bool expected)
+        {
+            gm.extraPatientEveryNShifts = 0;
+            gm.shiftsToWin = 0; // never win while advancing
+            while (gm.CurrentShift < reachShift) ArrivalsForNextShift();
+            gm.shiftsToWin = shiftsToWin;
+
+            Assert.AreEqual(expected, gm.IsFinalShift);
+        }
+
+        [Test]
+        public void StartNewShift_DiversionEndsTheRun_NoSecondArrival()
+        {
+            // Wire the diversion penalty as GameManager.Start would, with just enough Reputation for one diversion.
+            board.OnPatientDiverted += gm.DivertPatient;
+            gm.DiversionReputationPenalty = 2;
+            gm.SpendReputation(gm.CurrentReputation - 2);
+            Assert.AreEqual(2, gm.CurrentReputation, "Fixture error: starting Reputation not set.");
+            gm.extraPatientEveryNShifts = 1; // every shift would bring a second arrival
+
+            int got = ArrivalsForNextShift();
+
+            Assert.AreEqual(GamePhase.GameOver, gm.CurrentPhase, "The first diversion should end the run.");
+            Assert.AreEqual(1, got, "No extra patient may arrive once the run is over.");
+        }
+
+        [Test]
         public void StartNewShift_OccupantsDecayEachShift()
         {
             // Guards the fixture: AdvanceShift really ran on the board (so this is the live loop, not a stub).

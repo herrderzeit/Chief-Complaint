@@ -206,19 +206,24 @@ namespace ChiefComplaint.Sim.Tests
             Assert.Null(Find(g, ActionKind.Treat, x => x.Patient == b));
         }
 
-        [Fact]
-        public void Paging_costs_2_3_4_AP_by_tier_and_only_charges_on_success()
+        [Theory]
+        // triage -> primary symptom tier -> page cost (PagingRules.ApCost: Tier 1 = 2, Tier 2 = 2, Tier 3 = 3)
+        [InlineData(5, 1, 2)]
+        [InlineData(3, 2, 2)]
+        [InlineData(1, 3, 3)]
+        public void Paging_costs_2_2_3_AP_by_tier_and_only_charges_on_success(int triage, int tier, int cost)
         {
-            var data = Content(new[] { Diagnose(3) }, Patient(EscalationType.Ambulance, triage: 3));
+            var data = Content(new[] { Diagnose(3) }, Patient(EscalationType.Ambulance, triage: triage));
             data.Config.BaseAP = 5;
             var g = Start(data);
             Patient p = g.Patients.Single();
+            Assert.Equal(tier, p.Symptoms.Single().Tier);
             g.Apply(Find(g, ActionKind.Admit));
             g.PlayCard(g.Hand[0], p);
             GameAction page = Find(g, ActionKind.Treat, a => a.Page);
-            Assert.Equal(3, page.Cost);
+            Assert.Equal(cost, page.Cost);
             g.Apply(page);
-            Assert.Equal(5 - 1 - 3, g.AP);
+            Assert.Equal(5 - 1 - cost, g.AP);
             Assert.True(p.IsAwaitingDischarge);
         }
 

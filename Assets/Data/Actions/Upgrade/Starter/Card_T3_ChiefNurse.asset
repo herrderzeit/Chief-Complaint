@@ -54,7 +54,7 @@ MonoBehaviour:
   - {fileID: 3150022580502162594}
   - {fileID: -7114811943155610463}
   directDraftUpgrade: {fileID: 0}
-  draftUpgradeCost: 5
+  draftUpgradeCost: 0
   upgradeTokenCost: 0
   upgradeTokenAnyColour: 0
   upgradeTokenColour: 0

@@ -19,7 +19,7 @@ MonoBehaviour:
   flavorText: Bed 4 is fine, Bed 6 is not, and someone ate the last biscuit.
   isPlayable: 1
   successChance: 1
-  apCost: 1
+  apCost: 0
   reputationCost: 0
   cardsToDraw: 2
   powerTier: 1
@@ -28,4 +28,7 @@ MonoBehaviour:
   effects: []
   directDraftUpgrade: {fileID: 0}
   draftUpgradeCost: 0
+  upgradeTokenCost: 0
+  upgradeTokenAnyColour: 0
+  upgradeTokenColour: 0
   cardArt: {fileID: 0}

@@ -16,7 +16,6 @@ MonoBehaviour:
   clinicalTags:
   - Neurological
   - Stroke
-  - Vascular
   tier1Name: Tingling Extremities
   tier1Description: Pins and needles in the hands.
   tier2Name: TIA (Mini-Stroke)

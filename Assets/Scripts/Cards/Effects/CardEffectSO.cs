@@ -19,6 +19,9 @@ namespace ChiefComplaint.Cards.Effects
         /// <summary>Short result text for the drag preview, e.g. "+2 AP" or "Pause decay". Null if there is nothing to show.</summary>
         public virtual string Describe() => null;
 
+        /// <summary>Reputation this effect takes when played (e.g. a Red Tape "Lose 3 Reputation"), counted by the Reputation gate.</summary>
+        public virtual int ReputationLoss => 0;
+
         /// <summary>What this effect gives when the card is dropped on the play zone; null if it needs a target.</summary>
         public virtual string DescribeOnPlayZone() => RequiresPatientTarget || RequiresCardTarget ? null : Describe();
 

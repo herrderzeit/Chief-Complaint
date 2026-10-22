@@ -14,21 +14,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PatientCardSO
   patientName: Arthur Martinez
   chiefComplaint: Chest Pressure
-  age: 20
+  age: 58
   clinicalTags:
-  - Cardiac
   - ACS
   - Moderate
   escalationPhase: 1
-  triageLevel: 3
+  triageLevel: 2
   incomingCategories: 0100000003000000i
   startingStability: 7
   stabilityDecayPerTurn: 2
   arrivesWithHandover: 1
-  reputationReward: 1
+  reputationReward: 2
   triggers:
   - condition: 2
     effect: 4
-    effectValue: 3
+    effectValue: 4
     cardReference: {fileID: 0}
   portraitSprite: {fileID: 0}

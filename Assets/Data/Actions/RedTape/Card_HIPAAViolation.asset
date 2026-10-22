@@ -27,15 +27,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ActionCardSO
   cardName: HIPAA Violation
   cardType: 4
-  tags: 06000000
-  rulesText: 'Lose 3 Reputation.
-
-    Card exhausts on use.'
-  flavorText: A resident left a patient's chart open on a public computer. The legal
-    department is furious.
+  tags: 06000000i
+  rulesText: 'Play to clear: lose 3 Reputation. Exhausts.'
+  flavorText: A resident left a patient's chart open on a public computer. The legal department is furious.
   isPlayable: 1
   successChance: 1
   apCost: 0
+  reputationCost: 0
   cardsToDraw: 0
   powerTier: 1
   exhaustsOnUse: 1
@@ -43,5 +41,8 @@ MonoBehaviour:
   effects:
   - {fileID: -8095275223406898104}
   directDraftUpgrade: {fileID: 0}
-  draftUpgradeCost: 5
+  draftUpgradeCost: 0
+  upgradeTokenCost: 0
+  upgradeTokenAnyColour: 0
+  upgradeTokenColour: 0
   cardArt: {fileID: 0}

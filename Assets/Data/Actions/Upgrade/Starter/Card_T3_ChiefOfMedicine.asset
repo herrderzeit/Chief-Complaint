@@ -14,15 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ActionCardSO
   cardName: Chief of Medicine
   cardType: 0
-  tags: 09000000
+  tags: 09000000i
   rulesText: 'Gain 3 AP.
 
     Draw 1 card(s).'
-  flavorText: Years of experience and unquestionable authority. When they speak,
-    the entire department moves.
+  flavorText: Years of experience and unquestionable authority. When they speak, the entire department moves.
   isPlayable: 1
   successChance: 1
   apCost: 0
+  reputationCost: 0
   cardsToDraw: 1
   powerTier: 3
   exhaustsOnUse: 0
@@ -30,7 +30,10 @@ MonoBehaviour:
   effects:
   - {fileID: 1651345130545593563}
   directDraftUpgrade: {fileID: 0}
-  draftUpgradeCost: 5
+  draftUpgradeCost: 0
+  upgradeTokenCost: 0
+  upgradeTokenAnyColour: 0
+  upgradeTokenColour: 0
   cardArt: {fileID: 0}
 --- !u!114 &1651345130545593563
 MonoBehaviour:

@@ -29,29 +29,20 @@ MonoBehaviour:
   cardType: 1
   tags: 
   rulesText: '50% chance to: Unmask 1 hidden symptom (up to Tier-3).'
-  flavorText: '"I don''t care if the centrifuge is acting up, spin the samples by
-    hand if you have to!"'
+  flavorText: '"I don''t care if the centrifuge is acting up, spin the samples by hand if you have to!"'
   isPlayable: 1
   successChance: 0.5
   apCost: 0
-  apGenerated: 0
-  reputationGenerated: 0
-  isEitherOr: 0
-  altApGenerated: 0
-  isDiagnostic: 1
-  diagnosesSymptomTier: 3
-  pausesStabilityClock: 0
-  stabilisationHeal: 0
-  curesSymptomTier: 0
+  reputationCost: 0
   cardsToDraw: 0
-  cleansesRedTape: 0
-  repBonusPerRedTapeCleansed: 0
   powerTier: 2
-  isTrashCard: 0
   exhaustsOnUse: 0
   exhaustsAtShiftEnd: 0
   effects:
   - {fileID: -5925222582827463614}
   directDraftUpgrade: {fileID: 0}
-  draftUpgradeCost: 5
+  draftUpgradeCost: 0
+  upgradeTokenCost: 0
+  upgradeTokenAnyColour: 0
+  upgradeTokenColour: 0
   cardArt: {fileID: 0}

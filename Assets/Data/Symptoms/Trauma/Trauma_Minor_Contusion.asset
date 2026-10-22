@@ -17,6 +17,7 @@ MonoBehaviour:
   - Musculoskeletal
   - Orthopaedic
   - MVA
+  - Fracture
   tier1Name: Minor Contusion
   tier1Description: Severe bruising but no broken bones.
   tier2Name: Simple Fracture

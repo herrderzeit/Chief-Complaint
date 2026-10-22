@@ -165,7 +165,28 @@ namespace ChiefComplaint.Cards.Data
 
         if (cardsToDraw > 0) cost += (cardsToDraw * 2);
 
+        // Weaker deals are cheaper: a one-use card, a Reputation cost or a chance to fail each take 2 off.
+        if (exhaustsOnUse) cost -= 2;
+        cost -= 2 * Mathf.Max(0, reputationCost);
+        if (successChance < 1f) cost -= 2;
+
         return cardType == ActionCardType.RedTape ? 0 : Mathf.Max(2, cost);
+    }
+
+    /// <summary>
+    /// All the Reputation playing this card takes: its <see cref="reputationCost"/> plus any Reputation its effects
+    /// take (a Red Tape "Lose 3 Reputation"). The play gate uses this so no card can end the run.
+    /// </summary>
+    public int TotalReputationCost
+    {
+        get
+        {
+            int total = Mathf.Max(0, reputationCost);
+            if (effects != null)
+                foreach (var effect in effects)
+                    if (effect != null) total += effect.ReputationLoss;
+            return total;
+        }
     }
 }
 }

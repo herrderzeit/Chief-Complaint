@@ -227,6 +227,12 @@ namespace ChiefComplaint.Core
             OnShiftChanged?.Invoke(currentShift);
 
             ResetAP();
+            if (carriedAP > 0)
+            {
+                int carried = carriedAP;
+                carriedAP = 0;
+                GainAP(carried);
+            }
 
             if (boardManager != null) boardManager.AdvanceShift();
 
@@ -243,7 +249,10 @@ namespace ChiefComplaint.Core
             if (boardManager != null)
             {
                 boardManager.SpawnPatient();
-                if (IsExtraPatientShift(currentShift, extraPatientEveryNShifts)) boardManager.SpawnPatient();
+                // No extra arrival on the final shift (it could only cost Reputation through diversion), nor after a
+                // diversion has already ended the run.
+                if (CurrentPhase != GamePhase.GameOver && !IsFinalShift && IsExtraPatientShift(currentShift, extraPatientEveryNShifts))
+                    boardManager.SpawnPatient();
             }
         }
 
@@ -252,6 +261,9 @@ namespace ChiefComplaint.Core
         /// <paramref name="everyNShifts"/>th shift (shift 3, 6, 9 … for 3), never when it is 0.
         /// </summary>
         public static bool IsExtraPatientShift(int shift, int everyNShifts) => everyNShifts > 0 && shift % everyNShifts == 0;
+
+        /// <summary><c>true</c> during the last shift of a run with a win condition.</summary>
+        public bool IsFinalShift => shiftsToWin > 0 && currentShift >= shiftsToWin;
 
         /// <summary>Opens the inter-shift draft/market panel. Ignored unless a shift is in progress.</summary>
         public void EnterDraftPhase()
@@ -262,10 +274,14 @@ namespace ChiefComplaint.Core
             PatientPicker.Cancel();
 
             // Patients finish their surgeries: discharges pay out before the draft opens.
+            resolvingShiftEnd = true;
             if (boardManager != null) boardManager.ResolveSurgeries();
+            resolvingShiftEnd = false;
 
-            // Finishing the final shift wins the run instead of opening the draft.
-            if (shiftsToWin > 0 && currentShift >= shiftsToWin && CurrentPhase != GamePhase.GameOver)
+            // Finishing the final shift wins the run instead of opening the draft. There is deliberately no last round
+            // of decay: the goal is to get through the final shift, and a decay after it decided runs on whoever
+            // happened to be on the board (BalanceSim: most smart-bot losses moved to that last tick).
+            if (IsFinalShift && CurrentPhase != GamePhase.GameOver)
             {
                 TriggerVictory();
                 return;
@@ -299,9 +315,18 @@ namespace ChiefComplaint.Core
         /// <param name="amount">Number of AP to grant.</param>
         public void GainAP(int amount)
         {
+            // AP gained while the shift is being wrapped up (e.g. an OnCured trigger at discharge) would be wiped by
+            // the next shift's reset, so it carries over instead.
+            if (resolvingShiftEnd) { carriedAP += amount; return; }
             currentAP += amount;
             OnAPChanged?.Invoke(currentAP);
         }
+
+        private bool resolvingShiftEnd;
+        private int carriedAP;
+
+        /// <summary>AP waiting to be added at the start of the next shift (from effects resolved at End Shift).</summary>
+        public int CarriedAP => carriedAP;
 
         /// <summary>Returns the base Activity Funding paid for curing a patient of the given escalation type.</summary>
         /// <param name="type">The patient's escalation phase.</param>

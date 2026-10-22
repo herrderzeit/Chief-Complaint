@@ -28,6 +28,8 @@ namespace ChiefComplaint.Sim.Engine
         public int Shift { get; private set; } = 1;
         public Phase Phase { get; private set; } = Phase.Shift;
         public bool IsOver => Phase == Phase.Won || Phase == Phase.Lost;
+        /// <summary>Mirrors <c>GameManager.IsFinalShift</c>.</summary>
+        public bool IsFinalShift => Config.ShiftsToWin > 0 && Shift >= Config.ShiftsToWin;
         public string LossCause { get; private set; } = "";
 
         // Cards (DeckManager)
@@ -288,7 +290,7 @@ namespace ChiefComplaint.Sim.Engine
             if (card.Effects.Count == 0 && target == null) applied = true;
             if (!applied) return false;
 
-            if (!rngFailed && card.CardsToDraw > 0) DrawCards(card.CardsToDraw);
+            if (!rngFailed && card.CardsToDraw > 0) DrawCards(card.CardsToDraw, reshuffleDiscard: false);
             SpendAP(card.ApCost);
             if (card.ReputationCost > 0) SpendReputation(card.ReputationCost, "card:" + card.Name);
             Hand.Remove(card);
@@ -346,12 +348,15 @@ namespace ChiefComplaint.Sim.Engine
             int leftOver = AP;
 
             // GameManager.EnterDraftPhase
+            resolvingShiftEnd = true;
             ResolveSurgeries();
+            resolvingShiftEnd = false;
             observer?.OnShiftEnded(this, leftOver);
             if (IsOver) return;
 
-            if (Config.ShiftsToWin > 0 && Shift >= Config.ShiftsToWin)
+            if (IsFinalShift)
             {
+                // GameManager.EnterDraftPhase: finishing the final shift wins, with no last round of decay.
                 Phase = Phase.Won;
                 return;
             }
@@ -430,7 +435,7 @@ namespace ChiefComplaint.Sim.Engine
                     }
                     return true;
                 case DrawCardsEffect d:
-                    if (!rngFailed) DrawCards(d.Amount);
+                    if (!rngFailed) DrawCards(d.Amount, reshuffleDiscard: false);
                     return true;
                 case DiagnoseEffect d:
                     return TryDiagnoseNext(target, d.MaxTier, rngFailed);
@@ -606,6 +611,7 @@ namespace ChiefComplaint.Sim.Engine
             if (p.ClockPaused)
             {
                 p.ClockPaused = false;
+                ExecuteTriggers(p, TriggerCondition.OnTurnEnd); // a pause stops decay, not the patient's own effects
                 return;
             }
             p.Stability -= p.HasWardBed ? Math.Max(1, (p.DecayRate + 1) / 2) : p.DecayRate;
@@ -637,7 +643,7 @@ namespace ChiefComplaint.Sim.Engine
                     case TriggerEffect.LoseAP: SpendAP(Math.Max(0, t.Value)); break;
                     case TriggerEffect.GainReputation: AddReputation(Math.Max(0, t.Value), source); break;
                     case TriggerEffect.LoseReputation: SpendReputation(Math.Max(0, t.Value), source); break;
-                    case TriggerEffect.DrawCard: DrawCards(t.Value); break;
+                    case TriggerEffect.DrawCard: DrawCards(Math.Max(0, t.Value), reshuffleDiscard: false); break;
                     case TriggerEffect.ChangeStability: ApplyStabilisation(p, t.Value); break;
                     case TriggerEffect.AddCardToDiscard:
                         if (t.CardReference != null) DiscardPile.Add(t.CardReference);
@@ -755,7 +761,8 @@ namespace ChiefComplaint.Sim.Engine
             Shift++;
             bestDoctorTier = bestNurseTier = PendingTeamAssessmentTier = 0;
             synergyUsedThisShift = false;
-            AP = Config.BaseAP;
+            AP = Config.BaseAP + carriedAP;
+            carriedAP = 0;
 
             // BoardManager.AdvanceShift: iterate backwards so deaths don't skip anyone.
             ResolveSurgeries();
@@ -767,8 +774,8 @@ namespace ChiefComplaint.Sim.Engine
             DrawCards(Config.HandSize);
             CheckEscalation();
             SpawnPatient();
-            // GameManager.IsExtraPatientShift: busier shifts every Nth shift.
-            if (Config.ExtraPatientEveryNShifts > 0 && Shift % Config.ExtraPatientEveryNShifts == 0) SpawnPatient();
+            // GameManager.IsExtraPatientShift: busier shifts every Nth shift, never on the final shift or after a loss.
+            if (!IsOver && !IsFinalShift && Config.ExtraPatientEveryNShifts > 0 && Shift % Config.ExtraPatientEveryNShifts == 0) SpawnPatient();
         }
 
         // =====================================================================
@@ -782,9 +789,9 @@ namespace ChiefComplaint.Sim.Engine
             if (card.HasTag(CardTag.Nurse)) bestNurseTier = Math.Max(bestNurseTier, card.PowerTier);
             if (bestDoctorTier == 0 || bestNurseTier == 0) return;
 
-            synergyUsedThisShift = true;
             int tier = Math.Clamp(Math.Min(bestDoctorTier, bestNurseTier), 1, 3);
-            if (!ActivePatients.Any(p => p.CanTeamAssess(tier))) return; // wasted: nobody eligible
+            if (!ActivePatients.Any(p => p.CanTeamAssess(tier))) return; // not used up: tries again on the next Doctor/Nurse card
+            synergyUsedThisShift = true;
             PendingTeamAssessmentTier = tier;
             Phase = Phase.TeamAssessment;
         }
@@ -869,8 +876,17 @@ namespace ChiefComplaint.Sim.Engine
         private void SpendAP(int amount) => AP = Math.Max(0, AP - amount);
 
         /// <summary>Mirrors <c>DraggableCard.CanAffordReputation</c>: Reputation must stay above 0 after paying.</summary>
-        private bool CanAffordReputation(CardDef card) => card.ReputationCost <= 0 || Reputation > card.ReputationCost;
-        private void GainAP(int amount) => AP += amount;
+        private bool CanAffordReputation(CardDef card) => card.TotalReputationCost <= 0 || Reputation > card.TotalReputationCost;
+
+        /// <summary>Mirrors <c>GameManager.GainAP</c>: AP gained while the shift is wrapped up carries into the next one.</summary>
+        private void GainAP(int amount)
+        {
+            if (resolvingShiftEnd) { carriedAP += amount; return; }
+            AP += amount;
+        }
+
+        private bool resolvingShiftEnd;
+        private int carriedAP;
 
         private void AddReputation(int amount, string source)
         {
@@ -914,13 +930,14 @@ namespace ChiefComplaint.Sim.Engine
         // Deck (DeckManager)
         // =====================================================================
 
-        public void DrawCards(int amount)
+        /// <summary>Mirrors <c>DeckManager.DrawCards</c>: only the start-of-shift hand reshuffles the discard pile.</summary>
+        public void DrawCards(int amount, bool reshuffleDiscard = true)
         {
             for (int i = 0; i < amount; i++)
             {
                 if (DrawPile.Count == 0)
                 {
-                    if (DiscardPile.Count == 0) return;
+                    if (!reshuffleDiscard || DiscardPile.Count == 0) return;
                     DrawPile.AddRange(DiscardPile);
                     DiscardPile.Clear();
                     Shuffle(DrawPile);

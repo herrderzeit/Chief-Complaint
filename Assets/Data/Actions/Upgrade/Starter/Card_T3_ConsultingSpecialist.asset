@@ -18,11 +18,11 @@ MonoBehaviour:
   rulesText: 'Unmask 1 hidden symptom (up to Tier-3).
 
     Gain 1 AP.'
-  flavorText: They charge by the hour, but they rarely need more than five minutes
-    to pinpoint the exact problem.
+  flavorText: They charge by the hour, but they rarely need more than five minutes to pinpoint the exact problem.
   isPlayable: 1
   successChance: 1
   apCost: 1
+  reputationCost: 0
   cardsToDraw: 0
   powerTier: 3
   exhaustsOnUse: 0
@@ -31,7 +31,10 @@ MonoBehaviour:
   - {fileID: 2535059109492470556}
   - {fileID: 4547301687933328964}
   directDraftUpgrade: {fileID: 0}
-  draftUpgradeCost: 5
+  draftUpgradeCost: 0
+  upgradeTokenCost: 0
+  upgradeTokenAnyColour: 0
+  upgradeTokenColour: 0
   cardArt: {fileID: 0}
 --- !u!114 &2535059109492470556
 MonoBehaviour:

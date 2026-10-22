@@ -16,6 +16,7 @@ public int reputationGenerated = 1;
 
         public override string Describe() => reputationGenerated >= 0 ? $"+{reputationGenerated} Rep" : $"{reputationGenerated} Rep";
         public override bool CanApply(PatientCardView targetPatient, ActionCardView targetCard) => true;
+        public override int ReputationLoss => Mathf.Max(0, -reputationGenerated);
 
         public override bool Apply(PatientCardView targetPatient, ActionCardView targetCard, bool rngFailed, Vector3 mousePos)
         {

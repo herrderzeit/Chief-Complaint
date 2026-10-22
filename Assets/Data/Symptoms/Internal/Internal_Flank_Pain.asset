@@ -16,6 +16,7 @@ MonoBehaviour:
   clinicalTags:
   - GI
   - Musculoskeletal
+  - Vascular
   tier1Name: Flank Pain
   tier1Description: Dull ache in the lower back.
   tier2Name: Kidney Stones

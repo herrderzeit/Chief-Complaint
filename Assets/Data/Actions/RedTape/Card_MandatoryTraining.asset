@@ -14,15 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ActionCardSO
   cardName: Mandatory Training
   cardType: 4
-  tags: 04000000
-  rulesText: 'Lose 1 Reputation.
-
-    Card exhausts on use.'
-  flavorText: It's an hour-long slide presentation on proper lifting techniques that
-    could have been an email.
+  tags: 04000000i
+  rulesText: 'Play to clear: lose 1 Reputation. Exhausts.'
+  flavorText: It's an hour-long slide presentation on proper lifting techniques that could have been an email.
   isPlayable: 1
   successChance: 1
   apCost: 0
+  reputationCost: 0
   cardsToDraw: 0
   powerTier: 1
   exhaustsOnUse: 1
@@ -30,7 +28,10 @@ MonoBehaviour:
   effects:
   - {fileID: 1912779280419701414}
   directDraftUpgrade: {fileID: 0}
-  draftUpgradeCost: 5
+  draftUpgradeCost: 0
+  upgradeTokenCost: 0
+  upgradeTokenAnyColour: 0
+  upgradeTokenColour: 0
   cardArt: {fileID: 0}
 --- !u!114 &1912779280419701414
 MonoBehaviour:

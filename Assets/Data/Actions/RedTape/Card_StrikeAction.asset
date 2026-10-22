@@ -14,30 +14,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ActionCardSO
   cardName: Strike Action
   cardType: 4
-  tags: 05000000
+  tags: 05000000i
   rulesText: Card exhausts on use.
-  flavorText: The nurses' union is furious about the new overtime policy. Operations
-    have ground to a halt.
+  flavorText: The nurses' union is furious about the new overtime policy. Operations have ground to a halt.
   isPlayable: 1
   successChance: 1
   apCost: 3
-  apGenerated: 0
-  reputationGenerated: 0
-  isEitherOr: 0
-  altApGenerated: 0
-  isDiagnostic: 0
-  diagnosesSymptomTier: 0
-  pausesStabilityClock: 0
-  stabilisationHeal: 0
-  curesSymptomTier: 0
+  reputationCost: 0
   cardsToDraw: 0
-  cleansesRedTape: 0
-  repBonusPerRedTapeCleansed: 0
   powerTier: 1
-  isTrashCard: 0
   exhaustsOnUse: 1
   exhaustsAtShiftEnd: 0
   effects: []
   directDraftUpgrade: {fileID: 0}
-  draftUpgradeCost: 5
+  draftUpgradeCost: 0
+  upgradeTokenCost: 0
+  upgradeTokenAnyColour: 0
+  upgradeTokenColour: 0
   cardArt: {fileID: 0}

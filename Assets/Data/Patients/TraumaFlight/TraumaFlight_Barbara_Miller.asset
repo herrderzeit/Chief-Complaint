@@ -16,9 +16,9 @@ MonoBehaviour:
   chiefComplaint: Massive Heart Attack
   age: 84
   clinicalTags:
-  - Cardiac
   - STEMI
   - Critical
+  - ACS
   escalationPhase: 2
   triageLevel: 2
   incomingCategories: 010000000100000003000000i

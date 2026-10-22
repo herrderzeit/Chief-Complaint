@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ChiefComplaint.Sim.Data
 {
@@ -165,9 +166,16 @@ namespace ChiefComplaint.Sim.Data
                 if (ApCost == 0) cost += 2;
                 else if (ApCost >= 2) cost -= 1;
                 if (CardsToDraw > 0) cost += CardsToDraw * 2;
+                if (ExhaustsOnUse) cost -= 2;
+                cost -= 2 * Math.Max(0, ReputationCost);
+                if (SuccessChance < 1f) cost -= 2;
                 return Type == CardType.RedTape ? 0 : Math.Max(2, cost);
             }
         }
+
+        /// <summary>Mirrors <c>ActionCardSO.TotalReputationCost</c>: the card's cost plus Reputation its effects take.</summary>
+        public int TotalReputationCost =>
+            Math.Max(0, ReputationCost) + Effects.OfType<GainReputationEffect>().Sum(e => Math.Max(0, -e.Amount));
 
         public override string ToString() => Name;
     }

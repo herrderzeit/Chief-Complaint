@@ -18,11 +18,11 @@ MonoBehaviour:
   rulesText: 'Pause patient''s stability decay.
 
     Restore 8 Stability.'
-  flavorText: CLEAR! The sound nobody wants to hear, but the one that saves the most
-    lives.
+  flavorText: CLEAR! The sound nobody wants to hear, but the one that saves the most lives.
   isPlayable: 1
   successChance: 1
   apCost: 2
+  reputationCost: 0
   cardsToDraw: 0
   powerTier: 3
   exhaustsOnUse: 0
@@ -31,7 +31,10 @@ MonoBehaviour:
   - {fileID: 8878741963522917254}
   - {fileID: 1211027201697578380}
   directDraftUpgrade: {fileID: 0}
-  draftUpgradeCost: 5
+  draftUpgradeCost: 0
+  upgradeTokenCost: 0
+  upgradeTokenAnyColour: 0
+  upgradeTokenColour: 0
   cardArt: {fileID: 0}
 --- !u!114 &1211027201697578380
 MonoBehaviour:

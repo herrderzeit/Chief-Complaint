@@ -19,13 +19,12 @@ MonoBehaviour:
 
     Restore 6 Stability.
 
-    Draw
-    1 card(s).'
-  flavorText: When you don't know exactly what the bug is, but you know it's going
-    to kill them in five minutes.
+    Draw 1 card(s).'
+  flavorText: When you don't know exactly what the bug is, but you know it's going to kill them in five minutes.
   isPlayable: 1
   successChance: 1
   apCost: 1
+  reputationCost: 0
   cardsToDraw: 1
   powerTier: 3
   exhaustsOnUse: 0
@@ -34,7 +33,10 @@ MonoBehaviour:
   - {fileID: 7124308187194941839}
   - {fileID: 2527190858478402872}
   directDraftUpgrade: {fileID: 0}
-  draftUpgradeCost: 5
+  draftUpgradeCost: 0
+  upgradeTokenCost: 0
+  upgradeTokenAnyColour: 0
+  upgradeTokenColour: 0
   cardArt: {fileID: 0}
 --- !u!114 &2527190858478402872
 MonoBehaviour:

@@ -41,7 +41,7 @@ namespace ChiefComplaint.Cards.Interaction
             if (board == null) return;
 
             bool affordable = card != null && card.isPlayable && gm.CurrentAP >= card.apCost &&
-                              CanAffordReputation(card.reputationCost, gm.CurrentReputation);
+                              CanAffordReputation(card.TotalReputationCost, gm.CurrentReputation);
             foreach (var patient in board.ActivePatients)
             {
                 if (patient == null) continue;
@@ -278,7 +278,7 @@ namespace ChiefComplaint.Cards.Interaction
                 }
 
                 // Reputation gate: a Reputation cost may never be what ends the run.
-                if (!CanAffordReputation(cardData.reputationCost, GameManager.Instance.CurrentReputation))
+                if (!CanAffordReputation(cardData.TotalReputationCost, GameManager.Instance.CurrentReputation))
                 {
                     GameFeedback.WarnAt("NOT ENOUGH REPUTATION!", transform.position);
                     ClearHighlights();
@@ -340,7 +340,7 @@ namespace ChiefComplaint.Cards.Interaction
                 {
                     if (!rngFailed && cardData.cardsToDraw > 0 && DeckManager.Instance != null)
                     {
-                        DeckManager.Instance.DrawCards(cardData.cardsToDraw);
+                        DeckManager.Instance.DrawCards(cardData.cardsToDraw, reshuffleDiscard: false);
                         GameFeedback.ShowAt(GameFeedback.Cards(cardData.cardsToDraw), GetMouseWorldPosition(), GameFeedback.CardColour);
                     }
 

@@ -16,7 +16,6 @@ MonoBehaviour:
   chiefComplaint: Chest Pain
   age: 85
   clinicalTags:
-  - Cardiac
   - ACS
   - Moderate
   escalationPhase: 1

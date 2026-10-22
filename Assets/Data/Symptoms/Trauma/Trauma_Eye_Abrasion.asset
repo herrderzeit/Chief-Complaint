@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SymptomCardSO
   specialtyCategory: 0
   clinicalTags:
-  - Laceration
+  - Ocular
   - ENT
   tier1Name: Eye Abrasion
   tier1Description: Scratch on the surface of the eye.

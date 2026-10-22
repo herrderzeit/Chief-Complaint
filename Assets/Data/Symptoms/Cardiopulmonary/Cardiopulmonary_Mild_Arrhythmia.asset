@@ -17,6 +17,7 @@ MonoBehaviour:
   - Cardiac
   - Arrhythmia
   - Toxicological
+  - Environmental
   tier1Name: Mild Arrhythmia
   tier1Description: Patient reports minor heart palpitations.
   tier2Name: Atrial Fibrillation

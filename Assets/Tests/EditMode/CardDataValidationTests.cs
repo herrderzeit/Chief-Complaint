@@ -66,7 +66,7 @@ namespace ChiefComplaint.Tests
                          .ToArray();
 
         // folder, phase, stability min..max, decay, triage min..max
-        [TestCase("WalkIn", EscalationType.WalkIn, 10, 12, 1, 4, 5)]
+        [TestCase("WalkIn", EscalationType.WalkIn, 8, 12, 1, 4, 5)]
         [TestCase("Ambulance", EscalationType.Ambulance, 6, 9, 2, 2, 3)]
         [TestCase("TraumaFlight", EscalationType.TraumaFlight, 6, 8, 3, 1, 2)]
         public void PatientPool_MatchesItsBand(string folder, EscalationType phase, int minStab, int maxStab, int decay, int minTriage, int maxTriage)
@@ -81,6 +81,56 @@ namespace ChiefComplaint.Tests
                 Assert.AreEqual(decay, p.stabilityDecayPerTurn, $"{folder}/{p.name}: decay should be {decay}.");
                 Assert.That(p.triageLevel, Is.InRange(minTriage, maxTriage), $"{folder}/{p.name}: triage outside {minTriage}–{maxTriage}.");
             }
+        }
+
+        // Walk-In stability by triage: triage 4 arrives at exactly 8, triage 5 at 10-12.
+        [TestCase(4, 8, 8)]
+        [TestCase(5, 10, 12)]
+        public void WalkIns_StabilityMatchesTriage(int triage, int minStab, int maxStab)
+        {
+            var patients = LoadPatients("WalkIn").Where(p => p.triageLevel == triage).ToArray();
+            Assert.IsNotEmpty(patients, $"No triage-{triage} Walk-Ins found.");
+            foreach (var p in patients)
+                Assert.That(p.startingStability, Is.InRange(minStab, maxStab), $"{p.name} (triage {triage}): starting stability.");
+        }
+
+        [Test]
+        public void WalkIns_TriageFourAreTheDecidedFive()
+        {
+            var names = LoadPatients("WalkIn").Where(p => p.triageLevel == 4).Select(p => p.patientName).OrderBy(n => n).ToArray();
+            CollectionAssert.AreEqual(new[] { "John Garcia", "Joseph Wilson", "Marcus Gonzalez", "Richard Garcia", "Susan Martin" }, names);
+        }
+
+        // folder, triage, count
+        [TestCase("Ambulance", 3, 7)]
+        [TestCase("Ambulance", 2, 8)]
+        [TestCase("TraumaFlight", 1, 9)]
+        [TestCase("TraumaFlight", 2, 6)]
+        public void PatientPool_TriageCountsMatchTheDecidedRoster(string folder, int triage, int count)
+        {
+            Assert.AreEqual(count, LoadPatients(folder).Count(p => p.triageLevel == triage), $"{folder}: triage-{triage} patients.");
+        }
+
+        [Test]
+        public void ArthurMartinez_IsATriageTwoAmbulanceWithHandover()
+        {
+            var p = LoadPatients("Ambulance").Single(x => x.patientName == "Arthur Martinez");
+            Assert.AreEqual(2, p.triageLevel);
+            Assert.AreEqual(58, p.age);
+            Assert.AreEqual(2, p.reputationReward);
+            Assert.IsTrue(p.arrivesWithHandover, "Arthur Martinez keeps his paramedic handover.");
+            var deaths = DeathReputationTriggers(p);
+            Assert.AreEqual(1, deaths.Length);
+            Assert.AreEqual(4, deaths[0].effectValue, "A triage-2 death costs 4.");
+        }
+
+        [Test]
+        public void MichaelJohnson_CategoriesAreInternalThenTwoCardiopulmonary()
+        {
+            var p = LoadPatients("TraumaFlight").Single(x => x.patientName == "Michael Johnson");
+            CollectionAssert.AreEqual(
+                new[] { SymptomCategory.Internal, SymptomCategory.Cardiopulmonary, SymptomCategory.Cardiopulmonary },
+                p.incomingCategories);
         }
 
         [Test]
@@ -215,7 +265,7 @@ namespace ChiefComplaint.Tests
             Assert.AreEqual(0, card.apCost);
             Assert.AreEqual(1, card.powerTier);
             Assert.IsTrue(card.exhaustsOnUse, "Agency Nurse exhausts on use.");
-            Assert.AreEqual(7, card.CalculateDraftValue(), "Agency Nurse price.");
+            Assert.AreEqual(5, card.CalculateDraftValue(), "Agency Nurse price.");
         }
 
         [Test]
@@ -231,7 +281,7 @@ namespace ChiefComplaint.Tests
             Assert.AreEqual(1, card.effects.Count);
             Assert.AreEqual(3, ((ChiefComplaint.Cards.Effects.GainAPEffectSO)card.effects[0]).apGenerated, "Double Shift gains 3 AP.");
             Assert.AreEqual("Gain 3 AP. Draw 1 card. Exhausts.", card.rulesText);
-            Assert.AreEqual(9, card.CalculateDraftValue(), "Double Shift price.");
+            Assert.AreEqual(7, card.CalculateDraftValue(), "Double Shift price.");
         }
 
         [Test]
@@ -249,8 +299,8 @@ namespace ChiefComplaint.Tests
         public void WardRound_DecidedStats()
         {
             var card = LoadCard("Draft/Card_WardRound");
-            Assert.AreEqual(1, card.apCost);
-            Assert.AreEqual(2, card.powerTier);
+            Assert.AreEqual(1, card.apCost, "Ward Round still costs 1 AP.");
+            Assert.AreEqual(1, card.powerTier);
         }
 
         [Test]
@@ -262,6 +312,79 @@ namespace ChiefComplaint.Tests
             Assert.IsTrue(card.exhaustsOnUse, "Compliance Audit exhausts on use.");
             var cleanse = card.effects.OfType<ChiefComplaint.Cards.Effects.CleanseRedTapeEffectSO>().Single();
             Assert.AreEqual(1, cleanse.repBonusPerRedTapeCleansed, "Compliance Audit cleanse bonus.");
+        }
+
+        [Test]
+        public void ShiftHandover_DecidedStats()
+        {
+            var card = LoadCard("Draft/Card_ShiftHandover");
+            Assert.AreEqual(0, card.apCost, "Shift Handover is free to play.");
+            Assert.AreEqual(2, card.cardsToDraw);
+        }
+
+        [Test]
+        public void DamageControlSurgery_PausesThenCuresUpToTierThree()
+        {
+            var card = LoadCard("Draft/Card_DamageControlSurgery");
+            Assert.AreEqual(2, card.effects.Count, "Damage Control Surgery: a pause and a cure.");
+            Assert.IsInstanceOf<ChiefComplaint.Cards.Effects.PauseStabilityEffectSO>(card.effects[0], "The pause comes first.");
+            var cure = card.effects[1] as ChiefComplaint.Cards.Effects.CureSymptomEffectSO;
+            Assert.IsNotNull(cure, "The second effect cures a symptom.");
+            Assert.AreEqual(SymptomTier.Tier3, cure.curesSymptomTier);
+            Assert.IsTrue(card.exhaustsOnUse, "Damage Control Surgery exhausts.");
+        }
+
+        // Supply Room and upgrade-only prices after the exhaust / Reputation cost / failure-chance discounts.
+        [TestCase("Draft/Card_AgencyNurse", 5)]
+        [TestCase("Draft/Card_DoubleShift", 7)]
+        [TestCase("Draft/Card_SharpsBin", 2)]
+        [TestCase("Draft/Card_ComplianceAudit", 2)]
+        [TestCase("Draft/Card_BloodBank", 4)]
+        [TestCase("Draft/Card_GratefulPatient", 6)]
+        [TestCase("Draft/Card_TraumaTeam", 10)]
+        [TestCase("Draft/Card_DamageControlSurgery", 10)]
+        [TestCase("Draft/Card_StatLabs", 7)]
+        [TestCase("Draft/Card_ShiftHandover", 10)]
+        [TestCase("Draft/Card_WardRound", 4)]
+        [TestCase("Draft/Card_CrashCart", 11)]
+        [TestCase("Upgrade/Draft/Card_Philanthropist", 11)]
+        public void DecidedPrices(string path, int price)
+        {
+            var card = LoadCard(path);
+            Assert.AreEqual(price, card.CalculateDraftValue(), $"{card.cardName}: price.");
+        }
+
+        [Test]
+        public void GratefulPatient_UpgradesToPhilanthropistForSeven()
+        {
+            var card = LoadCard("Draft/Card_GratefulPatient");
+            Assert.IsNotNull(card.directDraftUpgrade);
+            Assert.AreEqual("Philanthropist", card.directDraftUpgrade.cardName);
+            Assert.AreEqual(7, card.draftUpgradeCost);
+        }
+
+        [Test]
+        public void Cards_WithoutAnUpgrade_HaveNoUpgradeCost()
+        {
+            var offenders = FindAssetPaths<ActionCardSO>()
+                .Select(p => (path: p, card: AssetDatabase.LoadAssetAtPath<ActionCardSO>(p)))
+                .Where(x => x.card.directDraftUpgrade == null && x.card.draftUpgradeCost != 0)
+                .Select(x => $"{x.path} ({x.card.draftUpgradeCost})")
+                .ToArray();
+            Assert.IsEmpty(offenders, "Cards without a directDraftUpgrade must have draftUpgradeCost 0:\n" + string.Join("\n", offenders));
+        }
+
+        [TestCase("RedTape/Card_HIPAAViolation", 3)]
+        [TestCase("RedTape/Card_MalpracticeThreat", 2)]
+        [TestCase("RedTape/Card_MandatoryTraining", 1)]
+        public void ReputationRedTape_RulesTextAndGateAgree(string path, int loss)
+        {
+            var card = LoadCard(path);
+            Assert.AreEqual(ActionCardType.RedTape, card.cardType);
+            Assert.IsTrue(card.isPlayable, $"{card.cardName}: played to clear.");
+            Assert.IsTrue(card.exhaustsOnUse, $"{card.cardName}: exhausts.");
+            Assert.AreEqual(loss, card.TotalReputationCost, $"{card.cardName}: the Reputation gate must count the loss.");
+            Assert.AreEqual($"Play to clear: lose {loss} Reputation. Exhausts.", card.rulesText);
         }
 
         [TestCase("Upgrade/Starter/Card_T2_SpecialisedCare", 1, 7)]
@@ -329,6 +452,55 @@ namespace ChiefComplaint.Tests
                 Assert.AreEqual(card, piles[i].card.cardName, $"Pile {i}: card.");
                 Assert.AreEqual(unlockAt, piles[i].unlockAt, $"Pile {i} ({card}): unlock stage.");
                 Assert.AreEqual(maxStock, piles[i].maxStock, $"Pile {i} ({card}): max stock.");
+            }
+        }
+
+        /// <summary>
+        /// Every patient's symptoms come from tag-matching cards: for each category a patient needs, that category's
+        /// scene deck holds at least as many distinct symptoms sharing a clinical tag with the patient as the patient
+        /// draws from it (a repeated category needs a second, different card), so the draw never falls back.
+        /// </summary>
+        [Test]
+        public void ScenePatients_HaveEnoughTagMatchingSymptomsAndNeverFallBack()
+        {
+            Scene scene = SceneManager.GetSceneByPath(ScenePath);
+            bool openedHere = !scene.isLoaded;
+            if (openedHere) scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Additive);
+            try
+            {
+                var pdm = scene.GetRootGameObjects()
+                               .SelectMany(g => g.GetComponentsInChildren<ChiefComplaint.Core.PatientDeckManager>(true))
+                               .First();
+                var decks = new Dictionary<SymptomCategory, List<SymptomCardSO>>
+                {
+                    { SymptomCategory.Trauma, pdm.traumaDeck },
+                    { SymptomCategory.Cardiopulmonary, pdm.cardiopulmonaryDeck },
+                    { SymptomCategory.Infectious, pdm.infectiousDeck },
+                    { SymptomCategory.Internal, pdm.internalDeck },
+                };
+                var patients = pdm.walkInPool.Concat(pdm.ambulancePool).Concat(pdm.traumaFlightPool).ToArray();
+                Assert.IsNotEmpty(patients, "No patients in the scene's PatientDeckManager pools.");
+
+                var problems = new List<string>();
+                foreach (var p in patients)
+                {
+                    if (p == null) { problems.Add("A pool holds a missing patient."); continue; }
+                    if (p.clinicalTags == null || p.clinicalTags.Count == 0) { problems.Add($"{p.patientName}: no clinical tags."); continue; }
+                    foreach (var group in p.incomingCategories.GroupBy(c => c))
+                    {
+                        int matching = decks[group.Key]
+                            .Where(s => s != null && s.clinicalTags != null)
+                            .Distinct()
+                            .Count(s => s.clinicalTags.Any(t => p.clinicalTags.Contains(t)));
+                        if (matching < group.Count())
+                            problems.Add($"{p.patientName}: needs {group.Count()} {group.Key} symptom(s), only {matching} tag-matching in the deck.");
+                    }
+                }
+                Assert.IsEmpty(problems, "Patients whose symptom draw would fall back to an untagged card:\n" + string.Join("\n", problems));
+            }
+            finally
+            {
+                if (openedHere) EditorSceneManager.CloseScene(scene, true);
             }
         }
 

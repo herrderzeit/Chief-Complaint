@@ -28,10 +28,10 @@ namespace ChiefComplaint.Sim.Data
         public int AmbulanceCureThreshold = 3;
         public int TraumaFlightCureThreshold = 8;
         // Time-based escalation: the pool also unlocks at the start of this shift (0 = cures only).
-        public int AmbulanceShiftThreshold = 0;
-        public int TraumaFlightShiftThreshold = 0;
+        public int AmbulanceShiftThreshold = 5;
+        public int TraumaFlightShiftThreshold = 10;
         // GameManager: Reputation lost when an arriving patient is diverted because Triage is full (0 = free).
-        public int DiversionReputationPenalty = 0;
+        public int DiversionReputationPenalty = 2;
 
         // GameManager.extraPatientEveryNShifts: an extra patient arrives at the start of every Nth shift (0 = off).
         public int ExtraPatientEveryNShifts = 3;
@@ -50,8 +50,8 @@ namespace ChiefComplaint.Sim.Data
 
         // DepartmentFallbackButton ("Page the on-call team" cost by symptom tier)
         public int PageCostTier1 = 2;
-        public int PageCostTier2 = 3;
-        public int PageCostTier3 = 4;
+        public int PageCostTier2 = 2;
+        public int PageCostTier3 = 3;
 
         // PatientCardView
         public int LowStabilityThreshold = 3;

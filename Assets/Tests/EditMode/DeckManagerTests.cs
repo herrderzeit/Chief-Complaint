@@ -78,6 +78,53 @@ namespace ChiefComplaint.Tests.EditMode
             Assert.AreEqual(0, deckManager.discardPile.Count, "Discard pile should be empty after recycle.");
         }
 
+        /// <summary>Empties the draw pile into the hand and the hand into the discard pile, then draws 2 back.</summary>
+        private void LeaveEmptyDrawPileAndFullDiscard()
+        {
+            deckManager.InitializeDeck();
+            deckManager.DrawCards(10);
+            deckManager.DiscardHand();
+            Assert.AreEqual(0, deckManager.drawPile.Count, "Fixture error: the draw pile should be empty.");
+            Assert.AreEqual(10, deckManager.discardPile.Count, "Fixture error: the discard pile should hold the deck.");
+        }
+
+        [Test]
+        public void DrawCards_WithoutReshuffle_DrawsNothingFromAnEmptyDrawPile()
+        {
+            LeaveEmptyDrawPileAndFullDiscard();
+
+            deckManager.DrawCards(1, reshuffleDiscard: false);
+
+            Assert.AreEqual(0, deckManager.handData.Count, "A mid-shift draw must not pull the discard pile back in.");
+            Assert.AreEqual(10, deckManager.discardPile.Count, "The discard pile must be left untouched.");
+            Assert.AreEqual(0, deckManager.drawPile.Count);
+        }
+
+        [Test]
+        public void DrawCards_DefaultReshufflesTheDiscardIntoAnEmptyDrawPile()
+        {
+            LeaveEmptyDrawPileAndFullDiscard();
+
+            deckManager.DrawCards(1);
+
+            Assert.AreEqual(1, deckManager.handData.Count, "The start-of-shift draw reshuffles the discard pile.");
+            Assert.AreEqual(9, deckManager.drawPile.Count);
+            Assert.AreEqual(0, deckManager.discardPile.Count);
+        }
+
+        [Test]
+        public void DrawCards_WithoutReshuffle_StillDrawsWhatIsLeftInTheDrawPile()
+        {
+            deckManager.InitializeDeck();
+            deckManager.DrawCards(8);
+            deckManager.DiscardHand();
+
+            deckManager.DrawCards(5, reshuffleDiscard: false);
+
+            Assert.AreEqual(2, deckManager.handData.Count, "Only the 2 cards left in the draw pile can be drawn.");
+            Assert.AreEqual(8, deckManager.discardPile.Count);
+        }
+
         [Test]
         public void RemoveCardFromHand_CardNotInHand_DoesNotAddToDiscard()
         {

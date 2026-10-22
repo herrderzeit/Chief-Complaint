@@ -46,6 +46,16 @@ namespace ChiefComplaint.Sim.Tests
             Assert.Equal(16, new GameConfig().MaxReputation);
         }
 
+        [Fact]
+        public void Escalation_and_diversion_fallbacks_agree_with_the_scene()
+        {
+            // GameConfig's fallbacks must match the game, so a scene without these fields still simulates the real rules.
+            var defaults = new GameConfig();
+            Assert.Equal(defaults.DiversionReputationPenalty, Data.Config.DiversionReputationPenalty);
+            Assert.Equal(defaults.AmbulanceShiftThreshold, Data.Config.AmbulanceShiftThreshold);
+            Assert.Equal(defaults.TraumaFlightShiftThreshold, Data.Config.TraumaFlightShiftThreshold);
+        }
+
         // ------------------------------------------------------------------ patient pools
 
         private static List<PatientDef> Pool(EscalationType phase) => phase switch
@@ -56,7 +66,7 @@ namespace ChiefComplaint.Sim.Tests
         };
 
         [Theory]
-        [InlineData(EscalationType.WalkIn, 10, 12, 1, 4, 5)]
+        [InlineData(EscalationType.WalkIn, 8, 12, 1, 4, 5)]
         [InlineData(EscalationType.Ambulance, 6, 9, 2, 2, 3)]
         [InlineData(EscalationType.TraumaFlight, 6, 8, 3, 1, 2)]
         public void Patient_pool_matches_its_band(EscalationType phase, int minStab, int maxStab, int decay, int minTriage, int maxTriage)
@@ -73,8 +83,68 @@ namespace ChiefComplaint.Sim.Tests
         }
 
         [Theory]
-        [InlineData(EscalationType.Ambulance, 3, 8)]
-        [InlineData(EscalationType.Ambulance, 2, 7)]
+        // Walk-In stability by triage: triage 4 (more urgent) arrives at exactly 8, triage 5 at 10-12.
+        [InlineData(4, 8, 8)]
+        [InlineData(5, 10, 12)]
+        public void Walk_in_stability_matches_its_triage(int triage, int minStab, int maxStab)
+        {
+            var patients = Data.WalkInPool.Where(p => p.TriageLevel == triage).ToList();
+            Assert.NotEmpty(patients);
+            foreach (PatientDef p in patients)
+                Assert.True(p.StartingStability >= minStab && p.StartingStability <= maxStab,
+                    $"{p.Name} (triage {triage}): stability {p.StartingStability}, expected {minStab}-{maxStab}");
+        }
+
+        [Fact]
+        public void Triage_4_walk_ins_are_the_decided_five()
+        {
+            Assert.Equal(new[] { "John Garcia", "Joseph Wilson", "Marcus Gonzalez", "Richard Garcia", "Susan Martin" },
+                Data.WalkInPool.Where(p => p.TriageLevel == 4).Select(p => p.Name).OrderBy(n => n).ToArray());
+        }
+
+        [Fact]
+        public void Arthur_Martinez_is_a_triage_2_ambulance_with_handover()
+        {
+            PatientDef p = Data.AmbulancePool.Single(x => x.Name == "Arthur Martinez");
+            Assert.Equal(2, p.TriageLevel);
+            Assert.Equal(2, p.ReputationReward);
+            Assert.True(p.ArrivesWithHandover);
+            var death = p.Triggers.Single(t => t.Condition == TriggerCondition.OnDeath && t.Effect == TriggerEffect.LoseReputation);
+            Assert.Equal(4, death.Value);
+        }
+
+        [Fact]
+        public void Michael_Johnson_categories_are_internal_and_two_cardiopulmonary()
+        {
+            PatientDef p = Data.TraumaFlightPool.Single(x => x.Name == "Michael Johnson");
+            Assert.Equal(new[] { SymptomCategory.Internal, SymptomCategory.Cardiopulmonary, SymptomCategory.Cardiopulmonary }, p.Categories);
+        }
+
+        /// <summary>
+        /// Every patient's symptoms come from tag-matching cards: for each category the patient needs, its scene deck
+        /// holds at least as many distinct symptoms sharing a clinical tag with the patient as the patient draws from
+        /// that category (a repeated category needs a second, different card), so the draw never falls back.
+        /// </summary>
+        [Fact]
+        public void Every_patient_has_enough_tag_matching_symptoms_and_never_falls_back()
+        {
+            var problems = new List<string>();
+            foreach (PatientDef p in Data.WalkInPool.Concat(Data.AmbulancePool).Concat(Data.TraumaFlightPool))
+            {
+                if (p.Tags.Count == 0) { problems.Add($"{p.Name}: no clinical tags"); continue; }
+                foreach (var group in p.Categories.GroupBy(c => c))
+                {
+                    int matching = Data.SymptomDecks[group.Key].Distinct().Count(s => s.Tags.Any(p.Tags.Contains));
+                    if (matching < group.Count())
+                        problems.Add($"{p.Name}: needs {group.Count()} {group.Key} symptom(s), {matching} tag-matching in the deck");
+                }
+            }
+            Assert.True(problems.Count == 0, string.Join(Environment.NewLine, problems));
+        }
+
+        [Theory]
+        [InlineData(EscalationType.Ambulance, 3, 7)]
+        [InlineData(EscalationType.Ambulance, 2, 8)]
         [InlineData(EscalationType.TraumaFlight, 1, 9)]
         [InlineData(EscalationType.TraumaFlight, 2, 6)]
         public void Pool_triage_counts_match_the_decided_roster(EscalationType phase, int triage, int count)
@@ -141,11 +211,13 @@ namespace ChiefComplaint.Sim.Tests
 
         [Theory]
         // name, AP, tier (-1 = not pinned), reputation cost, exhausts, price (-1 = not pinned)
-        [InlineData("Agency Nurse", 0, 1, 0, true, 7)]
-        [InlineData("Double Shift", 0, 1, 0, true, 9)]
-        [InlineData("Sharps Bin", 1, 1, 0, true, -1)]
-        [InlineData("Ward Round", 1, 2, 0, false, -1)]
-        [InlineData("Compliance Audit", 1, 1, 0, true, -1)]
+        [InlineData("Agency Nurse", 0, 1, 0, true, 5)]
+        [InlineData("Double Shift", 0, 1, 0, true, 7)]
+        [InlineData("Sharps Bin", 1, 1, 0, true, 2)]
+        [InlineData("Ward Round", 1, 1, 0, false, 4)]
+        [InlineData("Compliance Audit", 1, 1, 0, true, 2)]
+        [InlineData("Shift Handover", 0, 1, 0, false, 10)]
+        [InlineData("Damage Control Surgery", 1, 3, 0, true, 10)]
         [InlineData("Specialised Care", 1, -1, 0, false, 7)]
         [InlineData("Surgical Intervention", 2, -1, 0, false, 11)]
         public void Decided_card_stats(string name, int ap, int tier, int repCost, bool exhausts, int price)
@@ -156,6 +228,62 @@ namespace ChiefComplaint.Sim.Tests
             Assert.Equal(repCost, card.ReputationCost);
             Assert.Equal(exhausts, card.ExhaustsOnUse);
             if (price >= 0) Assert.Equal(price, card.DraftValue);
+        }
+
+        [Theory]
+        // Supply Room and upgrade-only prices after the exhaust / Reputation cost / failure-chance discounts.
+        [InlineData("Agency Nurse", 5)]
+        [InlineData("Double Shift", 7)]
+        [InlineData("Sharps Bin", 2)]
+        [InlineData("Compliance Audit", 2)]
+        [InlineData("Blood Bank", 4)]
+        [InlineData("Grateful Patient", 6)]
+        [InlineData("Trauma Team", 10)]
+        [InlineData("Damage Control Surgery", 10)]
+        [InlineData("Stat Labs", 7)]
+        [InlineData("Shift Handover", 10)]
+        [InlineData("Ward Round", 4)]
+        [InlineData("Crash Cart", 11)]
+        [InlineData("Philanthropist", 11)]
+        public void Decided_prices(string name, int price)
+        {
+            Assert.Equal(price, Card(name).DraftValue);
+        }
+
+        [Fact]
+        public void Grateful_Patient_upgrades_to_Philanthropist_for_7()
+        {
+            CardDef grateful = Card("Grateful Patient");
+            Assert.Equal("Philanthropist", grateful.Upgrade?.Name);
+            Assert.Equal(7, grateful.UpgradeCost);
+        }
+
+        [Fact]
+        public void Cards_without_an_upgrade_have_no_upgrade_cost()
+        {
+            foreach (CardDef c in Data.AllCards.Values.Where(c => c.Upgrade == null))
+                Assert.True(c.UpgradeCost == 0, $"{c.Name}: upgrade cost {c.UpgradeCost} without an upgrade");
+        }
+
+        [Fact]
+        public void Damage_Control_Surgery_pauses_then_cures_up_to_tier_3()
+        {
+            CardDef card = Card("Damage Control Surgery");
+            Assert.Equal(2, card.Effects.Count);
+            Assert.IsType<PauseEffect>(card.Effects[0]);
+            Assert.Equal(3, Assert.IsType<CureEffect>(card.Effects[1]).MaxTier);
+            Assert.True(card.ExhaustsOnUse);
+        }
+
+        [Theory]
+        [InlineData("HIPAA Violation", 3)]
+        [InlineData("Malpractice Threat", 2)]
+        [InlineData("Mandatory Training", 1)]
+        public void Reputation_red_tape_counts_its_loss_in_the_gate(string name, int loss)
+        {
+            CardDef card = Card(name);
+            Assert.Equal(CardType.RedTape, card.Type);
+            Assert.Equal(loss, card.TotalReputationCost);
         }
 
         [Fact]

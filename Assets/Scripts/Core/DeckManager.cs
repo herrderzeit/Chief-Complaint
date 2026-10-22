@@ -143,13 +143,18 @@ namespace ChiefComplaint.Core
             return totalCleansed;
         }
 
-        public void DrawCards(int amount)
+        /// <summary>
+        /// Draws <paramref name="amount"/> cards into the hand. Only the start-of-shift hand may reshuffle the discard
+        /// pile into an empty draw pile; mid-shift draws (cards, effects, patient triggers) pass
+        /// <paramref name="reshuffleDiscard"/> false, so two "+AP, draw 1" cards can't draw each other forever.
+        /// </summary>
+        public void DrawCards(int amount, bool reshuffleDiscard = true)
         {
             for (int i = 0; i < amount; i++)
             {
                 if (drawPile.Count == 0)
                 {
-                    if (discardPile.Count == 0) return;
+                    if (!reshuffleDiscard || discardPile.Count == 0) return;
 
                     drawPile.AddRange(discardPile);
                     discardPile.Clear();

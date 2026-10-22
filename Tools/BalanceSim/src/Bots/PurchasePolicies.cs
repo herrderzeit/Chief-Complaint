@@ -73,7 +73,11 @@ namespace ChiefComplaint.Sim.Bots
     /// </summary>
     public sealed class FocusPurchases : IPurchasePolicy
     {
+        /// <summary>At most this many copies of one market card per run, so cheap cards aren't judged on a deck of a dozen copies.</summary>
+        public const int MaxCopiesPerCard = 3;
+
         private readonly HashSet<string> keys;
+        private readonly Dictionary<string, int> bought = new Dictionary<string, int>();
         public FocusPurchases(string label, IEnumerable<string> keys)
         {
             Name = "focus[" + label + "]";
@@ -81,8 +85,14 @@ namespace ChiefComplaint.Sim.Bots
         }
         public string Name { get; }
 
-        public GameAction Choose(Game game, List<GameAction> legal, Random rng) =>
-            legal.FirstOrDefault(a => keys.Contains(PurchaseItems.Key(a))) ?? GameAction.FinishDraft;
+        public GameAction Choose(Game game, List<GameAction> legal, Random rng)
+        {
+            GameAction pick = legal.FirstOrDefault(a => keys.Contains(PurchaseItems.Key(a)) &&
+                (a.Kind != ActionKind.Buy || bought.GetValueOrDefault(PurchaseItems.Key(a)) < MaxCopiesPerCard));
+            if (pick == null) return GameAction.FinishDraft;
+            if (pick.Kind == ActionKind.Buy) bought[PurchaseItems.Key(pick)] = bought.GetValueOrDefault(PurchaseItems.Key(pick)) + 1;
+            return pick;
+        }
     }
 
     /// <summary>
@@ -137,6 +147,13 @@ namespace ChiefComplaint.Sim.Bots
             {
                 int redTape = owned.Count(x => x.Type == CardType.RedTape);
                 return redTape >= 2 ? 30 + 10 * redTape : 0;
+            }
+            if (c.Effects.OfType<TrashEffect>().Any())
+            {
+                // A trash card is only worth a slot while there's Red Tape to remove (one bin per Red Tape card).
+                int redTape = owned.Count(x => x.Type == CardType.RedTape);
+                int bins = owned.Count(x => x.Effects.OfType<TrashEffect>().Any());
+                return bins < redTape ? 35 : 0;
             }
             if (c.Effects.Any(e => e is PauseEffect || e is HealEffect)) return hardest ? 45 : 30;
             return 15;

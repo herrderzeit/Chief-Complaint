@@ -21,7 +21,7 @@ MonoBehaviour:
   - Critical
   escalationPhase: 2
   triageLevel: 1
-  incomingCategories: 030000000100000000000000i
+  incomingCategories: 030000000100000001000000i
   startingStability: 6
   stabilityDecayPerTurn: 3
   arrivesWithHandover: 1
