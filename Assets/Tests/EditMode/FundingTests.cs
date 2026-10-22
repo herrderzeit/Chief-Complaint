@@ -53,9 +53,9 @@ namespace ChiefComplaint.Tests.EditMode
         }
 
         [Test]
-        public void StartingReputation_DefaultTuning_IsEight()
+        public void StartingReputation_DefaultTuning_IsSeven()
         {
-            Assert.AreEqual(8, gm.CurrentReputation, "Option A tuning: a run starts on 8 Reputation.");
+            Assert.AreEqual(7, gm.CurrentReputation, "Final balance pass: a run starts on 7 Reputation.");
         }
 
         [Test]

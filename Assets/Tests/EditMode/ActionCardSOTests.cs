@@ -37,15 +37,18 @@ namespace ChiefComplaint.Tests
         }
 
         // type, tier, AP, draw, exhausts, Reputation cost, success chance, expected
-        [TestCase(ActionCardType.Staff,      1, 0, 0, true,  0, 1f,    5,  Description = "Agency Nurse: 4 + 1 + 2 - 2 for exhausting")]
-        [TestCase(ActionCardType.Staff,      1, 0, 1, true,  0, 1f,    7,  Description = "Double Shift: 4 + 1 + 2 + 2 - 2")]
+        [TestCase(ActionCardType.Staff,      1, 1, 0, false, 0, 1f,    5,  Description = "Agency Nurse: 4 + 1")]
+        [TestCase(ActionCardType.Staff,      1, 0, 2, true,  0, 1f,    9,  Description = "Double Shift: 4 + 1 + 2 + 2 x 2 - 2")]
+        [TestCase(ActionCardType.Staff,      1, 0, 0, true,  0, 1f,    5,  Description = "Free and exhausting: 4 + 1 + 2 - 2")]
         [TestCase(ActionCardType.Staff,      3, 2, 0, false, 1, 1f,    10, Description = "4 + 9 - 1 - 2 per Reputation")]
         [TestCase(ActionCardType.Staff,      3, 2, 0, false, 2, 1f,    8,  Description = "Two Reputation take 4 off")]
         [TestCase(ActionCardType.Staff,      3, 2, 0, false, -1, 1f,   12, Description = "A negative Reputation cost is no cost")]
         [TestCase(ActionCardType.Diagnostic, 2, 0, 0, false, 0, 0.5f,  7,  Description = "Stat Labs: 3 + 4 + 2 - 2 for a failure chance")]
         [TestCase(ActionCardType.Diagnostic, 2, 0, 0, false, 0, 0.99f, 7,  Description = "Any failure chance takes 2 off")]
         [TestCase(ActionCardType.Diagnostic, 2, 0, 0, false, 0, 1f,    9,  Description = "A sure thing pays full price")]
-        [TestCase(ActionCardType.Supply,     1, 1, 0, true,  0, 1f,    2,  Description = "Sharps Bin: 2 + 1 - 2 = 1, clamped to 2")]
+        [TestCase(ActionCardType.Supply,     1, 0, 1, true,  0, 1f,    5,  Description = "Sharps Bin: 2 + 1 + 2 + 2 - 2")]
+        [TestCase(ActionCardType.Diagnostic, 1, 0, 0, false, 0, 1f,    6,  Description = "Ward Round: 3 + 1 + 2")]
+        [TestCase(ActionCardType.Supply,     1, 1, 0, true,  0, 1f,    2,  Description = "2 + 1 - 2 = 1, clamped to 2")]
         [TestCase(ActionCardType.Utility,    1, 2, 0, true,  3, 0.5f,  2,  Description = "Every discount at once still floors at 2")]
         [TestCase(ActionCardType.RedTape,    1, 0, 0, true,  3, 0.5f,  0,  Description = "Red Tape is always free")]
         public void CalculateDraftValue_DiscountsExhaustReputationCostAndFailureChance(

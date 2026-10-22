@@ -254,7 +254,7 @@ namespace ChiefComplaint.Sim.Data
                 case "CureSymptomEffectSO": return new CureEffect { MaxTier = doc.GetInt("curesSymptomTier", 3) };
                 case "StabilisationHealEffectSO": return new HealEffect { Amount = doc.GetInt("healAmount", 1) };
                 case "PauseStabilityEffectSO": return new PauseEffect();
-                case "TrashCardEffectSO": return new TrashEffect();
+                case "TrashCardEffectSO": return new TrashEffect { RedTapeOnly = doc.GetInt("redTapeOnly", 0) != 0 };
                 case "CleanseRedTapeEffectSO": return new CleanseRedTapeEffect { RepPerCard = doc.GetInt("repBonusPerRedTapeCleansed", 1) };
                 case "EitherOrEffectSO":
                     return new EitherOrEffect { Reputation = doc.GetInt("reputationGenerated", 1), Ap = doc.GetInt("altApGenerated", 1) };

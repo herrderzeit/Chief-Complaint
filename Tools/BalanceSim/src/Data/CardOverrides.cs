@@ -123,6 +123,13 @@ namespace ChiefComplaint.Sim.Data
                 case "exhaustsOnUse": card.ExhaustsOnUse = value.GetBoolean(); break;
                 case "upgradeCost": card.UpgradeCost = value.GetInt32(); break;
                 case "upgradeTokenCost": card.UpgradeTokenCost = value.GetInt32(); break;
+                case "upgradeTokenAnyColour": card.UpgradeTokenAnyColour = value.GetBoolean(); break;
+                case "trashRedTapeOnly": foreach (TrashEffect e in card.Effects.OfType<TrashEffect>()) e.RedTapeOnly = value.GetBoolean(); break;
+                case "exhaustsAtShiftEnd": card.ExhaustsAtShiftEnd = value.GetBoolean(); break;
+                case "addGainAp": card.Effects.Add(new GainApEffect { Amount = value.GetInt32() }); break;
+                case "healAmount":
+                    foreach (HealEffect e in card.Effects.OfType<HealEffect>()) e.Amount = value.GetInt32();
+                    break;
                 case "cleanseRepPerCard":
                     foreach (CleanseRedTapeEffect e in card.Effects.OfType<CleanseRedTapeEffect>()) e.RepPerCard = value.GetInt32();
                     break;
@@ -141,6 +148,11 @@ namespace ChiefComplaint.Sim.Data
             "exhaustsOnUse" => card.ExhaustsOnUse.ToString(),
             "upgradeCost" => card.UpgradeCost.ToString(),
             "upgradeTokenCost" => card.UpgradeTokenCost.ToString(),
+            "upgradeTokenAnyColour" => card.UpgradeTokenAnyColour.ToString(),
+            "trashRedTapeOnly" => string.Join(",", card.Effects.OfType<TrashEffect>().Select(e => e.RedTapeOnly)),
+            "exhaustsAtShiftEnd" => card.ExhaustsAtShiftEnd.ToString(),
+            "addGainAp" => string.Join(",", card.Effects.OfType<GainApEffect>().Select(e => e.Amount)),
+            "healAmount" => string.Join(",", card.Effects.OfType<HealEffect>().Select(e => e.Amount)),
             "cleanseRepPerCard" => string.Join(",", card.Effects.OfType<CleanseRedTapeEffect>().Select(e => e.RepPerCard)),
             _ => "?"
         };

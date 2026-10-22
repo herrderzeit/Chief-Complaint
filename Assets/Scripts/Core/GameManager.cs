@@ -61,7 +61,7 @@ namespace ChiefComplaint.Core
         /// <summary>Action Points restored to the player at the start of every shift.</summary>
         public int baseAP = 3;
         [SerializeField] private int currentAP;
-        [SerializeField] private int currentReputation = 8;
+        [SerializeField] private int currentReputation = 7;
         [Tooltip("Activity Funding the run starts with. Spent on draft cards and card upgrades.")]
         [SerializeField] private int currentFunding = 6;
         [SerializeField] private int currentShift = 1;
@@ -72,12 +72,12 @@ namespace ChiefComplaint.Core
         [Tooltip("An extra patient arrives at the start of every Nth shift, on top of the usual one (0 = off).")]
         [Min(0)] public int extraPatientEveryNShifts = 3;
         [Tooltip("Reputation can't be raised above this (0 = no cap), so a strong run can't bank an unlimited buffer.")]
-        [Min(0)] public int maxReputation = 16;
+        [Min(0)] public int maxReputation = 14;
         [Tooltip("Reputation lost when a patient dies (Code Blue).")]
         public int deathReputationPenalty = 5;
 
         [Tooltip("Reputation lost when an arriving patient has to be diverted because every Triage slot is full (0 = free).")]
-        [SerializeField] private int diversionReputationPenalty = 2;
+        [SerializeField] private int diversionReputationPenalty = 3;
 
         /// <summary>Reputation lost per diverted patient (0 = diversion is free).</summary>
         public int DiversionReputationPenalty

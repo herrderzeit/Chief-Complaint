@@ -207,11 +207,11 @@ namespace ChiefComplaint.Sim.Tests
         }
 
         [Theory]
-        // triage -> primary symptom tier -> page cost (PagingRules.ApCost: Tier 1 = 2, Tier 2 = 2, Tier 3 = 3)
+        // triage -> primary symptom tier -> page cost (PagingRules.ApCost: Tier 1 = 2, Tier 2 = 3, Tier 3 = 3)
         [InlineData(5, 1, 2)]
-        [InlineData(3, 2, 2)]
+        [InlineData(3, 2, 3)]
         [InlineData(1, 3, 3)]
-        public void Paging_costs_2_2_3_AP_by_tier_and_only_charges_on_success(int triage, int tier, int cost)
+        public void Paging_costs_2_3_3_AP_by_tier_and_only_charges_on_success(int triage, int tier, int cost)
         {
             var data = Content(new[] { Diagnose(3) }, Patient(EscalationType.Ambulance, triage: triage));
             data.Config.BaseAP = 5;

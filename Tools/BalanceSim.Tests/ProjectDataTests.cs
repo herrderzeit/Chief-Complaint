@@ -30,20 +30,21 @@ namespace ChiefComplaint.Sim.Tests
         [Fact]
         public void Scene_config_matches_the_decided_tuning()
         {
-            // Pins the "option A" retune read from MainBoard.unity's GameManager; change deliberately.
-            Assert.Equal(8, Data.Config.StartingReputation);
+            // Pins the final balance pass read from MainBoard.unity's GameManager; change deliberately.
+            Assert.Equal(7, Data.Config.StartingReputation);
+            Assert.Equal(3, Data.Config.DiversionReputationPenalty);
             Assert.Equal(3, Data.Config.WalkInFundingReward);
             Assert.Equal(6, Data.Config.AmbulanceFundingReward);
             Assert.Equal(8, Data.Config.TraumaFlightFundingReward);
             Assert.Equal(3, Data.Config.ExtraPatientEveryNShifts);
-            Assert.Equal(16, Data.Config.MaxReputation);
+            Assert.Equal(14, Data.Config.MaxReputation);
         }
 
         [Fact]
         public void MaxReputation_default_matches_the_decided_tuning()
         {
             // The fallback used when the scene has no maxReputation must agree with GameManager's default.
-            Assert.Equal(16, new GameConfig().MaxReputation);
+            Assert.Equal(14, new GameConfig().MaxReputation);
         }
 
         [Fact]
@@ -68,7 +69,7 @@ namespace ChiefComplaint.Sim.Tests
         [Theory]
         [InlineData(EscalationType.WalkIn, 8, 12, 1, 4, 5)]
         [InlineData(EscalationType.Ambulance, 6, 9, 2, 2, 3)]
-        [InlineData(EscalationType.TraumaFlight, 6, 8, 3, 1, 2)]
+        [InlineData(EscalationType.TraumaFlight, 7, 9, 3, 1, 2)]
         public void Patient_pool_matches_its_band(EscalationType phase, int minStab, int maxStab, int decay, int minTriage, int maxTriage)
         {
             List<PatientDef> pool = Pool(phase);
@@ -93,6 +94,29 @@ namespace ChiefComplaint.Sim.Tests
             foreach (PatientDef p in patients)
                 Assert.True(p.StartingStability >= minStab && p.StartingStability <= maxStab,
                     $"{p.Name} (triage {triage}): stability {p.StartingStability}, expected {minStab}-{maxStab}");
+        }
+
+        [Fact]
+        public void Trauma_Flight_stability_matches_its_triage()
+        {
+            // Final balance pass: triage 1 arrives at 7 (John Jones alone at 9), triage 2 at 8.
+            foreach (PatientDef p in Data.TraumaFlightPool)
+            {
+                int expected = p.TriageLevel == 2 ? 8 : p.Name == "John Jones" ? 9 : 7;
+                Assert.True(p.StartingStability == expected,
+                    $"{p.Name} (triage {p.TriageLevel}): stability {p.StartingStability}, expected {expected}");
+            }
+            Assert.Contains(Data.TraumaFlightPool, p => p.Name == "John Jones" && p.TriageLevel == 1);
+        }
+
+        [Theory]
+        [InlineData("IV Saline", 1)]
+        [InlineData("Fluid Resuscitation", 2)]
+        public void Fluid_line_upgrades_accept_tokens_of_any_colour(string name, int tokenCost)
+        {
+            CardDef card = Card(name);
+            Assert.True(card.UpgradeTokenAnyColour, $"{name} should take upgrade tokens of any colour.");
+            Assert.Equal(tokenCost, card.UpgradeTokenCost);
         }
 
         [Fact]
@@ -211,10 +235,10 @@ namespace ChiefComplaint.Sim.Tests
 
         [Theory]
         // name, AP, tier (-1 = not pinned), reputation cost, exhausts, price (-1 = not pinned)
-        [InlineData("Agency Nurse", 0, 1, 0, true, 5)]
-        [InlineData("Double Shift", 0, 1, 0, true, 7)]
-        [InlineData("Sharps Bin", 1, 1, 0, true, 2)]
-        [InlineData("Ward Round", 1, 1, 0, false, 4)]
+        [InlineData("Agency Nurse", 1, 1, 0, false, 5)]
+        [InlineData("Double Shift", 0, 1, 0, true, 9)]
+        [InlineData("Sharps Bin", 0, 1, 0, true, 5)]
+        [InlineData("Ward Round", 0, 1, 0, false, 6)]
         [InlineData("Compliance Audit", 1, 1, 0, true, 2)]
         [InlineData("Shift Handover", 0, 1, 0, false, 10)]
         [InlineData("Damage Control Surgery", 1, 3, 0, true, 10)]
@@ -233,8 +257,8 @@ namespace ChiefComplaint.Sim.Tests
         [Theory]
         // Supply Room and upgrade-only prices after the exhaust / Reputation cost / failure-chance discounts.
         [InlineData("Agency Nurse", 5)]
-        [InlineData("Double Shift", 7)]
-        [InlineData("Sharps Bin", 2)]
+        [InlineData("Double Shift", 9)]
+        [InlineData("Sharps Bin", 5)]
         [InlineData("Compliance Audit", 2)]
         [InlineData("Blood Bank", 4)]
         [InlineData("Grateful Patient", 6)]
@@ -242,7 +266,7 @@ namespace ChiefComplaint.Sim.Tests
         [InlineData("Damage Control Surgery", 10)]
         [InlineData("Stat Labs", 7)]
         [InlineData("Shift Handover", 10)]
-        [InlineData("Ward Round", 4)]
+        [InlineData("Ward Round", 6)]
         [InlineData("Crash Cart", 11)]
         [InlineData("Philanthropist", 11)]
         public void Decided_prices(string name, int price)
@@ -290,11 +314,16 @@ namespace ChiefComplaint.Sim.Tests
         public void Double_Shift_Compliance_Audit_and_Sharps_Bin_effects()
         {
             Assert.Equal(3, Card("Double Shift").Effects.OfType<GainApEffect>().Single().Amount);
-            Assert.Equal(1, Card("Double Shift").CardsToDraw);
+            Assert.Equal(2, Card("Double Shift").CardsToDraw);
+            Assert.Equal(0, Card("Double Shift").ReputationCost);
+            Assert.True(Card("Double Shift").ExhaustsOnUse);
             Assert.Equal(CardType.Staff, Card("Double Shift").Type);
             Assert.Equal(1, Card("Compliance Audit").Effects.OfType<CleanseRedTapeEffect>().Single().RepPerCard);
             Assert.Equal(CardType.Supply, Card("Sharps Bin").Type);
-            Assert.Single(Card("Sharps Bin").Effects.OfType<TrashEffect>());
+            Assert.True(Assert.Single(Card("Sharps Bin").Effects.OfType<TrashEffect>()).RedTapeOnly,
+                "Sharps Bin may only dispose of Red Tape.");
+            Assert.Equal(1, Card("Sharps Bin").CardsToDraw);
+            Assert.True(Card("Sharps Bin").ExhaustsAtShiftEnd);
         }
 
         [Fact]

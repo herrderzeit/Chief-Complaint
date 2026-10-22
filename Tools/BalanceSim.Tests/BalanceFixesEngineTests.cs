@@ -277,9 +277,9 @@ namespace ChiefComplaint.Sim.Tests
 
         [Theory]
         [InlineData(1, 2)]
-        [InlineData(2, 2)]
+        [InlineData(2, 3)]
         [InlineData(3, 3)]
-        public void Default_paging_costs_are_2_2_3_by_tier(int tier, int cost)
+        public void Default_paging_costs_are_2_3_3_by_tier(int tier, int cost)
         {
             Assert.Equal(cost, new GameConfig().PageCost(tier));
         }
@@ -288,15 +288,18 @@ namespace ChiefComplaint.Sim.Tests
 
         [Theory]
         // type, tier, AP, draw, exhausts, rep cost, success, expected
-        [InlineData(CardType.Staff, 1, 0, 0, true, 0, 1f, 5)]        // Agency Nurse: 4 + 1 + 2 - 2
-        [InlineData(CardType.Staff, 1, 0, 1, true, 0, 1f, 7)]        // Double Shift: 4 + 1 + 2 + 2 - 2
+        [InlineData(CardType.Staff, 1, 1, 0, false, 0, 1f, 5)]       // Agency Nurse: 4 + 1
+        [InlineData(CardType.Staff, 1, 0, 2, true, 0, 1f, 9)]        // Double Shift: 4 + 1 + 2 + 2 × 2 - 2
+        [InlineData(CardType.Staff, 1, 0, 0, true, 0, 1f, 5)]        // a free exhausting Tier 1 Staff card: 4 + 1 + 2 - 2
         [InlineData(CardType.Staff, 3, 2, 0, false, 1, 1f, 10)]      // 4 + 9 - 1 - 2 × 1
         [InlineData(CardType.Staff, 3, 2, 0, false, 2, 1f, 8)]       // 4 + 9 - 1 - 2 × 2
         [InlineData(CardType.Staff, 3, 2, 0, false, -1, 1f, 12)]     // a negative Reputation cost is no cost
         [InlineData(CardType.Diagnostic, 2, 0, 0, false, 0, 0.5f, 7)] // Stat Labs: 3 + 4 + 2 - 2
         [InlineData(CardType.Diagnostic, 2, 0, 0, false, 0, 0.99f, 7)]
         [InlineData(CardType.Diagnostic, 2, 0, 0, false, 0, 1f, 9)]   // control: a sure thing pays full price
-        [InlineData(CardType.Supply, 1, 1, 0, true, 0, 1f, 2)]        // Sharps Bin: 2 + 1 - 2 = 1, minimum 2
+        [InlineData(CardType.Supply, 1, 0, 1, true, 0, 1f, 5)]        // Sharps Bin: 2 + 1 + 2 + 2 - 2
+        [InlineData(CardType.Diagnostic, 1, 0, 0, false, 0, 1f, 6)]   // Ward Round: 3 + 1 + 2
+        [InlineData(CardType.Supply, 1, 1, 0, true, 0, 1f, 2)]        // 2 + 1 - 2 = 1, minimum 2
         [InlineData(CardType.Utility, 1, 2, 0, true, 3, 0.5f, 2)]     // every discount at once still floors at 2
         [InlineData(CardType.RedTape, 3, 0, 2, false, 0, 1f, 0)]      // Red Tape is always free
         public void DraftValue_discounts_exhaust_reputation_cost_and_failure_chance(
@@ -316,11 +319,13 @@ namespace ChiefComplaint.Sim.Tests
         public void GameConfig_fallbacks_match_the_game_defaults()
         {
             var c = new GameConfig();
-            Assert.Equal(2, c.DiversionReputationPenalty);
+            Assert.Equal(3, c.DiversionReputationPenalty);
+            Assert.Equal(7, c.StartingReputation);
+            Assert.Equal(14, c.MaxReputation);
             Assert.Equal(5, c.AmbulanceShiftThreshold);
             Assert.Equal(10, c.TraumaFlightShiftThreshold);
             Assert.Equal(2, c.PageCostTier1);
-            Assert.Equal(2, c.PageCostTier2);
+            Assert.Equal(3, c.PageCostTier2);
             Assert.Equal(3, c.PageCostTier3);
         }
 

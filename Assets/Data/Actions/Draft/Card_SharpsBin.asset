@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4eded8d4a81bfdc46b2a731f60d29ba2, type: 3}
   m_Name: TrashCardEffect
   m_EditorClassIdentifier: GameScripts::ChiefComplaint.Cards.Effects.TrashCardEffectSO
+  redTapeOnly: 1
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -27,16 +28,16 @@ MonoBehaviour:
   cardName: Sharps Bin
   cardType: 6
   tags: 
-  rulesText: Drop on a card in your hand to trash it (removed from the run). Exhausts.
+  rulesText: Drop on a Red Tape card in your hand to dispose of it. Draw 1 card. Exhausts; leaves at the end of the shift if unused.
   flavorText: Points down, lid shut, no regrets.
   isPlayable: 1
   successChance: 1
-  apCost: 1
+  apCost: 0
   reputationCost: 0
-  cardsToDraw: 0
+  cardsToDraw: 1
   powerTier: 1
   exhaustsOnUse: 1
-  exhaustsAtShiftEnd: 0
+  exhaustsAtShiftEnd: 1
   effects:
   - {fileID: -4353059634709318146}
   directDraftUpgrade: {fileID: 0}

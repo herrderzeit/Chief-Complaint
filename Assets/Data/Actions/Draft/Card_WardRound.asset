@@ -45,7 +45,7 @@ MonoBehaviour:
   flavorText: Twelve beds, one coffee, and a consultant walking at speed.
   isPlayable: 1
   successChance: 1
-  apCost: 1
+  apCost: 0
   reputationCost: 0
   cardsToDraw: 0
   powerTier: 1

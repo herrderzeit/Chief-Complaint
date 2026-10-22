@@ -75,6 +75,7 @@ namespace ChiefComplaint.Sim.Data
     /// </summary>
     public sealed class TrashEffect : EffectDef
     {
+        public bool RedTapeOnly;   // TrashCardEffectSO.redTapeOnly: can only dispose of Red Tape
         public override bool RequiresPatientTarget => false;
     }
 

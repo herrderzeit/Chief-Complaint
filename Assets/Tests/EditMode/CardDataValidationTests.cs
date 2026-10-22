@@ -68,7 +68,7 @@ namespace ChiefComplaint.Tests
         // folder, phase, stability min..max, decay, triage min..max
         [TestCase("WalkIn", EscalationType.WalkIn, 8, 12, 1, 4, 5)]
         [TestCase("Ambulance", EscalationType.Ambulance, 6, 9, 2, 2, 3)]
-        [TestCase("TraumaFlight", EscalationType.TraumaFlight, 6, 8, 3, 1, 2)]
+        [TestCase("TraumaFlight", EscalationType.TraumaFlight, 7, 9, 3, 1, 2)]
         public void PatientPool_MatchesItsBand(string folder, EscalationType phase, int minStab, int maxStab, int decay, int minTriage, int maxTriage)
         {
             var patients = LoadPatients(folder);
@@ -92,6 +92,20 @@ namespace ChiefComplaint.Tests
             Assert.IsNotEmpty(patients, $"No triage-{triage} Walk-Ins found.");
             foreach (var p in patients)
                 Assert.That(p.startingStability, Is.InRange(minStab, maxStab), $"{p.name} (triage {triage}): starting stability.");
+        }
+
+        [Test]
+        public void TraumaFlights_StabilityMatchesTriage()
+        {
+            // Final balance pass: triage 1 arrives at 7 (John Jones alone at 9), triage 2 at 8.
+            var flights = LoadPatients("TraumaFlight");
+            Assert.IsNotEmpty(flights);
+            foreach (var p in flights)
+            {
+                int expected = p.triageLevel == 2 ? 8 : p.patientName == "John Jones" ? 9 : 7;
+                Assert.AreEqual(expected, p.startingStability, $"{p.name} (triage {p.triageLevel}): starting stability.");
+            }
+            Assert.IsTrue(flights.Any(p => p.patientName == "John Jones" && p.triageLevel == 1), "John Jones should be a triage-1 Trauma Flight.");
         }
 
         [Test]
@@ -262,9 +276,10 @@ namespace ChiefComplaint.Tests
         public void AgencyNurse_DecidedStats()
         {
             var card = LoadCard("Draft/Card_AgencyNurse");
-            Assert.AreEqual(0, card.apCost);
+            Assert.AreEqual(1, card.apCost, "Agency Nurse costs 1 AP.");
             Assert.AreEqual(1, card.powerTier);
-            Assert.IsTrue(card.exhaustsOnUse, "Agency Nurse exhausts on use.");
+            Assert.IsFalse(card.exhaustsOnUse, "Agency Nurse no longer exhausts.");
+            StringAssert.DoesNotContain("Exhaust", card.rulesText, "Agency Nurse rules text should not mention exhausting.");
             Assert.AreEqual(5, card.CalculateDraftValue(), "Agency Nurse price.");
         }
 
@@ -276,12 +291,12 @@ namespace ChiefComplaint.Tests
             Assert.AreEqual(1, card.powerTier);
             Assert.AreEqual(ActionCardType.Staff, card.cardType);
             Assert.AreEqual(0, card.reputationCost, "Double Shift no longer costs Reputation.");
-            Assert.AreEqual(1, card.cardsToDraw, "Double Shift draws 1 card.");
+            Assert.AreEqual(2, card.cardsToDraw, "Double Shift draws 2 cards.");
             Assert.IsTrue(card.exhaustsOnUse, "Double Shift exhausts on use.");
             Assert.AreEqual(1, card.effects.Count);
             Assert.AreEqual(3, ((ChiefComplaint.Cards.Effects.GainAPEffectSO)card.effects[0]).apGenerated, "Double Shift gains 3 AP.");
-            Assert.AreEqual("Gain 3 AP. Draw 1 card. Exhausts.", card.rulesText);
-            Assert.AreEqual(7, card.CalculateDraftValue(), "Double Shift price.");
+            Assert.AreEqual("Gain 3 AP. Draw 2 cards. Exhausts.", card.rulesText);
+            Assert.AreEqual(9, card.CalculateDraftValue(), "Double Shift price.");
         }
 
         [Test]
@@ -290,17 +305,35 @@ namespace ChiefComplaint.Tests
             var card = LoadCard("Draft/Card_SharpsBin");
             Assert.AreEqual(ActionCardType.Supply, card.cardType);
             Assert.AreEqual(1, card.powerTier);
-            Assert.AreEqual(1, card.apCost);
+            Assert.AreEqual(0, card.apCost, "Sharps Bin is free to play.");
+            Assert.AreEqual(1, card.cardsToDraw, "Sharps Bin draws 1 card.");
             Assert.IsTrue(card.exhaustsOnUse, "Sharps Bin exhausts on use.");
-            Assert.IsTrue(card.effects.Any(e => e is ChiefComplaint.Cards.Effects.TrashCardEffectSO), "Sharps Bin trashes a card.");
+            Assert.IsTrue(card.exhaustsAtShiftEnd, "Sharps Bin leaves at the end of the shift if unused.");
+            var trash = card.effects.OfType<ChiefComplaint.Cards.Effects.TrashCardEffectSO>().ToArray();
+            Assert.AreEqual(1, trash.Length, "Sharps Bin has one Trash effect.");
+            Assert.IsTrue(trash[0].redTapeOnly, "Sharps Bin may only dispose of Red Tape.");
+            StringAssert.Contains("Red Tape", card.rulesText, "Sharps Bin rules text should mention Red Tape.");
+            StringAssert.Contains("Draw 1", card.rulesText, "Sharps Bin rules text should mention drawing 1 card.");
+            Assert.AreEqual(5, card.CalculateDraftValue(), "Sharps Bin price.");
         }
 
         [Test]
         public void WardRound_DecidedStats()
         {
             var card = LoadCard("Draft/Card_WardRound");
-            Assert.AreEqual(1, card.apCost, "Ward Round still costs 1 AP.");
+            Assert.AreEqual(0, card.apCost, "Ward Round is free to play.");
             Assert.AreEqual(1, card.powerTier);
+            Assert.AreEqual(6, card.CalculateDraftValue(), "Ward Round price.");
+        }
+
+        // card, upgrade token cost
+        [TestCase("Starter/Card_IVSaline", 1)]
+        [TestCase("Upgrade/Starter/Card_T2_FluidResuscitation", 2)]
+        public void FluidLine_UpgradeTokensOfAnyColour(string path, int tokenCost)
+        {
+            var card = LoadCard(path);
+            Assert.IsTrue(card.upgradeTokenAnyColour, $"{card.cardName}: should take upgrade tokens of any colour.");
+            Assert.AreEqual(tokenCost, card.upgradeTokenCost, $"{card.cardName}: upgrade token cost.");
         }
 
         [Test]
@@ -336,8 +369,8 @@ namespace ChiefComplaint.Tests
 
         // Supply Room and upgrade-only prices after the exhaust / Reputation cost / failure-chance discounts.
         [TestCase("Draft/Card_AgencyNurse", 5)]
-        [TestCase("Draft/Card_DoubleShift", 7)]
-        [TestCase("Draft/Card_SharpsBin", 2)]
+        [TestCase("Draft/Card_DoubleShift", 9)]
+        [TestCase("Draft/Card_SharpsBin", 5)]
         [TestCase("Draft/Card_ComplianceAudit", 2)]
         [TestCase("Draft/Card_BloodBank", 4)]
         [TestCase("Draft/Card_GratefulPatient", 6)]
@@ -345,7 +378,7 @@ namespace ChiefComplaint.Tests
         [TestCase("Draft/Card_DamageControlSurgery", 10)]
         [TestCase("Draft/Card_StatLabs", 7)]
         [TestCase("Draft/Card_ShiftHandover", 10)]
-        [TestCase("Draft/Card_WardRound", 4)]
+        [TestCase("Draft/Card_WardRound", 6)]
         [TestCase("Draft/Card_CrashCart", 11)]
         [TestCase("Upgrade/Draft/Card_Philanthropist", 11)]
         public void DecidedPrices(string path, int price)

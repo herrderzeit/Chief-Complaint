@@ -381,20 +381,26 @@ namespace ChiefComplaint.Sim.Engine
                 case ChoiceEffect c: return (c.OptionA != null && CanApply(c.OptionA, target)) || (c.OptionB != null && CanApply(c.OptionB, target));
                 case WardWideEffect w:
                     return w.PatientEffect != null && WardPatients().Any(p => CanApply(w.PatientEffect, p));
-                case TrashEffect _: return TrashCandidate() != null;
+                case TrashEffect t: return TrashCandidate(t.RedTapeOnly) != null;
                 case UnknownEffect _: return false;
                 default: return true;
             }
         }
 
-        /// <summary>The card a trash effect removes: a Red Tape card in hand, else the cheapest Tier 1 card (never another trash card).</summary>
-        private CardDef TrashCandidate()
+        /// <summary>
+        /// The card a trash effect removes (the player picks it in the game): a Red Tape card in hand, else the cheapest
+        /// Tier 1 card that isn't the deck's diagnosis or cure (a player wouldn't bin their only Initial Assessment or
+        /// Standard Care), never another trash card.
+        /// </summary>
+        private CardDef TrashCandidate(bool redTapeOnly = false)
         {
             CardDef best = null;
             foreach (CardDef c in Hand)
             {
                 if (c.Effects.Any(e => e is TrashEffect)) continue;
                 if (c.Type == CardType.RedTape) return c;
+                if (redTapeOnly) continue;
+                if (c.Effects.Any(e => e is DiagnoseEffect || e is CureEffect)) continue;
                 if (c.PowerTier == 1 && (best == null || c.DraftValue < best.DraftValue)) best = c;
             }
             return best;
@@ -450,8 +456,8 @@ namespace ChiefComplaint.Sim.Engine
                 case CleanseRedTapeEffect c:
                     if (!rngFailed) CleanseRedTape(c.RepPerCard);
                     return true;
-                case TrashEffect _:
-                    if (!rngFailed) Hand.Remove(TrashCandidate());
+                case TrashEffect t:
+                    if (!rngFailed) Hand.Remove(TrashCandidate(t.RedTapeOnly));
                     return true;
                 case EitherOrEffect e:
                     if (!rngFailed)

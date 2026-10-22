@@ -43,7 +43,7 @@ MonoBehaviour:
   directDraftUpgrade: {fileID: 11400000, guid: 8a1dd651da4b7b24eb4b423a3d22001f, type: 2}
   draftUpgradeCost: 4
   upgradeTokenCost: 1
-  upgradeTokenAnyColour: 0
+  upgradeTokenAnyColour: 1
   upgradeTokenColour: 1
   cardArt: {fileID: 0}
 --- !u!114 &2195140639630190864

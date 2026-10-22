@@ -90,6 +90,7 @@ namespace ChiefComplaint.Tests.EditMode
             Assert.IsNull(BoardView.Instance.GetEmptyTriageSlot(board.ActivePatients), "The fixture should leave no free Triage slot.");
         }
 
+        [TestCase(3, Description = "The decided penalty")]
         [TestCase(2)]
         [TestCase(1)]
         [TestCase(5)]

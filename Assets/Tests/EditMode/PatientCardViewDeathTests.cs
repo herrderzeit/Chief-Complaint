@@ -37,7 +37,7 @@ namespace ChiefComplaint.Tests.EditMode
             gm = NewComponent<GameManager>("DeathTestsGameManager");
             gm.deathReputationPenalty = FlatPenalty;
             gm.deathAddsRedTape = false; // keep the test independent of DeckManager
-            gm.maxReputation = 0; // StartingReputation sits above the default cap of 16; the cap is not under test here
+            gm.maxReputation = 0; // StartingReputation sits above the default cap of 14; the cap is not under test here
             gm.AddReputation(StartingReputation - gm.CurrentReputation);
             Assert.AreEqual(StartingReputation, gm.CurrentReputation, "Fixture error: starting Reputation not set.");
             Override(gm);

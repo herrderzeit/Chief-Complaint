@@ -10,11 +10,19 @@ namespace ChiefComplaint.Tests
     public class PagingRulesTests
     {
         [TestCase(SymptomTier.Tier1, 2)]
-        [TestCase(SymptomTier.Tier2, 2)]
+        [TestCase(SymptomTier.Tier2, 3)]
         [TestCase(SymptomTier.Tier3, 3)]
         public void ApCost_ByTier(SymptomTier tier, int expected)
         {
             Assert.AreEqual(expected, PagingRules.ApCost(tier), $"Paging cost for {tier}.");
+        }
+
+        [TestCase(SymptomTier.Tier1)]
+        [TestCase(SymptomTier.Tier2)]
+        [TestCase(SymptomTier.Tier3)]
+        public void ApCost_NeverExceedsAShiftsBaseAP(SymptomTier tier)
+        {
+            Assert.LessOrEqual(PagingRules.ApCost(tier), 3, $"Paging a {tier} symptom must fit in one shift's base AP (3).");
         }
 
         [Test]

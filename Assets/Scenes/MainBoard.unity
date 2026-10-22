@@ -1533,14 +1533,14 @@ MonoBehaviour:
   gameOverScreen: {fileID: 1163945929}
   baseAP: 3
   currentAP: 0
-  currentReputation: 8
+  currentReputation: 7
   currentFunding: 6
   currentShift: 1
   initialPatientCount: 2
   extraPatientEveryNShifts: 3
-  maxReputation: 16
+  maxReputation: 14
   deathReputationPenalty: 5
-  diversionReputationPenalty: 2
+  diversionReputationPenalty: 3
   deathAddsRedTape: 1
   shiftsToWin: 15
   walkInFundingReward: 3
