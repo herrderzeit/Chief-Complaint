@@ -14,7 +14,7 @@ namespace ChiefComplaint.Sim.Data
         // GameManager
         public int BaseAP = 3;
         public int StartingReputation = 7;
-        public int StartingFunding = 6;
+        public int StartingFunding = 10;
         public int InitialPatientCount = 2;
         public int DeathReputationPenalty = 5;
         public bool DeathAddsRedTape = true;
@@ -36,7 +36,7 @@ namespace ChiefComplaint.Sim.Data
         // GameManager.extraPatientEveryNShifts: an extra patient arrives at the start of every Nth shift (0 = off).
         public int ExtraPatientEveryNShifts = 3;
         // GameManager.maxReputation: Reputation gains stop here (0 = no cap).
-        public int MaxReputation = 14;
+        public int MaxReputation = 15;
 
         // DeckManager
         public int HandSize = 5;

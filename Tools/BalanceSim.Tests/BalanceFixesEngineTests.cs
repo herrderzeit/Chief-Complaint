@@ -321,7 +321,8 @@ namespace ChiefComplaint.Sim.Tests
             var c = new GameConfig();
             Assert.Equal(3, c.DiversionReputationPenalty);
             Assert.Equal(7, c.StartingReputation);
-            Assert.Equal(14, c.MaxReputation);
+            Assert.Equal(15, c.MaxReputation);
+            Assert.Equal(10, c.StartingFunding);
             Assert.Equal(5, c.AmbulanceShiftThreshold);
             Assert.Equal(10, c.TraumaFlightShiftThreshold);
             Assert.Equal(2, c.PageCostTier1);

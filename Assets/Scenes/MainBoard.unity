@@ -1534,11 +1534,11 @@ MonoBehaviour:
   baseAP: 3
   currentAP: 0
   currentReputation: 7
-  currentFunding: 6
+  currentFunding: 10
   currentShift: 1
   initialPatientCount: 2
   extraPatientEveryNShifts: 3
-  maxReputation: 14
+  maxReputation: 15
   deathReputationPenalty: 5
   diversionReputationPenalty: 3
   deathAddsRedTape: 1

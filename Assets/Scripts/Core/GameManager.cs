@@ -63,7 +63,7 @@ namespace ChiefComplaint.Core
         [SerializeField] private int currentAP;
         [SerializeField] private int currentReputation = 7;
         [Tooltip("Activity Funding the run starts with. Spent on draft cards and card upgrades.")]
-        [SerializeField] private int currentFunding = 6;
+        [SerializeField] private int currentFunding = 10;
         [SerializeField] private int currentShift = 1;
 
         [Header("Run Balance")]
@@ -72,7 +72,7 @@ namespace ChiefComplaint.Core
         [Tooltip("An extra patient arrives at the start of every Nth shift, on top of the usual one (0 = off).")]
         [Min(0)] public int extraPatientEveryNShifts = 3;
         [Tooltip("Reputation can't be raised above this (0 = no cap), so a strong run can't bank an unlimited buffer.")]
-        [Min(0)] public int maxReputation = 14;
+        [Min(0)] public int maxReputation = 15;
         [Tooltip("Reputation lost when a patient dies (Code Blue).")]
         public int deathReputationPenalty = 5;
 

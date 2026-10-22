@@ -37,15 +37,23 @@ namespace ChiefComplaint.Sim.Tests
             Assert.Equal(6, Data.Config.AmbulanceFundingReward);
             Assert.Equal(8, Data.Config.TraumaFlightFundingReward);
             Assert.Equal(3, Data.Config.ExtraPatientEveryNShifts);
-            Assert.Equal(14, Data.Config.MaxReputation);
+            Assert.Equal(15, Data.Config.MaxReputation);
             Assert.Equal(2, Data.Config.CureReputationCap);
+            Assert.Equal(10, Data.Config.StartingFunding);
         }
 
         [Fact]
         public void MaxReputation_default_matches_the_decided_tuning()
         {
             // The fallback used when the scene has no maxReputation must agree with GameManager's default.
-            Assert.Equal(14, new GameConfig().MaxReputation);
+            Assert.Equal(15, new GameConfig().MaxReputation);
+        }
+
+        [Fact]
+        public void StartingFunding_default_matches_the_decided_tuning()
+        {
+            // The fallback used when the scene has no currentFunding must agree with GameManager's default.
+            Assert.Equal(10, new GameConfig().StartingFunding);
         }
 
         [Fact]
@@ -178,10 +186,11 @@ namespace ChiefComplaint.Sim.Tests
         }
 
         [Fact]
-        public void Handover_only_on_the_two_Arthurs_and_every_Trauma_Flight()
+        public void Handover_only_on_Arthur_Martinez_and_every_Trauma_Flight()
         {
-            Assert.Equal(new[] { "Arthur Martinez", "Arthur Miller" },
+            Assert.Equal(new[] { "Arthur Martinez" },
                 Data.AmbulancePool.Where(p => p.ArrivesWithHandover).Select(p => p.Name).OrderBy(n => n).ToArray());
+            Assert.False(Data.AmbulancePool.Single(p => p.Name == "Arthur Miller").ArrivesWithHandover, "Arthur Miller");
             Assert.All(Data.TraumaFlightPool, p => Assert.True(p.ArrivesWithHandover, p.Name));
             Assert.All(Data.WalkInPool, p => Assert.False(p.ArrivesWithHandover, p.Name));
         }

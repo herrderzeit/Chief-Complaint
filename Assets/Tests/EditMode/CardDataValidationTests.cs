@@ -148,11 +148,18 @@ namespace ChiefComplaint.Tests
         }
 
         [Test]
-        public void Handover_OnlyArthurMartinezAndArthurMillerAmongAmbulances()
+        public void Handover_OnlyArthurMartinezAmongAmbulances()
         {
             var withHandover = LoadPatients("Ambulance").Where(p => p.arrivesWithHandover).Select(p => p.patientName).OrderBy(n => n).ToArray();
-            CollectionAssert.AreEqual(new[] { "Arthur Martinez", "Arthur Miller" }, withHandover,
-                "Exactly Arthur Martinez and Arthur Miller should arrive by Ambulance with a handover.");
+            CollectionAssert.AreEqual(new[] { "Arthur Martinez" }, withHandover,
+                "Exactly one Ambulance, Arthur Martinez, should arrive with a paramedic handover.");
+        }
+
+        [Test]
+        public void ArthurMiller_NoLongerArrivesWithHandover()
+        {
+            var p = LoadPatients("Ambulance").Single(x => x.patientName == "Arthur Miller");
+            Assert.IsFalse(p.arrivesWithHandover, "Arthur Miller lost his paramedic handover in the latest tuning.");
         }
 
         [Test]

@@ -1,7 +1,10 @@
 using ChiefComplaint.Cards.Data;
 using ChiefComplaint.Core;
+using System.Linq;
 using NUnit.Framework;
+using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace ChiefComplaint.Tests.EditMode
 {
@@ -22,10 +25,31 @@ namespace ChiefComplaint.Tests.EditMode
         [TearDown]
         public void Teardown() => Object.DestroyImmediate(go);
 
+        // Pins the decided tuning (component default; the MainBoard scene value is pinned below).
+        private const int DecidedStartingFunding = 10;
+
         [Test]
-        public void StartingFunding_IsSix()
+        public void StartingFunding_IsTen()
         {
-            Assert.AreEqual(6, gm.CurrentFunding);
+            Assert.AreEqual(DecidedStartingFunding, gm.CurrentFunding, "Decided tuning: a run starts with 10 Funding (was 6).");
+        }
+
+        [Test]
+        public void StartingFunding_SceneValue_IsTen()
+        {
+            const string scenePath = "Assets/Scenes/MainBoard.unity";
+            Scene scene = SceneManager.GetSceneByPath(scenePath);
+            bool openedHere = !scene.isLoaded;
+            if (openedHere) scene = EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Additive);
+            try
+            {
+                var sceneGm = scene.GetRootGameObjects().SelectMany(g => g.GetComponentsInChildren<GameManager>(true)).First();
+                Assert.AreEqual(DecidedStartingFunding, sceneGm.CurrentFunding, "MainBoard's GameManager should start with 10 Funding.");
+            }
+            finally
+            {
+                if (openedHere) EditorSceneManager.CloseScene(scene, true);
+            }
         }
 
         // The rule: each escalation type pays its own configured reward. Distinct sentinel values
@@ -63,24 +87,30 @@ namespace ChiefComplaint.Tests.EditMode
         {
             int? raised = null;
             gm.OnFundingChanged += v => raised = v;
+            int start = gm.CurrentFunding;
 
             gm.AddFunding(4);
 
-            Assert.AreEqual(10, gm.CurrentFunding);
-            Assert.AreEqual(10, raised);
+            Assert.AreEqual(start + 4, gm.CurrentFunding);
+            Assert.AreEqual(start + 4, raised);
         }
 
-        // starting balance is 6
-        [TestCase(0, true, 6)]
-        [TestCase(5, true, 1)]
-        [TestCase(6, true, 0)]
-        [TestCase(7, false, 6)]
-        public void TrySpendFunding_RespectsBalance(int cost, bool expectedResult, int expectedBalance)
+        // Rule test, independent of the starting tuning: the cost is given relative to the starting balance
+        // (null = free), so every boundary (free, just under, exactly, one over) is covered whatever it is.
+        [TestCase(null, true, Description = "A free purchase always succeeds")]
+        [TestCase(-1, true, Description = "One under the balance")]
+        [TestCase(0, true, Description = "Exactly the balance: spends down to 0")]
+        [TestCase(1, false, Description = "One over the balance: refused, nothing taken")]
+        public void TrySpendFunding_RespectsBalance(int? offsetFromBalance, bool expectedResult)
         {
+            int start = gm.CurrentFunding;
+            Assume.That(start, Is.GreaterThan(1), "Fixture needs a starting balance above 1.");
+            int cost = offsetFromBalance.HasValue ? start + offsetFromBalance.Value : 0;
+
             bool result = gm.TrySpendFunding(cost);
 
-            Assert.AreEqual(expectedResult, result);
-            Assert.AreEqual(expectedBalance, gm.CurrentFunding);
+            Assert.AreEqual(expectedResult, result, $"TrySpendFunding({cost}) with a balance of {start}");
+            Assert.AreEqual(expectedResult ? start - cost : start, gm.CurrentFunding);
         }
 
         [Test]

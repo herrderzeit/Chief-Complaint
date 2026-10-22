@@ -200,7 +200,7 @@ namespace ChiefComplaint.Tests.EditMode
         }
 
         // ---------------------------------------------------------------------
-        // GameManager upgrade payment (starting Funding is 6)
+        // GameManager upgrade payment (costs are relative to the configured starting Funding)
         // ---------------------------------------------------------------------
 
         private GameManager NewGameManager()
@@ -234,12 +234,14 @@ namespace ChiefComplaint.Tests.EditMode
             Assert.IsFalse(gm.CanAffordUpgrade(NewCard(0, 0, withUpgrade: false)));
         }
 
-        [TestCase(6, true)]
-        [TestCase(7, false)]
-        public void CanAffordUpgrade_FundingBoundary(int fundingCost, bool expected)
+        // Funding cost relative to the starting balance: exactly the balance is affordable, one over is not.
+        [TestCase(0, true)]
+        [TestCase(1, false)]
+        public void CanAffordUpgrade_FundingBoundary(int offsetFromBalance, bool expected)
         {
             var gm = NewGameManager();
-            Assert.AreEqual(expected, gm.CanAffordUpgrade(NewCard(fundingCost, 0)));
+            int cost = gm.CurrentFunding + offsetFromBalance;
+            Assert.AreEqual(expected, gm.CanAffordUpgrade(NewCard(cost, 0)), $"Upgrade costing {cost} with {gm.CurrentFunding} Funding");
         }
 
         [Test]
@@ -259,14 +261,15 @@ namespace ChiefComplaint.Tests.EditMode
         {
             var gm = NewGameManager();
             gm.AddUpgradeTokens(Internal, 2);
-            var card = NewCard(7, 2, colour: Internal);
+            int start = gm.CurrentFunding;
+            var card = NewCard(start + 1, 2, colour: Internal);
             bool fundingRaised = false, tokensRaised = false;
             gm.OnFundingChanged += _ => fundingRaised = true;
             gm.OnUpgradeTokensChanged += (_, __) => tokensRaised = true;
 
             Assert.IsFalse(gm.TryPayForUpgrade(card));
 
-            Assert.AreEqual(6, gm.CurrentFunding);
+            Assert.AreEqual(start, gm.CurrentFunding);
             Assert.AreEqual(2, gm.UpgradeTokens.Get(Internal), "Tokens must not be taken when the Funding is short.");
             Assert.IsFalse(fundingRaised);
             Assert.IsFalse(tokensRaised);
@@ -277,14 +280,16 @@ namespace ChiefComplaint.Tests.EditMode
         {
             var gm = NewGameManager();
             gm.AddUpgradeTokens(Internal, 1);
+            int start = gm.CurrentFunding;
             var card = NewCard(5, 2, colour: Internal);
+            Assume.That(start, Is.GreaterThanOrEqualTo(5), "Fixture: the Funding must be affordable so only the tokens are short.");
             bool fundingRaised = false, tokensRaised = false;
             gm.OnFundingChanged += _ => fundingRaised = true;
             gm.OnUpgradeTokensChanged += (_, __) => tokensRaised = true;
 
             Assert.IsFalse(gm.TryPayForUpgrade(card));
 
-            Assert.AreEqual(6, gm.CurrentFunding, "Funding must not be taken when the tokens are short.");
+            Assert.AreEqual(start, gm.CurrentFunding, "Funding must not be taken when the tokens are short.");
             Assert.AreEqual(1, gm.UpgradeTokens.Get(Internal));
             Assert.IsFalse(fundingRaised);
             Assert.IsFalse(tokensRaised);
@@ -296,6 +301,7 @@ namespace ChiefComplaint.Tests.EditMode
             var gm = NewGameManager();
             gm.AddUpgradeTokens(Trauma, 3);
             gm.AddUpgradeTokens(Cardio, 1);
+            int start = gm.CurrentFunding;
             var card = NewCard(5, 2, colour: Trauma);
             int? fundingRaised = null;
             var tokenEvents = new Dictionary<SymptomCategory, int>();
@@ -304,10 +310,10 @@ namespace ChiefComplaint.Tests.EditMode
 
             Assert.IsTrue(gm.TryPayForUpgrade(card));
 
-            Assert.AreEqual(1, gm.CurrentFunding);
+            Assert.AreEqual(start - 5, gm.CurrentFunding);
             Assert.AreEqual(1, gm.UpgradeTokens.Get(Trauma));
             Assert.AreEqual(1, gm.UpgradeTokens.Get(Cardio));
-            Assert.AreEqual(1, fundingRaised);
+            Assert.AreEqual(start - 5, fundingRaised);
             Assert.IsTrue(tokenEvents.ContainsKey(Trauma), "OnUpgradeTokensChanged should report the colour that was paid.");
             Assert.AreEqual(1, tokenEvents[Trauma]);
         }
@@ -318,11 +324,12 @@ namespace ChiefComplaint.Tests.EditMode
             var gm = NewGameManager();
             gm.AddUpgradeTokens(Trauma, 1);
             gm.AddUpgradeTokens(Infectious, 3);
+            int start = gm.CurrentFunding;
             var card = NewCard(3, 2, anyColour: true);
 
             Assert.IsTrue(gm.TryPayForUpgrade(card));
 
-            Assert.AreEqual(3, gm.CurrentFunding);
+            Assert.AreEqual(start - 3, gm.CurrentFunding);
             Assert.AreEqual(1, gm.UpgradeTokens.Get(Trauma));
             Assert.AreEqual(1, gm.UpgradeTokens.Get(Infectious));
         }
@@ -331,11 +338,12 @@ namespace ChiefComplaint.Tests.EditMode
         public void TryPayForUpgrade_NoTokenCost_PaysFundingOnly()
         {
             var gm = NewGameManager();
+            int start = gm.CurrentFunding;
             var card = NewCard(3, 0);
 
             Assert.IsTrue(gm.TryPayForUpgrade(card));
 
-            Assert.AreEqual(3, gm.CurrentFunding);
+            Assert.AreEqual(start - 3, gm.CurrentFunding);
             Assert.AreEqual(0, gm.UpgradeTokens.Total);
         }
 

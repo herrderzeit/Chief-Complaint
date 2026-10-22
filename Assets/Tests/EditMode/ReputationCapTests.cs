@@ -10,27 +10,28 @@ namespace ChiefComplaint.Tests.EditMode
     /// <summary>
     /// Covers the Reputation cap: <see cref="GameManager.ApplyReputationCap"/> (pure maths), the clamp inside
     /// <see cref="GameManager.AddReputation"/>, and the decided tuning of <see cref="GameManager.maxReputation"/>
-    /// (component default and the MainBoard scene value, both 14), plus the starting Reputation (7) and the
+    /// (component default and the MainBoard scene value, both 15), plus the starting Reputation (7) and the
     /// diversion penalty (3) from the final balance pass, and the cure Reputation cap (2, component default and scene).
     /// </summary>
     [Category("Economy")]
     public class ReputationCapTests
     {
         private const string ScenePath = "Assets/Scenes/MainBoard.unity";
-        private const int DecidedCap = 14;
+        private const int DecidedCap = 15;
         private const int DecidedStartingReputation = 7;
         private const int DecidedDiversionPenalty = 3;
         private const int DecidedCureReputationCap = 2;
 
         // reputation after the gain, cap, reputation before the gain -> expected
         [TestCase(30, 0, 10, 30, Description = "Cap 0 is off: no clamp at all")]
-        [TestCase(12, 14, 10, 12, Description = "Under the cap: unchanged")]
-        [TestCase(14, 14, 12, 14, Description = "Landing exactly on the cap: unchanged")]
-        [TestCase(17, 14, 12, 14, Description = "Crossing the cap: clamped to the cap")]
-        [TestCase(15, 14, 14, 14, Description = "Already at the cap: a gain is lost")]
-        [TestCase(21, 14, 20, 20, Description = "Already above the cap (lowered mid-run): stays, never reduced")]
-        [TestCase(20, 14, 20, 20, Description = "Above the cap, zero gain: stays")]
-        [TestCase(-3, 14, 2, -3, Description = "Below the cap the value passes through untouched")]
+        [TestCase(12, 15, 10, 12, Description = "Under the cap: unchanged")]
+        [TestCase(14, 15, 12, 14, Description = "One under the cap: unchanged")]
+        [TestCase(15, 15, 12, 15, Description = "Landing exactly on the cap: unchanged")]
+        [TestCase(17, 15, 12, 15, Description = "Crossing the cap: clamped to the cap")]
+        [TestCase(16, 15, 15, 15, Description = "Already at the cap: a gain is lost")]
+        [TestCase(21, 15, 20, 20, Description = "Already above the cap (lowered mid-run): stays, never reduced")]
+        [TestCase(20, 15, 20, 20, Description = "Above the cap, zero gain: stays")]
+        [TestCase(-3, 15, 2, -3, Description = "Below the cap the value passes through untouched")]
         public void ApplyReputationCap_Cases(int reputation, int cap, int before, int expected)
         {
             Assert.AreEqual(expected, GameManager.ApplyReputationCap(reputation, cap, before),
@@ -44,18 +45,18 @@ namespace ChiefComplaint.Tests.EditMode
         }
 
         [Test]
-        public void MaxReputation_ComponentDefault_IsFourteen()
+        public void MaxReputation_ComponentDefault_IsFifteen()
         {
             var gm = NewGameManager(out var go);
             try
             {
-                Assert.AreEqual(DecidedCap, gm.maxReputation, "Decided tuning: Reputation caps at 14.");
+                Assert.AreEqual(DecidedCap, gm.maxReputation, "Decided tuning: Reputation caps at 15 (was 14).");
             }
             finally { Object.DestroyImmediate(go); }
         }
 
         [Test]
-        public void MaxReputation_SceneValue_IsFourteen()
+        public void MaxReputation_SceneValue_IsFifteen()
         {
             Scene scene = SceneManager.GetSceneByPath(ScenePath);
             bool openedHere = !scene.isLoaded;
@@ -63,7 +64,7 @@ namespace ChiefComplaint.Tests.EditMode
             try
             {
                 var gm = scene.GetRootGameObjects().SelectMany(g => g.GetComponentsInChildren<GameManager>(true)).First();
-                Assert.AreEqual(DecidedCap, gm.maxReputation, "MainBoard's GameManager.maxReputation should be 14.");
+                Assert.AreEqual(DecidedCap, gm.maxReputation, "MainBoard's GameManager.maxReputation should be 15.");
             }
             finally
             {
@@ -102,9 +103,10 @@ namespace ChiefComplaint.Tests.EditMode
         }
 
         // starting Reputation (7 by default), gain, cap -> expected
-        [TestCase(10, 14, 14, Description = "7 + 10 clamps to 14")]
-        [TestCase(7, 14, 14, Description = "7 + 7 lands exactly on 14")]
-        [TestCase(3, 14, 10, Description = "Under the cap is unaffected")]
+        [TestCase(10, 15, 15, Description = "7 + 10 clamps to 15")]
+        [TestCase(8, 15, 15, Description = "7 + 8 lands exactly on 15")]
+        [TestCase(7, 15, 14, Description = "7 + 7 stays one under the cap")]
+        [TestCase(3, 15, 10, Description = "Under the cap is unaffected")]
         [TestCase(50, 0, 57, Description = "0 disables the cap")]
         [TestCase(5, 10, 10, Description = "A lower cap clamps too")]
         public void AddReputation_ClampsAtMaxReputation(int gain, int cap, int expected)
