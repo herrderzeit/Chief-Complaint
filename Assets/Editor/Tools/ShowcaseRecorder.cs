@@ -316,6 +316,12 @@ namespace ChiefComplaint.Editor.Tools
                     DragTo(() => HandCard("Standard Care"), () => At(ward));
                 }),
                 ("Treating earns an upgrade token in that department's colour (top bar).", null),
+                ("Nurses now pause a patient's decay and heal them: Registered Nurse restores 2 and pauses.", () =>
+                {
+                    Do(() => Hurt(second, 3));
+                    AddToHand("Upgrade/Starter/Card_T2_RegisteredNurse");
+                    DragTo(() => HandCard("Registered Nurse"), () => At(second));
+                }),
                 ("End Shift: the Supply Room opens. Piles have limited stock and unlock as the run escalates.", () =>
                 {
                     Do(() => Gm().AddFunding(15));
@@ -333,7 +339,7 @@ namespace ChiefComplaint.Editor.Tools
                     Click(() => AtUi(Upgrades().upgradesTabButton.transform));
                 }),
                 ("View Deck groups your cards by type.", () => Click(() => AtUi(Upgrades().deckViewTabButton.transform))),
-                ("Next shift. Harder patients unlock by cures or by time: Ambulances from shift 5.", () =>
+                ("Next shift. Every 3rd shift an extra patient arrives; Ambulances unlock by cures or from shift 5.", () =>
                 {
                     Click(() => AtUi(Upgrades().marketTabButton.transform));
                     Click(() => AtUi(Named("NextShift_Button")));
