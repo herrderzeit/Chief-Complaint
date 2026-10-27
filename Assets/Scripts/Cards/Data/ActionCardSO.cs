@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 /// <summary>Defines the five categories of playable action cards in the game.</summary>
 public enum ActionCardType
@@ -34,7 +35,7 @@ namespace ChiefComplaint.Cards.Data
 {
     /// <summary>
     /// ScriptableObject data container for a single action card. Defines all static asset
-    /// properties: identity, costs, mechanical effects, draft valuation, and visuals.
+    /// properties: identity, costs, mechanical effects, market price, and visuals.
     /// Runtime mutable state (e.g. which pile the card is in) lives in <see cref="DeckManager"/>.
     /// </summary>
     [CreateAssetMenu(fileName = "New Action Card", menuName = "Chief Complaint/Action Card")]
@@ -76,7 +77,7 @@ namespace ChiefComplaint.Cards.Data
     [Tooltip("How many cards the player draws when this card is played.")]
     public int cardsToDraw;
 
-    [Header("Draft Valuation")]
+    [Header("Market Price")]
     [Tooltip("1 = Basic, 2 = Specialised, 3 = Game-changing")]
     public int powerTier = 1;
 
@@ -90,11 +91,11 @@ namespace ChiefComplaint.Cards.Data
     [Header("Effects (Strategy Pattern)")]
     public System.Collections.Generic.List<ChiefComplaint.Cards.Effects.CardEffectSO> effects = new System.Collections.Generic.List<ChiefComplaint.Cards.Effects.CardEffectSO>();
 
-    [Header("Draft Phase Upgrades")]
-    [Tooltip("The card this upgrades into when paying Funding in the Draft screen.")]
-    public ActionCardSO directDraftUpgrade;
-    [Tooltip("The Funding cost to upgrade to the directDraftUpgrade card.")]
-    public int draftUpgradeCost = 5;
+    [Header("Staff Room Upgrades")]
+    [Tooltip("The card this upgrades into when paying Funding in the Staff Room.")]
+    [FormerlySerializedAs("directDraftUpgrade")] public ActionCardSO upgradesTo;
+    [Tooltip("The Funding cost to upgrade to the upgradesTo card.")]
+    [FormerlySerializedAs("draftUpgradeCost")] public int upgradeCost = 5;
 
     [Tooltip("Upgrade tokens needed for the direct upgrade, on top of Funding. Tokens are earned by treating symptoms in a department.")]
     [Min(0)] public int upgradeTokenCost = 0;
@@ -107,11 +108,11 @@ namespace ChiefComplaint.Cards.Data
     public Sprite cardArt;
 
     // -------------------------------------------------------------------------
-    // Draft Valuation
+    // Market Price
     // -------------------------------------------------------------------------
 
     /// <summary>
-    /// Calculates a dynamic Funding cost for the draft market based on the card's
+    /// Calculates a dynamic Funding cost for the market based on the card's
     /// type, power tier, AP cost, and card-draw value.
     /// <list type="bullet">
     ///   <item><description>Base cost by card type (Staff = 4, Utility/Diagnostic/Treatment = 3, RedTape = 0).</description></item>
@@ -121,7 +122,7 @@ namespace ChiefComplaint.Cards.Data
     /// </list>
     /// RedTape cards always return 0. All other results are clamped to a minimum of 2.
     /// </summary>
-    /// <returns>The Funding cost to purchase this card during a draft phase.</returns>
+    /// <returns>The Funding cost to purchase this card during a staff room.</returns>
     /// <summary>
     /// What playing this card on the play zone gives, one result per line (e.g. "+3 AP" / "-2 Rep"), for the
     /// drag preview. Empty if the card does nothing without a target.
@@ -142,7 +143,7 @@ namespace ChiefComplaint.Cards.Data
         return string.Join("\n", lines);
     }
 
-    public int CalculateDraftValue()
+    public int CalculateMarketPrice()
     {
         int cost = cardType switch
         {

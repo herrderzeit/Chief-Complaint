@@ -30,12 +30,12 @@ namespace ChiefComplaint.Sim.Tests
             return data;
         }
 
-        /// <summary>Ends the current shift and skips the draft, so the next shift starts.</summary>
+        /// <summary>Ends the current shift and skips the staff room, so the next shift starts.</summary>
         private static void NextShift(Game g)
         {
             g.Apply(GameAction.EndShift);
-            Assert.Equal(Phase.Draft, g.Phase);
-            g.Apply(GameAction.FinishDraft);
+            Assert.Equal(Phase.StaffRoom, g.Phase);
+            g.Apply(GameAction.LeaveStaffRoom);
             Assert.Equal(Phase.Shift, g.Phase);
         }
 
@@ -181,7 +181,7 @@ namespace ChiefComplaint.Sim.Tests
             NextShift(g);
             Assert.Equal(2, g.Reputation);
             g.Apply(GameAction.EndShift);
-            g.Apply(GameAction.FinishDraft);
+            g.Apply(GameAction.LeaveStaffRoom);
 
             Assert.Equal(0, g.Reputation);
             Assert.Equal(Phase.Lost, g.Phase);

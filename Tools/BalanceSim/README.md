@@ -56,7 +56,7 @@ purchase carries a run on its own.
 `GameManager` (AP, Reputation, Funding, shift loop, win/lose), `BoardManager` and `PatientCardView`
 (spawn, decay, diagnose, treat, surgery, discharge, triggers), `PatientDeckManager` (patient draw, symptom
 generation, escalation), `DeckManager` (piles, Red Tape, cleanse), `DraggableCard` (card play rules),
-`DepartmentFallbackButton` (paging), `StaffSynergyManager` (Team Assessment), `DraftManager` and
+`DepartmentFallbackButton` (paging), `StaffSynergyManager` (Team Assessment), `StaffRoomManager` and
 `DeckUpgradeManager` (market and upgrades), and the `*EffectSO` classes (card effects).
 
 When a rule changes in the Unity code, change it here too; the tests in `Tools/BalanceSim.Tests` pin the

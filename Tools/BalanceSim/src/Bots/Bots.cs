@@ -18,7 +18,7 @@ namespace ChiefComplaint.Sim.Bots
 
     /// <summary>
     /// Baseline: plays random legal actions. Ends the shift with a 10% chance per step (otherwise it would end
-    /// most shifts after one action), and buys random affordable items in the draft.
+    /// most shifts after one action), and buys random affordable items in the staff room.
     /// </summary>
     public sealed class RandomBot : IBot
     {
@@ -48,7 +48,7 @@ namespace ChiefComplaint.Sim.Bots
 
     /// <summary>
     /// A competent heuristic player: scores every legal action and takes the best one until nothing scores
-    /// above zero, then ends the shift. Draft spending is delegated to a <see cref="IPurchasePolicy"/>.
+    /// above zero, then ends the shift. Staff room spending is delegated to a <see cref="IPurchasePolicy"/>.
     /// </summary>
     public sealed class GreedyBot : IBot
     {
@@ -69,7 +69,7 @@ namespace ChiefComplaint.Sim.Bots
 
         public GameAction Choose(Game game, List<GameAction> legal)
         {
-            if (game.Phase == Phase.Draft) return purchases.Choose(game, legal, rng);
+            if (game.Phase == Phase.StaffRoom) return purchases.Choose(game, legal, rng);
 
             GameAction best = null;
             double bestScore = 0;

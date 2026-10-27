@@ -19,8 +19,8 @@ namespace ChiefComplaint.Sim.Tests
             var data = Content(new[] { Diagnose(1), Cure(1) }, patients);
             data.SupplyPiles.Add(new SupplyPileDef { Card = walkIn, UnlockAt = EscalationType.WalkIn, MaxStock = 2 });
             data.SupplyPiles.Add(new SupplyPileDef { Card = ambulance, UnlockAt = EscalationType.Ambulance, MaxStock = 3 });
-            data.DraftPool.Add(walkIn);
-            data.DraftPool.Add(ambulance);
+            data.MarketPool.Add(walkIn);
+            data.MarketPool.Add(ambulance);
             data.Config.StartingFunding = 100;
             return data;
         }
@@ -30,13 +30,13 @@ namespace ChiefComplaint.Sim.Tests
         // ------------------------------------------------------------------ supply room
 
         [Fact]
-        public void First_draft_unlocks_walk_in_piles_full_and_keeps_ambulance_piles_locked()
+        public void First_staff_room_visit_unlocks_walk_in_piles_full_and_keeps_ambulance_piles_locked()
         {
             CardDef a = Stock("A"), b = Stock("B");
             var g = Start(SupplyContent(a, b, Patient(stability: 50)));
             g.Apply(GameAction.EndShift);
 
-            Assert.Equal(Phase.Draft, g.Phase);
+            Assert.Equal(Phase.StaffRoom, g.Phase);
             Assert.True(g.PileUnlocked[0]);
             Assert.Equal(2, g.PileStock[0]);
             Assert.False(g.PileUnlocked[1]);
@@ -55,7 +55,7 @@ namespace ChiefComplaint.Sim.Tests
 
             g.Apply(BuyAction(g, 0));
             Assert.Equal(1, g.PileStock[0]);
-            Assert.Equal(funding - a.DraftValue, g.Funding);
+            Assert.Equal(funding - a.MarketPrice, g.Funding);
 
             g.Apply(BuyAction(g, 0));
             Assert.Equal(0, g.PileStock[0]);
@@ -66,12 +66,12 @@ namespace ChiefComplaint.Sim.Tests
             Assert.Equal(0, g.PileStock[0]);
             Assert.Equal(before, g.Funding);
 
-            g.Apply(GameAction.FinishDraft);
+            g.Apply(GameAction.LeaveStaffRoom);
             Assert.Equal(2, g.OwnedCards.Count(c => c == a)); // purchases join the deck for the next shift
         }
 
         [Fact]
-        public void Open_piles_restock_one_per_draft_capped_at_max()
+        public void Open_piles_restock_one_per_visit_capped_at_max()
         {
             CardDef a = Stock("A"), b = Stock("B");
             var g = Start(SupplyContent(a, b, Patient(stability: 50)));
@@ -83,9 +83,9 @@ namespace ChiefComplaint.Sim.Tests
             int[] expected = { 1, 2, 2 };
             foreach (int stock in expected)
             {
-                g.Apply(GameAction.FinishDraft);
+                g.Apply(GameAction.LeaveStaffRoom);
                 g.Apply(GameAction.EndShift);
-                Assert.Equal(Phase.Draft, g.Phase);
+                Assert.Equal(Phase.StaffRoom, g.Phase);
                 Assert.Equal(stock, g.PileStock[0]);
                 Assert.False(g.PileUnlocked[1]);
                 Assert.Equal(0, g.PileStock[1]); // locked piles never restock
@@ -109,7 +109,7 @@ namespace ChiefComplaint.Sim.Tests
             g.Apply(GameAction.EndShift);
 
             Assert.True(g.AmbulancesUnlocked);
-            Assert.Equal(Phase.Draft, g.Phase);
+            Assert.Equal(Phase.StaffRoom, g.Phase);
             Assert.True(g.PileUnlocked[1]);
             Assert.Equal(3, g.PileStock[1]);
             Assert.NotNull(BuyAction(g, 1));

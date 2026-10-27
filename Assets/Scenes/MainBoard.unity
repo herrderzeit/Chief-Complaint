@@ -954,7 +954,7 @@ GameObject:
   - component: {fileID: 110998062}
   - component: {fileID: 110998061}
   m_Layer: 5
-  m_Name: DraftPhase_Panel
+  m_Name: StaffRoom_Panel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1035,7 +1035,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6141116f6a385f24bbfe37b4807a174c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: GameScripts::DeckUpgradeManager
-  draftMarketContainer: {fileID: 2139295336}
+  marketTabContainer: {fileID: 2139295336}
   upgradesContainer: {fileID: 1186049678}
   deckViewContainer: {fileID: 1850219073}
   marketTabButton: {fileID: 848243482}
@@ -1529,7 +1529,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
   boardManager: {fileID: 1196415561}
-  draftManager: {fileID: 1415911623}
+  staffRoomManager: {fileID: 1415911623}
   gameOverScreen: {fileID: 1163945929}
   baseAP: 3
   currentAP: 0
@@ -5384,7 +5384,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: RESOURCE ALLOCATION
+  m_text: RESEARCH & DEVELOPMENT
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 82c2bd3979921114e8dfd112a660673c, type: 2}
   m_sharedMaterial: {fileID: -1812805028744952617, guid: 82c2bd3979921114e8dfd112a660673c, type: 2}
@@ -8743,7 +8743,7 @@ GameObject:
   - component: {fileID: 1415911622}
   - component: {fileID: 1415911623}
   m_Layer: 0
-  m_Name: DraftManager
+  m_Name: StaffRoomManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8776,7 +8776,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b0e5f3875f0b94a4c9072fdbdb640b99, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DraftManager
-  draftPanel: {fileID: 110998059}
+  staffRoomPanel: {fileID: 110998059}
   marketCardPrefab: {fileID: 1568622686187278603, guid: 4971f5ce35562c64ebd66eb5f1713f14, type: 3}
   marketContainer: {fileID: 388075010}
   endShiftButton: {fileID: 1895769627}
@@ -10391,8 +10391,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1415911623}
-        m_TargetAssemblyTypeName: DraftManager, Assembly-CSharp
-        m_MethodName: CloseDraftAndStartShift
+        m_TargetAssemblyTypeName: ChiefComplaint.StaffRoom.StaffRoomManager, GameScripts
+        m_MethodName: CloseStaffRoomAndStartShift
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -12066,7 +12066,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 173221098}
         m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: EnterDraftPhase
+        m_MethodName: EnterStaffRoom
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -13333,7 +13333,7 @@ GameObject:
   - component: {fileID: 2139295339}
   - component: {fileID: 2139295338}
   m_Layer: 5
-  m_Name: DraftMarketContainer
+  m_Name: MarketContainer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

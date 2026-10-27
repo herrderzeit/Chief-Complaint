@@ -5,7 +5,7 @@ using ChiefComplaint.Cards.Data;
 using ChiefComplaint.Cards.Interaction;
 using ChiefComplaint.Cards.Views;
 using ChiefComplaint.Core;
-using ChiefComplaint.Drafting;
+using ChiefComplaint.StaffRoom;
 using ChiefComplaint.UI;
 using ChiefComplaint.Utils;
 
@@ -160,7 +160,7 @@ namespace ChiefComplaint.UI
         public void PointerDown()
         {
             if (!isInteractable || currentPatient == null || targetTier == null) return;
-            if (!GameManager.Instance.CanInteract) return; // board locked (draft, choice prompt, pause)
+            if (!GameManager.Instance.CanInteract) return; // board locked (staff room, choice prompt, pause)
 
             if (GameManager.Instance.CurrentAP >= currentAPCost)
             {

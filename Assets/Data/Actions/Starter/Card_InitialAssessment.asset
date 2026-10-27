@@ -40,8 +40,8 @@ MonoBehaviour:
   exhaustsAtShiftEnd: 0
   effects:
   - {fileID: -4634232346131975975}
-  directDraftUpgrade: {fileID: 11400000, guid: b4a2e5d9c1f84931a7c6e0b4d2f8e1a5, type: 2}
-  draftUpgradeCost: 4
+  upgradesTo: {fileID: 11400000, guid: b4a2e5d9c1f84931a7c6e0b4d2f8e1a5, type: 2}
+  upgradeCost: 4
   upgradeTokenCost: 1
   upgradeTokenAnyColour: 0
   upgradeTokenColour: 3

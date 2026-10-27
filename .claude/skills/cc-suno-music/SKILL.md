@@ -1,7 +1,7 @@
 ---
 name: cc-suno-music
 description: "Chief Complaint music with Suno (Songs tab). Writes ready-to-paste Suno Songs prompts for the game's music loops from the project's sound brief, and with 'import' brings downloaded tracks from Assets/Audio/Music/_Incoming into the game. Use when the user wants music, a theme or a loop. For sound effects and stings use cc-suno-sounds; for voice lines use cc-suno-speech."
-argument-hint: "<cue or moment, e.g. 'Music_Shift_Calm' or 'draft phase'>  |  import"
+argument-hint: "<cue or moment, e.g. 'Music_Shift_Calm' or 'staff room'>  |  import"
 disable-model-invocation: true
 ---
 

@@ -7,7 +7,7 @@ using ChiefComplaint.Cards.Data;
 using ChiefComplaint.Cards.Interaction;
 using ChiefComplaint.Cards.Views;
 using ChiefComplaint.Core;
-using ChiefComplaint.Drafting;
+using ChiefComplaint.StaffRoom;
 using ChiefComplaint.UI;
 using ChiefComplaint.Utils;
 
@@ -54,7 +54,7 @@ namespace ChiefComplaint.Editor.Inspectors
         {
             string path = AssetDatabase.GetAssetPath(card);
             if (path.Contains("/Starting/")) return "Starting Deck";
-            if (path.Contains("/Draft/")) return "Draft Pool";
+            if (path.Contains("/Market/")) return "Market Pool";
             if (path.Contains("/Upgrade/")) return "Upgraded Target";
             if (path.Contains("/RedTape/")) return "Red Tape Pool";
             return "Uncategorised";
@@ -65,7 +65,7 @@ namespace ChiefComplaint.Editor.Inspectors
             return loc switch
             {
                 "Starting Deck" => 0,
-                "Draft Pool" => 1,
+                "Market Pool" => 1,
                 "Upgraded Target" => 2,
                 "Red Tape Pool" => 3,
                 _ => 4
@@ -120,15 +120,15 @@ namespace ChiefComplaint.Editor.Inspectors
             EditorGUILayout.LabelField("Economy & Curve Balancing Analysis", EditorStyles.boldLabel);
             GUILayout.BeginVertical(EditorStyles.helpBox);
 
-            var drafts = allCards.Where(c => GetLocation(c) == "Draft Pool").ToList();
+            var marketCards = allCards.Where(c => GetLocation(c) == "Market Pool").ToList();
             var starting = allCards.Where(c => GetLocation(c) == "Starting Deck").ToList();
 
             float startingAPCost = starting.Count > 0 ? (float)starting.Average(c => c.apCost) : 0f;
-            float draftAPCost = drafts.Count > 0 ? (float)drafts.Average(c => c.apCost) : 0f;
+            float marketAPCost = marketCards.Count > 0 ? (float)marketCards.Average(c => c.apCost) : 0f;
             int totalAPGen = starting.Sum(c => c.effects.OfType<ChiefComplaint.Cards.Effects.GainAPEffectSO>().Sum(e => e.apGenerated));
 
             GUILayout.Label($"Average Starting Deck AP Cost: {startingAPCost:F2} AP");
-            GUILayout.Label($"Average Draft Pool AP Cost: {draftAPCost:F2} AP");
+            GUILayout.Label($"Average Market Pool AP Cost: {marketAPCost:F2} AP");
             GUILayout.Label($"Total Base AP Generation in Starting Deck: {totalAPGen} AP");
 
             GUILayout.EndVertical();
@@ -144,7 +144,7 @@ namespace ChiefComplaint.Editor.Inspectors
             GUILayout.Label("P. Tier", headerStyle, GUILayout.Width(50));
             GUILayout.Label("Med Effect (Diag/Cure)", headerStyle, GUILayout.Width(180));
             GUILayout.Label("Economy (AP / Rep)", headerStyle, GUILayout.Width(130));
-            GUILayout.Label("Draft Upgrade?", headerStyle, GUILayout.Width(250));
+            GUILayout.Label("Upgrades To", headerStyle, GUILayout.Width(250));
             GUILayout.EndHorizontal();
         }
 
@@ -199,9 +199,9 @@ namespace ChiefComplaint.Editor.Inspectors
 
             // Upgrades formatting
             string upgradeStr = "-";
-            if (card.directDraftUpgrade != null)
+            if (card.upgradesTo != null)
             {
-                upgradeStr = $"Upgrades to: {card.directDraftUpgrade.cardName} ({card.draftUpgradeCost} Rep)";
+                upgradeStr = $"Upgrades to: {card.upgradesTo.cardName} ({card.upgradeCost} Rep)";
             }
             GUILayout.Label(upgradeStr, GUILayout.Width(250));
 

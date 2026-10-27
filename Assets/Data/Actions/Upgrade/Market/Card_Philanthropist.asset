@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-4353059634709318146
+--- !u!114 &-9126909604860248107
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -9,10 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4eded8d4a81bfdc46b2a731f60d29ba2, type: 3}
-  m_Name: TrashCardEffect
-  m_EditorClassIdentifier: GameScripts::ChiefComplaint.Cards.Effects.TrashCardEffectSO
-  redTapeOnly: 1
+  m_Script: {fileID: 11500000, guid: 2c7cba7fd310eb343b3d0291f39dc1d4, type: 3}
+  m_Name: GainReputationEffect
+  m_EditorClassIdentifier: GameScripts:ChiefComplaint.Cards.Effects:GainReputationEffectSO
+  reputationGenerated: 4
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23,25 +23,25 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a19c702a9b380a64ba00656724a44857, type: 3}
-  m_Name: Card_SharpsBin
-  m_EditorClassIdentifier: GameScripts::ChiefComplaint.Cards.Data.ActionCardSO
-  cardName: Sharps Bin
-  cardType: 6
+  m_Name: Card_Philanthropist
+  m_EditorClassIdentifier: Assembly-CSharp::ActionCardSO
+  cardName: Philanthropist
+  cardType: 0
   tags: 
-  rulesText: Drop on a Red Tape card in your hand to dispose of it. Draw 1 card. Exhausts; leaves at the end of the shift if unused.
-  flavorText: Points down, lid shut, no regrets.
+  rulesText: Gain 4 Reputation. Exhausts.
+  flavorText: Deep pockets and a desire for good PR. Just smile, nod, and gladly take the cheque.
   isPlayable: 1
   successChance: 1
-  apCost: 0
+  apCost: 1
   reputationCost: 0
-  cardsToDraw: 1
-  powerTier: 1
+  cardsToDraw: 0
+  powerTier: 3
   exhaustsOnUse: 1
-  exhaustsAtShiftEnd: 1
+  exhaustsAtShiftEnd: 0
   effects:
-  - {fileID: -4353059634709318146}
-  directDraftUpgrade: {fileID: 0}
-  draftUpgradeCost: 0
+  - {fileID: -9126909604860248107}
+  upgradesTo: {fileID: 0}
+  upgradeCost: 0
   upgradeTokenCost: 0
   upgradeTokenAnyColour: 0
   upgradeTokenColour: 0

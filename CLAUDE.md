@@ -37,7 +37,7 @@ All gameplay code lives in `Assets/Scripts/` (assembly `GameScripts`, references
 |---|---|---|
 | `Core/` | `ChiefComplaint.Core` | `GameManager`, `DeckManager`, `PatientDeckManager`, `StaffSynergyManager` |
 | `Board/` | `ChiefComplaint.Board` | `BoardManager`, `BoardView`, `DepartmentSlot` |
-| `Drafting/` | `ChiefComplaint.Drafting` | `DraftManager`, `DeckUpgradeManager`, `DraftMarketCardView` |
+| `StaffRoom/` | `ChiefComplaint.StaffRoom` | `StaffRoomManager`, `DeckUpgradeManager`, `MarketCardView`, `SupplyRoom` |
 | `Cards/Data/` | `ChiefComplaint.Cards.Data` | `PatientCardSO`, `SymptomCardSO`, `ActionCardSO`, `CardTypeIconsSO` |
 | `Cards/Effects/` | `ChiefComplaint.Cards.Effects` | `CardEffectSO` base and one SO per effect (strategy pattern) |
 | `Cards/Views/` | `ChiefComplaint.Cards.Views` | `ActionCardView`, `PatientCardView`, `SymptomSubCardView`, `UI_ActionCardView` |
@@ -49,9 +49,9 @@ The enums `ActionCardType` and `CardTag` are in the **global** namespace (`Actio
 
 **Existing events (use these rather than inventing new ones):** `GameManager.OnAPChanged`, `OnReputationChanged`, `OnFundingChanged`, `OnShiftChanged`, `OnPhaseChanged(GamePhase)`; `DeckManager.OnDeckCountChanged`, `OnDiscardCountChanged`; `PatientDeckManager.OnPatientsCuredChanged`, `OnEscalationPhaseChanged`; `BoardManager.OnCodeBlueCountChanged`; `PatientCardView.OnDied`, `OnRemoved`, `OnStabilityChanged`; static `DraggableCard.OnCardDragStarted`, `OnCardDragEnded`, `OnCardPlayed`.
 
-**Shift flow:** End Shift → `GameManager.EnterDraftPhase` (resolves surgeries, discards hand) → `DraftManager.OpenDraftPhase` → purchases / upgrades → `DraftManager.CloseDraftAndStartShift` → `GameManager.StartNewShift`.
+**Shift flow:** End Shift → `GameManager.EnterStaffRoom` (resolves surgeries, discards hand) → `StaffRoomManager.OpenStaffRoom` → purchases / upgrades → `StaffRoomManager.CloseStaffRoomAndStartShift` → `GameManager.StartNewShift`.
 
-**Economy:** Reputation is life (0 ends the run); Activity Funding is earned by curing patients and spent in the draft market and on upgrades.
+**Economy:** Reputation is life (0 ends the run); Activity Funding is earned by curing patients and spent in the staff room market and on upgrades.
 
 ## Engineering rules
 - SOLID, decoupled managers; prefer `System.Action` events over direct references; keep data, logic and presentation separate.
@@ -71,7 +71,7 @@ You lead; the specialists are subagents in `.claude/agents/`. Delegate with the 
 |---|---|---|
 | **cc-card-engine-specialist** (you) | All other C#: managers, effects, SO definitions, card views, interaction, `Tools/BalanceSim` | Logic, schema, events, the shift loop, economy code |
 | **cc-medical-data-scraper** | `Assets/Data/` | Card, patient and symptom content, clinical accuracy, numbers tuning |
-| **cc-ui-ux-specialist** | `Assets/Scripts/UI/`, `Assets/Prefabs/`, `Assets/Art/` | Canvases, HUD, draft screens, card/slot visuals, feedback, tooltips |
+| **cc-ui-ux-specialist** | `Assets/Scripts/UI/`, `Assets/Prefabs/`, `Assets/Art/` | Canvases, HUD, staff room screens, card/slot visuals, feedback, tooltips |
 | **cc-unity-qa-tester** | `Assets/Tests/`, `Tools/BalanceSim.Tests/` | New or failing tests, regressions, edge cases |
 | **cc-audio-specialist** | `Assets/Audio/`, `Assets/Scripts/Audio/`, `Assets/Scripts/VFX/`, `docs/audio/` | Sound, importing Suno music, mixers, particles, post-processing |
 

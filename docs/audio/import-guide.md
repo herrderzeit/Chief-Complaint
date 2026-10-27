@@ -33,7 +33,7 @@ Trim leading silence on one-shots and voice lines, and check that loops cut clea
 
 ## 5. Wiring (events, never polling)
 Audio scripts live in `Assets/Scripts/Audio/` (`ChiefComplaint.Audio`) and only listen to game events (see the event list in `CLAUDE.md`). They never drive game state.
-- **MusicDirector:** plays one loop at a time with a crossfade of about 1.5 s. It reacts to `GameManager.OnPhaseChanged` (Shift, Draft, GameOver) and to `PatientCardView.OnStabilityChanged` (switching between Calm and Tense).
+- **MusicDirector:** plays one loop at a time with a crossfade of about 1.5 s. It reacts to `GameManager.OnPhaseChanged` (Shift, StaffRoom, GameOver) and to `PatientCardView.OnStabilityChanged` (switching between Calm and Tense).
 - **SfxPlayer:** plays pooled one-shots on events such as `DraggableCard.OnCardPlayed`, the diagnose, cure and death events, `OnFundingChanged`, and button clicks. It adds a little pitch and volume variation to repeated sounds.
 - **VoicePlayer:** plays one line at a time, queues or drops lines that overlap, ducks the music, and has a cooldown per cue so announcements don't repeat.
 - If an event a cue needs doesn't exist, report it to the lead; don't add it yourself.

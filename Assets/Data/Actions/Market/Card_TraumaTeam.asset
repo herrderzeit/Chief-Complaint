@@ -41,8 +41,11 @@ MonoBehaviour:
   effects:
   - {fileID: 8661075327825608352}
   - {fileID: -446682201311485906}
-  directDraftUpgrade: {fileID: 0}
-  draftUpgradeCost: 0
+  upgradesTo: {fileID: 0}
+  upgradeCost: 0
+  upgradeTokenCost: 0
+  upgradeTokenAnyColour: 0
+  upgradeTokenColour: 0
   cardArt: {fileID: 0}
 --- !u!114 &1801431800237153345
 MonoBehaviour:

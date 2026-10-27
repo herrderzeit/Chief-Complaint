@@ -14,7 +14,7 @@ You are the lead (cc-card-engine-specialist, see `CLAUDE.md`). Build one feature
 ## Step 0: Design (you, with the user)
 
 1. Read the code the feature touches (managers, views, effects, the shift flow) and Grep for existing events and helpers to reuse.
-2. Write a short design: the rule in one or two sentences, how the player triggers and sees it, the numbers, edge cases (empty board, Game Over, draft phase, Escape), and how it interacts with existing mechanics (Team Assessment, surgeries, Red Tape, escalation).
+2. Write a short design: the rule in one or two sentences, how the player triggers and sees it, the numbers, edge cases (empty board, Game Over, staff room, Escape), and how it interacts with existing mechanics (Team Assessment, surgeries, Red Tape, escalation).
 3. Ask the user (AskUserQuestion) about the design choices that are genuinely theirs, such as the rule, numbers or feel. Recommend an option.
 4. Present the plan (the steps below, with owners and files) and **wait for the user's go-ahead** before writing code. A feature changes several systems at once, so it needs their OK first.
 

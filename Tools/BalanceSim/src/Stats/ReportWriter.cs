@@ -117,8 +117,8 @@ namespace ChiefComplaint.Sim.Stats
             sb.AppendLine();
             sb.AppendLine(string.Join(", ", config.Describe().Select(kv => $"`{kv.Key}={kv.Value}`")));
             sb.AppendLine();
-            sb.AppendLine($"Content: {data.StartingDeck.Count}-card starting deck, {data.DraftPool.Count} draftable cards " +
-                          $"({string.Join(", ", data.DraftPool.Select(c => $"{c.Name} {c.DraftValue}F"))}), {data.RedTapePool.Count} Red Tape, " +
+            sb.AppendLine($"Content: {data.StartingDeck.Count}-card starting deck, {data.MarketPool.Count} purchasable cards " +
+                          $"({string.Join(", ", data.MarketPool.Select(c => $"{c.Name} {c.MarketPrice}F"))}), {data.RedTapePool.Count} Red Tape, " +
                           $"{data.WalkInPool.Count}/{data.AmbulancePool.Count}/{data.TraumaFlightPool.Count} Walk-In/Ambulance/Trauma patients.");
             if (data.Warnings.Count > 0)
             {

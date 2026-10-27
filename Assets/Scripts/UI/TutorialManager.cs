@@ -15,7 +15,7 @@ namespace ChiefComplaint.UI
             "Once diagnosed, the Patient's required Medical Specialties (e.g., Trauma, Internal) are revealed.\n\nYou can now drag the Patient's card from Triage into a matching Specialty Department (the large central zones).",
             "With the Patient in the correct Department, you can play Treatment cards onto them to cure their Symptoms. But beware: each Specialty Department can only be used ONCE per shift!",
             "Need to clear Triage quickly? You can drag a Patient into a Ward bed (the side zones) to stabilise them. Hospitalised Patients decay half as fast, but they still need to visit a Department for treatment.",
-            "When all of a Patient's Symptoms are cured, they are successfully discharged! You will earn Reputation and have the chance to draft powerful new cards for your deck to help you handle tougher shifts.",
+            "When all of a Patient's Symptoms are cured, they are successfully discharged! You will earn Reputation and have the chance to buy powerful new cards for your deck to help you handle tougher shifts.",
             "When you run out of AP or can't make a move, click 'End Shift'.\n\nThis triggers Patient decay, discards your remaining hand, draws 5 new cards, and brings new Patients into the ER. Good luck, Chief!"
         };
 

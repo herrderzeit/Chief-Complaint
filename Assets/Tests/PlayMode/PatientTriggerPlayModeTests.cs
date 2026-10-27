@@ -8,7 +8,7 @@ using ChiefComplaint.Board;
 using ChiefComplaint.Cards.Data;
 using ChiefComplaint.Cards.Views;
 using ChiefComplaint.Core;
-using ChiefComplaint.Drafting;
+using ChiefComplaint.StaffRoom;
 
 public class PatientTriggerPlayModeTests
 {

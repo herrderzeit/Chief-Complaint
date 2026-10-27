@@ -1,11 +1,12 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 using TMPro;
 using ChiefComplaint.Board;
 using ChiefComplaint.Cards.Data;
 using ChiefComplaint.Cards.Interaction;
 using ChiefComplaint.Cards.Views;
 using ChiefComplaint.Core;
-using ChiefComplaint.Drafting;
+using ChiefComplaint.StaffRoom;
 using ChiefComplaint.UI;
 using ChiefComplaint.Utils;
 
@@ -17,8 +18,8 @@ namespace ChiefComplaint.Core
     {
         /// <summary>The player is working a shift: cards and patients can be dragged.</summary>
         Shift,
-        /// <summary>The inter-shift draft/market panel is open.</summary>
-        Draft,
+        /// <summary>The inter-shift staff room panel is open.</summary>
+        StaffRoom,
         /// <summary>The hospital has gone bankrupt; the run is over.</summary>
         GameOver,
         /// <summary>A tutorial dialog or prompt is currently active.</summary>
@@ -29,7 +30,7 @@ namespace ChiefComplaint.Core
 
     /// <summary>
     /// Central game orchestrator. Owns the AP and Reputation economy, drives the
-    /// shift loop, and delegates board/draft phase control to its sub-managers.
+    /// shift loop, and delegates board/staff room control to its sub-managers.
     /// </summary>
     [UnityEngine.Scripting.APIUpdating.MovedFrom(true, null, null, null)]
     public class GameManager : Singleton<GameManager>
@@ -39,7 +40,7 @@ namespace ChiefComplaint.Core
 
         [Header("Sub-Managers")]
         public BoardManager boardManager;
-        public DraftManager draftManager;
+        [FormerlySerializedAs("draftManager")] public StaffRoomManager staffRoomManager;
 
         [Header("Game Over")]
         /// <summary>The full-screen Game Over overlay. Assign in the Inspector.</summary>
@@ -62,7 +63,7 @@ namespace ChiefComplaint.Core
         public int baseAP = 3;
         [SerializeField] private int currentAP;
         [SerializeField] private int currentReputation = 7;
-        [Tooltip("Activity Funding the run starts with. Spent on draft cards and card upgrades.")]
+        [Tooltip("Activity Funding the run starts with. Spent on market cards and card upgrades.")]
         [SerializeField] private int currentFunding = 10;
         [SerializeField] private int currentShift = 1;
 
@@ -106,7 +107,7 @@ namespace ChiefComplaint.Core
         /// <summary>The hospital's current Reputation (also the lose condition).</summary>
         public int CurrentReputation => currentReputation;
 
-        /// <summary>Activity Funding the player can currently spend on drafts and upgrades.</summary>
+        /// <summary>Activity Funding the player can currently spend in the market and on upgrades.</summary>
         public int CurrentFunding => currentFunding;
 
         /// <summary>Symptom upgrade tokens earned this run (one colour per department).</summary>
@@ -169,7 +170,7 @@ namespace ChiefComplaint.Core
                     QuitGame();
                     break;
                 case GamePhase.Shift:
-                case GamePhase.Draft:
+                case GamePhase.StaffRoom:
                     phaseBeforePause = CurrentPhase;
                     SetPhase(GamePhase.Paused);
                     ChoicePrompt.Show("Quit the game?",
@@ -265,20 +266,20 @@ namespace ChiefComplaint.Core
         /// <summary><c>true</c> during the last shift of a run with a win condition.</summary>
         public bool IsFinalShift => shiftsToWin > 0 && currentShift >= shiftsToWin;
 
-        /// <summary>Opens the inter-shift draft/market panel. Ignored unless a shift is in progress.</summary>
-        public void EnterDraftPhase()
+        /// <summary>Opens the inter-shift staff room panel. Ignored unless a shift is in progress.</summary>
+        public void EnterStaffRoom()
         {
             if (CurrentPhase != GamePhase.Shift) return;
 
             // Ending the shift abandons any pending patient pick.
             PatientPicker.Cancel();
 
-            // Patients finish their surgeries: discharges pay out before the draft opens.
+            // Patients finish their surgeries: discharges pay out before the staff room opens.
             resolvingShiftEnd = true;
             if (boardManager != null) boardManager.ResolveSurgeries();
             resolvingShiftEnd = false;
 
-            // Finishing the final shift wins the run instead of opening the draft. There is deliberately no last round
+            // Finishing the final shift wins the run instead of opening the staff room. There is deliberately no last round
             // of decay: the goal is to get through the final shift, and a decay after it decided runs on whoever
             // happened to be on the board (BalanceSim: most smart-bot losses moved to that last tick).
             if (IsFinalShift && CurrentPhase != GamePhase.GameOver)
@@ -287,9 +288,9 @@ namespace ChiefComplaint.Core
                 return;
             }
 
-            SetPhase(GamePhase.Draft);
+            SetPhase(GamePhase.StaffRoom);
             if (DeckManager.Instance != null) DeckManager.Instance.DiscardHand();
-            if (draftManager != null) draftManager.OpenDraftPhase();
+            if (staffRoomManager != null) staffRoomManager.OpenStaffRoom();
         }
 
         private void SetPhase(GamePhase phase)
@@ -375,7 +376,7 @@ namespace ChiefComplaint.Core
 
         /// <summary><c>true</c> if the player has the Funding and upgrade tokens for <paramref name="card"/>'s direct upgrade.</summary>
         public bool CanAffordUpgrade(ActionCardSO card) =>
-            card != null && card.directDraftUpgrade != null && currentFunding >= card.draftUpgradeCost &&
+            card != null && card.upgradesTo != null && currentFunding >= card.upgradeCost &&
             UpgradeTokens.CanPay(card.upgradeTokenCost, card.upgradeTokenAnyColour, card.upgradeTokenColour);
 
         /// <summary>Pays the Funding and upgrade tokens for <paramref name="card"/>'s direct upgrade, or nothing if either is short.</summary>
@@ -388,7 +389,7 @@ namespace ChiefComplaint.Core
                 // An any-colour cost may draw from several colours, so refresh them all.
                 for (int i = 0; i < 4; i++) OnUpgradeTokensChanged?.Invoke((SymptomCategory)i, UpgradeTokens.Get((SymptomCategory)i));
             }
-            return TrySpendFunding(card.draftUpgradeCost);
+            return TrySpendFunding(card.upgradeCost);
         }
 
         /// <summary>

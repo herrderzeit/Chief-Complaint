@@ -5,7 +5,7 @@ using ChiefComplaint.Sim.Data;
 
 namespace ChiefComplaint.Sim.Engine
 {
-    public enum Phase { Shift, TeamAssessment, Draft, Won, Lost }
+    public enum Phase { Shift, TeamAssessment, StaffRoom, Won, Lost }
 
     /// <summary>
     /// The rules of one run, with no Unity dependency. Each method notes the Unity code it mirrors, so a
@@ -52,8 +52,8 @@ namespace ChiefComplaint.Sim.Engine
         private bool synergyUsedThisShift;
         public int PendingTeamAssessmentTier { get; private set; }
 
-        // Draft (DraftManager)
-        // Supply room (DraftManager / SupplyRoom): one entry per Data.SupplyPiles pile.
+        // Staff room (StaffRoomManager)
+        // Supply room (StaffRoomManager / SupplyRoom): one entry per Data.SupplyPiles pile.
         public readonly List<bool> PileUnlocked = new List<bool>();
         /// <summary>Upgrade tokens per SymptomCategory (GameManager.UpgradeTokens), earned one per symptom treated.</summary>
         public readonly int[] UpgradeTokens = new int[4];
@@ -131,7 +131,7 @@ namespace ChiefComplaint.Sim.Engine
                             actions.Add(new GameAction { Kind = ActionKind.TeamAssess, Patient = p });
                     actions.Add(GameAction.SkipTeamAssess);
                     break;
-                case Phase.Draft: AddDraftActions(actions); break;
+                case Phase.StaffRoom: AddStaffRoomActions(actions); break;
             }
             return actions;
         }
@@ -214,20 +214,20 @@ namespace ChiefComplaint.Sim.Engine
             return false;
         }
 
-        private void AddDraftActions(List<GameAction> actions)
+        private void AddStaffRoomActions(List<GameAction> actions)
         {
             for (int i = 0; i < PileStock.Count; i++)
             {
                 if (!PileUnlocked[i] || PileStock[i] <= 0) continue;
-                int cost = Data.SupplyPiles[i].Card.DraftValue;
+                int cost = Data.SupplyPiles[i].Card.MarketPrice;
                 if (Funding >= cost)
                     actions.Add(new GameAction { Kind = ActionKind.Buy, Card = Data.SupplyPiles[i].Card, MarketSlot = i, Cost = cost });
             }
-            // DeckUpgradeManager lists every distinct card in draw + discard + hand (the hand is empty during the draft).
+            // DeckUpgradeManager lists every distinct card in draw + discard + hand (the hand is empty during the staff room).
             foreach (CardDef card in OwnedCards.Distinct())
                 if (card.Upgrade != null && Funding >= card.UpgradeCost && CanPayTokens(card))
                     actions.Add(new GameAction { Kind = ActionKind.Upgrade, Card = card, Cost = card.UpgradeCost });
-            actions.Add(GameAction.FinishDraft);
+            actions.Add(GameAction.LeaveStaffRoom);
         }
 
         // =====================================================================
@@ -248,7 +248,7 @@ namespace ChiefComplaint.Sim.Engine
                 case ActionKind.SkipTeamAssess: PendingTeamAssessmentTier = 0; Phase = Phase.Shift; break;
                 case ActionKind.Buy: Buy(action.MarketSlot); break;
                 case ActionKind.Upgrade: UpgradeCard(action.Card); break;
-                case ActionKind.FinishDraft: FinishDraft(); break;
+                case ActionKind.LeaveStaffRoom: LeaveStaffRoom(); break;
             }
             NotifyIfOver();
         }
@@ -347,7 +347,7 @@ namespace ChiefComplaint.Sim.Engine
             if (Phase != Phase.Shift) return;
             int leftOver = AP;
 
-            // GameManager.EnterDraftPhase
+            // GameManager.EnterStaffRoom
             resolvingShiftEnd = true;
             ResolveSurgeries();
             resolvingShiftEnd = false;
@@ -356,14 +356,14 @@ namespace ChiefComplaint.Sim.Engine
 
             if (IsFinalShift)
             {
-                // GameManager.EnterDraftPhase: finishing the final shift wins, with no last round of decay.
+                // GameManager.EnterStaffRoom: finishing the final shift wins, with no last round of decay.
                 Phase = Phase.Won;
                 return;
             }
 
-            Phase = Phase.Draft;
+            Phase = Phase.StaffRoom;
             DiscardHand();
-            OpenDraft();
+            Restock();
         }
 
         // =====================================================================
@@ -401,7 +401,7 @@ namespace ChiefComplaint.Sim.Engine
                 if (c.Type == CardType.RedTape) return c;
                 if (redTapeOnly) continue;
                 if (c.Effects.Any(e => e is DiagnoseEffect || e is CureEffect)) continue;
-                if (c.PowerTier == 1 && (best == null || c.DraftValue < best.DraftValue)) best = c;
+                if (c.PowerTier == 1 && (best == null || c.MarketPrice < best.MarketPrice)) best = c;
             }
             return best;
         }
@@ -821,13 +821,13 @@ namespace ChiefComplaint.Sim.Engine
         }
 
         // =====================================================================
-        // Draft (DraftManager / DeckUpgradeManager)
+        // Staff room (StaffRoomManager / DeckUpgradeManager)
         // =====================================================================
 
-        private void OpenDraft()
+        private void Restock()
         {
             pendingPurchases.Clear();
-            // SupplyRoom.OpenDraft: newly reached piles unlock full; open piles restock +1 up to max.
+            // SupplyRoom.Restock: newly reached piles unlock full; open piles restock +1 up to max.
             var reached = TraumaFlightsUnlocked ? EscalationType.TraumaFlight : AmbulancesUnlocked ? EscalationType.Ambulance : EscalationType.WalkIn;
             for (int i = 0; i < Data.SupplyPiles.Count; i++)
             {
@@ -845,9 +845,9 @@ namespace ChiefComplaint.Sim.Engine
 
         private void Buy(int slot)
         {
-            if (Phase != Phase.Draft || slot < 0 || slot >= PileStock.Count || !PileUnlocked[slot] || PileStock[slot] <= 0) return;
+            if (Phase != Phase.StaffRoom || slot < 0 || slot >= PileStock.Count || !PileUnlocked[slot] || PileStock[slot] <= 0) return;
             CardDef card = Data.SupplyPiles[slot].Card;
-            int cost = card.DraftValue;
+            int cost = card.MarketPrice;
             if (!TrySpendFunding(cost, "buy")) return;
             pendingPurchases.Add(card);
             PileStock[slot]--;
@@ -856,7 +856,7 @@ namespace ChiefComplaint.Sim.Engine
 
         private void UpgradeCard(CardDef card)
         {
-            if (Phase != Phase.Draft || card.Upgrade == null) return;
+            if (Phase != Phase.StaffRoom || card.Upgrade == null) return;
             if (!DrawPile.Contains(card) && !DiscardPile.Contains(card) && !Hand.Contains(card)) return;
             if (!CanPayTokens(card) || !TrySpendFunding(card.UpgradeCost, "upgrade")) return;
             PayTokens(card);
@@ -867,9 +867,9 @@ namespace ChiefComplaint.Sim.Engine
             observer?.OnPurchase(this, "upgrade:" + card.Name, card, card.UpgradeCost);
         }
 
-        private void FinishDraft()
+        private void LeaveStaffRoom()
         {
-            if (Phase != Phase.Draft) return;
+            if (Phase != Phase.StaffRoom) return;
             foreach (CardDef card in pendingPurchases) DiscardPile.Add(card);
             pendingPurchases.Clear();
             StartNewShift();

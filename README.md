@@ -35,7 +35,7 @@ I've made a strict rule to separate state from presentation.
 
 ## 👀 Where to start looking:
 
-If you want to follow the data flow, I recommend starting at `PatientDeckManager.cs` to see how patients and symptoms are procedurally generated, then look at `BoardManager.cs` for the shift decay loop, and finally check `ActionCardSO.cs` to see how the player's draft valuation and AP costs are structured.
+If you want to follow the data flow, I recommend starting at `PatientDeckManager.cs` to see how patients and symptoms are procedurally generated, then look at `BoardManager.cs` for the shift decay loop, and finally check `ActionCardSO.cs` to see how market prices and AP costs are structured.
 
 Let me know if you have any questions on the structural flow!
 

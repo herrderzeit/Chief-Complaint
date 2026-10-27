@@ -853,7 +853,7 @@ GameObject:
   - component: {fileID: 7027067929825358899}
   - component: {fileID: 1568622686187278603}
   m_Layer: 0
-  m_Name: Draft_Market_Card
+  m_Name: Market_Card
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

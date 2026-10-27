@@ -135,16 +135,16 @@ namespace ChiefComplaint.Tests.EditMode
         }
 
         [Test]
-        public void EnterDraftPhase_LocksBoardAndOnlyWorksFromShift()
+        public void EnterStaffRoom_LocksBoardAndOnlyWorksFromShift()
         {
-            gm.EnterDraftPhase();
-            Assert.AreEqual(GamePhase.Draft, gm.CurrentPhase);
+            gm.EnterStaffRoom();
+            Assert.AreEqual(GamePhase.StaffRoom, gm.CurrentPhase);
             Assert.IsFalse(gm.CanInteract);
 
-            // A second call (already in Draft) must not change anything or raise another event.
+            // A second call (already in the staff room) must not change anything or raise another event.
             int phaseChanges = 0;
             gm.OnPhaseChanged += _ => phaseChanges++;
-            gm.EnterDraftPhase();
+            gm.EnterStaffRoom();
             Assert.AreEqual(0, phaseChanges);
         }
 

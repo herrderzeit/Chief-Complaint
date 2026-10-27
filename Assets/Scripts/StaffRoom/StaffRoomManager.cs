@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 using TMPro;
 using ChiefComplaint.Board;
@@ -7,25 +8,25 @@ using ChiefComplaint.Cards.Data;
 using ChiefComplaint.Cards.Interaction;
 using ChiefComplaint.Cards.Views;
 using ChiefComplaint.Core;
-using ChiefComplaint.Drafting;
+using ChiefComplaint.StaffRoom;
 using ChiefComplaint.UI;
 using ChiefComplaint.Utils;
 
-namespace ChiefComplaint.Drafting
+namespace ChiefComplaint.StaffRoom
 {
     /// <summary>
-    /// Controls the inter-shift draft phase: the "supply room" market. Every draftable card has a pile with
-    /// limited stock (<see cref="SupplyRoom"/>); piles unlock as the run escalates and restock between drafts.
-    /// Prices come from <see cref="ActionCardSO.CalculateDraftValue"/>. Bought copies wait in a cart (Funding
+    /// Controls the inter-shift staff room: the "supply room" market. Every purchasable card has a pile with
+    /// limited stock (<see cref="SupplyRoom"/>); piles unlock as the run escalates and restock between visits.
+    /// Prices come from <see cref="ActionCardSO.CalculateMarketPrice"/>. Bought copies wait in a cart (Funding
     /// already spent, refundable) and join the discard pile when the next shift starts.
     /// </summary>
     [UnityEngine.Scripting.APIUpdating.MovedFrom(true, null, null, null)]
-    public class DraftManager : MonoBehaviour
+    public class StaffRoomManager : MonoBehaviour
     {
         [Header("UI References")]
-        public GameObject draftPanel;
+        [FormerlySerializedAs("draftPanel")] public GameObject staffRoomPanel;
         [Tooltip("One market offer; an instance is spawned into the market container for each card on sale.")]
-        public DraftMarketCardView marketCardPrefab;
+        public MarketCardView marketCardPrefab;
         public Transform marketContainer;
         public GameObject endShiftButton;
 
@@ -37,10 +38,10 @@ namespace ChiefComplaint.Drafting
         public event System.Action OnSupplyChanged;
 
         private SupplyRoom supplyRoom;
-        private readonly List<DraftMarketCardView> marketCards = new List<DraftMarketCardView>();
+        private readonly List<MarketCardView> marketCards = new List<MarketCardView>();
         private readonly List<ActionCardSO> boughtBuffer = new List<ActionCardSO>();
 
-        /// <summary>The supply room's runtime state (null until the first draft opens).</summary>
+        /// <summary>The supply room's runtime state (null until the first staff room visit).</summary>
         public SupplyRoom Supply => supplyRoom;
 
         // -------------------------------------------------------------------------
@@ -50,7 +51,7 @@ namespace ChiefComplaint.Drafting
         private void Start()
         {
             // The panel stays visible in the scene for editing; a run always begins in the shift phase.
-            if (draftPanel != null) draftPanel.SetActive(false);
+            if (staffRoomPanel != null) staffRoomPanel.SetActive(false);
         }
 
         private void OnEnable()
@@ -75,26 +76,26 @@ namespace ChiefComplaint.Drafting
         // -------------------------------------------------------------------------
 
         /// <summary>
-        /// Opens the draft panel: unlocks piles for the escalation stage reached, restocks open piles and
+        /// Opens the staff room panel: unlocks piles for the escalation stage reached, restocks open piles and
         /// rebuilds the market cards.
         /// </summary>
-        public void OpenDraftPhase()
+        public void OpenStaffRoom()
         {
             if (endShiftButton != null)
             {
                 endShiftButton.SetActive(false);
             }
-            draftPanel.SetActive(true);
+            staffRoomPanel.SetActive(true);
 
             supplyRoom ??= new SupplyRoom(supplyPiles);
             var reached = PatientDeckManager.Instance != null ? PatientDeckManager.Instance.CurrentEscalation : EscalationType.WalkIn;
-            supplyRoom.OpenDraft(reached);
+            supplyRoom.Restock(reached);
 
             BuildMarketCards();
             OnSupplyChanged?.Invoke();
         }
 
-        /// <summary>Spawns one <see cref="DraftMarketCardView"/> per pile, in the order the piles are configured.</summary>
+        /// <summary>Spawns one <see cref="MarketCardView"/> per pile, in the order the piles are configured.</summary>
         private void BuildMarketCards()
         {
             foreach (var old in marketCards) if (old != null) Destroy(old.gameObject);
@@ -104,7 +105,7 @@ namespace ChiefComplaint.Drafting
             for (int i = 0; i < supplyRoom.Piles.Count; i++)
             {
                 var pile = supplyRoom.Piles[i];
-                DraftMarketCardView view = Instantiate(marketCardPrefab, marketContainer);
+                MarketCardView view = Instantiate(marketCardPrefab, marketContainer);
                 int index = i; // captured for the click callbacks
                 view.Setup(pile.Card, pile.Price, () => Buy(index), () => Undo(index));
                 marketCards.Add(view);
@@ -146,10 +147,10 @@ namespace ChiefComplaint.Drafting
         }
 
         /// <summary>
-        /// Commits all pending purchases to the player's discard pile, closes the draft panel,
+        /// Commits all pending purchases to the player's discard pile, closes the staff room panel,
         /// and triggers the next shift via <see cref="GameManager.StartNewShift"/>.
         /// </summary>
-        public void CloseDraftAndStartShift()
+        public void CloseStaffRoomAndStartShift()
         {
             boughtBuffer.Clear();
             supplyRoom?.CommitCart(boughtBuffer);
@@ -160,7 +161,7 @@ namespace ChiefComplaint.Drafting
             }
             boughtBuffer.Clear();
 
-            draftPanel.SetActive(false);
+            staffRoomPanel.SetActive(false);
             if (endShiftButton != null)
             {
                 endShiftButton.SetActive(true);

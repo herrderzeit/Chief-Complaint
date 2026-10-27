@@ -20,10 +20,10 @@ namespace ChiefComplaint.Sim.Tests
     {
         private static readonly GameData Project = new ProjectLoader(ProjectLoader.FindProjectRoot(Directory.GetCurrentDirectory())).Load();
 
-        private static void EndShiftAndSkipDraft(Game g)
+        private static void EndShiftAndSkipStaffRoom(Game g)
         {
             g.Apply(GameAction.EndShift);
-            if (g.Phase == Phase.Draft) g.Apply(GameAction.FinishDraft);
+            if (g.Phase == Phase.StaffRoom) g.Apply(GameAction.LeaveStaffRoom);
         }
 
         private sealed class SpawnCounter : RunObserverBase
@@ -67,7 +67,7 @@ namespace ChiefComplaint.Sim.Tests
             Assert.Empty(g.Hand);
             Assert.Contains(discarded, g.DiscardPile);
 
-            EndShiftAndSkipDraft(g);
+            EndShiftAndSkipStaffRoom(g);
             Assert.Contains(discarded, g.Hand);
             Assert.Contains(drawer, g.Hand);
         }
@@ -154,13 +154,13 @@ namespace ChiefComplaint.Sim.Tests
 
             g.Apply(GameAction.EndShift);
             Assert.True(p.Removed, "Fixture: the patient should be discharged at End Shift.");
-            Assert.Equal(Phase.Draft, g.Phase);
+            Assert.Equal(Phase.StaffRoom, g.Phase);
 
-            g.Apply(GameAction.FinishDraft);
+            g.Apply(GameAction.LeaveStaffRoom);
             Assert.Equal(2, g.Shift);
             Assert.Equal(data.Config.BaseAP + 2, g.AP);
 
-            EndShiftAndSkipDraft(g);
+            EndShiftAndSkipStaffRoom(g);
             Assert.Equal(data.Config.BaseAP, g.AP); // carried once, not every shift
         }
 
@@ -177,7 +177,7 @@ namespace ChiefComplaint.Sim.Tests
             Assert.True(g.PlayCard(g.Hand[0], p));
             Assert.True(p.ClockPaused);
 
-            EndShiftAndSkipDraft(g);
+            EndShiftAndSkipStaffRoom(g);
 
             Assert.Equal(10, p.Stability);
             Assert.False(p.ClockPaused);
@@ -201,7 +201,7 @@ namespace ChiefComplaint.Sim.Tests
             for (int shift = 2; shift <= 15; shift++)
             {
                 int before = g.Patients.Count;
-                EndShiftAndSkipDraft(g);
+                EndShiftAndSkipStaffRoom(g);
                 Assert.Equal(shift, g.Shift);
                 arrivals[shift] = g.Patients.Count - before;
             }
@@ -226,7 +226,7 @@ namespace ChiefComplaint.Sim.Tests
             g.Start();
             counter.Skipped = 0;
 
-            EndShiftAndSkipDraft(g);
+            EndShiftAndSkipStaffRoom(g);
 
             Assert.Equal(Phase.Lost, g.Phase);
             Assert.Equal(1, counter.Skipped);
@@ -244,7 +244,7 @@ namespace ChiefComplaint.Sim.Tests
             data.Config.TriageSlots = 200;
             data.Config.ShiftsToWin = shiftsToWin;
             var g = Start(data);
-            while (g.Shift < reachShift && !g.IsOver) EndShiftAndSkipDraft(g);
+            while (g.Shift < reachShift && !g.IsOver) EndShiftAndSkipStaffRoom(g);
             Assert.Equal(reachShift, g.Shift);
             Assert.Equal(expected, g.IsFinalShift);
         }
@@ -260,7 +260,7 @@ namespace ChiefComplaint.Sim.Tests
             var g = Start(data);
             Patient p = g.Patients.Single();
 
-            EndShiftAndSkipDraft(g);
+            EndShiftAndSkipStaffRoom(g);
             Assert.Equal(2, g.Shift);
             Assert.Equal(1, p.Stability);
             int reputation = g.Reputation;
@@ -302,7 +302,7 @@ namespace ChiefComplaint.Sim.Tests
         [InlineData(CardType.Supply, 1, 1, 0, true, 0, 1f, 2)]        // 2 + 1 - 2 = 1, minimum 2
         [InlineData(CardType.Utility, 1, 2, 0, true, 3, 0.5f, 2)]     // every discount at once still floors at 2
         [InlineData(CardType.RedTape, 3, 0, 2, false, 0, 1f, 0)]      // Red Tape is always free
-        public void DraftValue_discounts_exhaust_reputation_cost_and_failure_chance(
+        public void MarketPrice_discounts_exhaust_reputation_cost_and_failure_chance(
             CardType type, int tier, int ap, int draw, bool exhausts, int repCost, float success, int expected)
         {
             var card = new CardDef
@@ -310,7 +310,7 @@ namespace ChiefComplaint.Sim.Tests
                 Type = type, PowerTier = tier, ApCost = ap, CardsToDraw = draw, ExhaustsOnUse = exhausts,
                 ReputationCost = repCost, SuccessChance = success
             };
-            Assert.Equal(expected, card.DraftValue);
+            Assert.Equal(expected, card.MarketPrice);
         }
 
         // ------------------------------------------------------------------ 10. GameConfig fallbacks
@@ -338,17 +338,17 @@ namespace ChiefComplaint.Sim.Tests
             var card = new CardDef { Id = "A", Name = "A", Type = CardType.Supply, ApCost = 1, PowerTier = 1 };
             var data = Content(new[] { Diagnose(1) }, Patient(stability: 100));
             data.SupplyPiles.Add(new SupplyPileDef { Card = card, UnlockAt = EscalationType.WalkIn, MaxStock = 10 });
-            data.DraftPool.Add(card);
+            data.MarketPool.Add(card);
             data.Config.StartingFunding = 200;
             var g = Start(data);
             var policy = new FocusPurchases("A", new[] { "buy:A" });
             var rng = new Random(1);
 
-            for (int draft = 0; draft < 3; draft++)
+            for (int visit = 0; visit < 3; visit++)
             {
                 g.Apply(GameAction.EndShift);
-                Assert.Equal(Phase.Draft, g.Phase);
-                for (int guard = 0; guard < 30 && g.Phase == Phase.Draft; guard++)
+                Assert.Equal(Phase.StaffRoom, g.Phase);
+                for (int guard = 0; guard < 30 && g.Phase == Phase.StaffRoom; guard++)
                     g.Apply(policy.Choose(g, g.LegalActions(), rng));
                 Assert.Equal(Phase.Shift, g.Phase);
             }

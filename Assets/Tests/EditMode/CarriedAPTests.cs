@@ -13,7 +13,7 @@ namespace ChiefComplaint.Tests.EditMode
     /// <summary>
     /// AP gained while End Shift resolves surgeries (e.g. an OnCured GainAP trigger at discharge) carries into the
     /// next shift through <see cref="GameManager.CarriedAP"/> instead of being wiped by the next shift's AP reset.
-    /// Drives the real <see cref="GameManager.EnterDraftPhase"/> → <see cref="BoardManager.ResolveSurgeries"/> →
+    /// Drives the real <see cref="GameManager.EnterStaffRoom"/> → <see cref="BoardManager.ResolveSurgeries"/> →
     /// <see cref="PatientCardView.ResolveSurgery"/> path with a patient waiting for discharge.
     /// </summary>
     [Category("Shift")]
@@ -90,7 +90,7 @@ namespace ChiefComplaint.Tests.EditMode
 
         private void EndShift()
         {
-            gm.EnterDraftPhase();
+            gm.EnterStaffRoom();
         }
 
         [Test]
@@ -103,7 +103,7 @@ namespace ChiefComplaint.Tests.EditMode
         }
 
         [Test]
-        public void EnterDraftPhase_OnCuredGainAP_IsCarriedNotSpent()
+        public void EnterStaffRoom_OnCuredGainAP_IsCarriedNotSpent()
         {
             var patient = AddPatientAwaitingDischarge(CureAP);
             gm.SpendAP(1);
@@ -112,7 +112,7 @@ namespace ChiefComplaint.Tests.EditMode
             EndShift();
 
             Assert.IsTrue(patient.isRemoved, "Fixture error: the patient should have been discharged.");
-            Assert.AreEqual(GamePhase.Draft, gm.CurrentPhase);
+            Assert.AreEqual(GamePhase.StaffRoom, gm.CurrentPhase);
             Assert.AreEqual(CureAP, gm.CarriedAP, "AP from a discharge at End Shift is carried to the next shift.");
             Assert.AreEqual(apBefore, gm.CurrentAP, "The carried AP must not be added to the shift that just ended.");
         }
@@ -129,18 +129,18 @@ namespace ChiefComplaint.Tests.EditMode
             Assert.AreEqual(gm.baseAP + CureAP, gm.CurrentAP, "The next shift starts with base AP plus the carried AP.");
             Assert.AreEqual(0, gm.CarriedAP, "The carry is used up.");
 
-            gm.EnterDraftPhase();
+            gm.EnterStaffRoom();
             gm.StartNewShift();
             Assert.AreEqual(gm.baseAP, gm.CurrentAP, "The carry applies to one shift only.");
         }
 
         [Test]
-        public void EnterDraftPhase_GainAPAfterTheShiftEnds_IsNoLongerCarried()
+        public void EnterStaffRoom_GainAPAfterTheShiftEnds_IsNoLongerCarried()
         {
             AddPatientAwaitingDischarge(CureAP);
             EndShift();
 
-            gm.GainAP(1); // e.g. something in the draft: End Shift has finished resolving
+            gm.GainAP(1); // e.g. something in the staff room: End Shift has finished resolving
 
             Assert.AreEqual(CureAP, gm.CarriedAP, "Only AP gained while End Shift resolves is carried.");
         }

@@ -82,9 +82,9 @@ namespace ChiefComplaint.Sim.Data
                 foreach (CardDef card in data.AllCards.Values.Distinct())
                 {
                     if (card.Upgrade == null || explicitUpgradeCost.Contains(card)) continue;
-                    int cost = Math.Max(1, (int)Math.Round(card.Upgrade.DraftValue * percent / 100.0, MidpointRounding.AwayFromZero));
+                    int cost = Math.Max(1, (int)Math.Round(card.Upgrade.MarketPrice * percent / 100.0, MidpointRounding.AwayFromZero));
                     if (cost == card.UpgradeCost) continue;
-                    log.Add($"{card.Name} -> {card.Upgrade.Name}: upgradeCost {card.UpgradeCost} -> {cost} ({percent}% of {card.Upgrade.DraftValue}F)");
+                    log.Add($"{card.Name} -> {card.Upgrade.Name}: upgradeCost {card.UpgradeCost} -> {cost} ({percent}% of {card.Upgrade.MarketPrice}F)");
                     card.UpgradeCost = cost;
                 }
             }

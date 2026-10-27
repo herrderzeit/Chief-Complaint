@@ -18,7 +18,7 @@ namespace ChiefComplaint.Sim.Tests
         public void Loads_every_pool_and_deck_from_the_scene()
         {
             Assert.Equal(10, Data.StartingDeck.Count);
-            Assert.NotEmpty(Data.DraftPool);
+            Assert.NotEmpty(Data.MarketPool);
             Assert.NotEmpty(Data.RedTapePool);
             Assert.NotEmpty(Data.WalkInPool);
             Assert.NotEmpty(Data.AmbulancePool);
@@ -220,9 +220,9 @@ namespace ChiefComplaint.Sim.Tests
             Assert.NotEmpty(sources);
             foreach (CardDef c in sources)
             {
-                int expected = (int)Math.Round(0.6m * c.Upgrade.DraftValue, MidpointRounding.AwayFromZero);
+                int expected = (int)Math.Round(0.6m * c.Upgrade.MarketPrice, MidpointRounding.AwayFromZero);
                 Assert.True(c.UpgradeCost == expected,
-                    $"{c.Name}: upgrade cost {c.UpgradeCost}, expected {expected} (target {c.Upgrade.Name} price {c.Upgrade.DraftValue})");
+                    $"{c.Name}: upgrade cost {c.UpgradeCost}, expected {expected} (target {c.Upgrade.Name} price {c.Upgrade.MarketPrice})");
                 Assert.True(c.UpgradeTokenCost == c.PowerTier, $"{c.Name}: token cost {c.UpgradeTokenCost}, tier {c.PowerTier}");
             }
         }
@@ -261,7 +261,7 @@ namespace ChiefComplaint.Sim.Tests
             if (tier > 0) Assert.Equal(tier, card.PowerTier);
             Assert.Equal(repCost, card.ReputationCost);
             Assert.Equal(exhausts, card.ExhaustsOnUse);
-            if (price >= 0) Assert.Equal(price, card.DraftValue);
+            if (price >= 0) Assert.Equal(price, card.MarketPrice);
         }
 
         [Theory]
@@ -281,7 +281,7 @@ namespace ChiefComplaint.Sim.Tests
         [InlineData("Philanthropist", 11)]
         public void Decided_prices(string name, int price)
         {
-            Assert.Equal(price, Card(name).DraftValue);
+            Assert.Equal(price, Card(name).MarketPrice);
         }
 
         [Fact]

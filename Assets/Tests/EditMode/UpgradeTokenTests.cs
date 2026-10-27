@@ -4,7 +4,7 @@ using ChiefComplaint.Board;
 using ChiefComplaint.Cards.Data;
 using ChiefComplaint.Cards.Views;
 using ChiefComplaint.Core;
-using ChiefComplaint.Drafting;
+using ChiefComplaint.StaffRoom;
 using ChiefComplaint.Utils;
 using NUnit.Framework;
 using UnityEngine;
@@ -50,7 +50,7 @@ namespace ChiefComplaint.Tests.EditMode
         {
             var card = ScriptableObject.CreateInstance<ActionCardSO>();
             created.Add(card);
-            card.draftUpgradeCost = fundingCost;
+            card.upgradeCost = fundingCost;
             card.upgradeTokenCost = tokenCost;
             card.upgradeTokenAnyColour = anyColour;
             card.upgradeTokenColour = colour;
@@ -58,7 +58,7 @@ namespace ChiefComplaint.Tests.EditMode
             {
                 var upgraded = ScriptableObject.CreateInstance<ActionCardSO>();
                 created.Add(upgraded);
-                card.directDraftUpgrade = upgraded;
+                card.upgradesTo = upgraded;
             }
             return card;
         }
@@ -356,7 +356,7 @@ namespace ChiefComplaint.Tests.EditMode
 
             gm.TryPayForUpgrade(card);
 
-            Assert.AreEqual(3, card.draftUpgradeCost);
+            Assert.AreEqual(3, card.upgradeCost);
             Assert.AreEqual(1, card.upgradeTokenCost);
             Assert.AreEqual(Trauma, card.upgradeTokenColour);
         }

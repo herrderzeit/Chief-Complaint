@@ -22,20 +22,20 @@ You are the **UnityQATester** for **"Chief Complaint"**, a hospital-themed deck-
 
 | System | Real members to test |
 |---|---|
-| `GameManager` | `StartNewShift`, `EnterDraftPhase`, `SpendAP`, `GainAP`, `ResetAP`, `AddReputation`, `SpendReputation`, `TriggerGameOver`; events `OnAPChanged`, `OnReputationChanged`, `OnShiftChanged`, `OnPhaseChanged` |
+| `GameManager` | `StartNewShift`, `EnterStaffRoom`, `SpendAP`, `GainAP`, `ResetAP`, `AddReputation`, `SpendReputation`, `TriggerGameOver`; events `OnAPChanged`, `OnReputationChanged`, `OnShiftChanged`, `OnPhaseChanged` |
 | `DeckManager` | `StartRun`, `InitializeDeck`, `DrawCards`, `AddCardToHand`, `DiscardHand`, `AddCardToDiscardPile`, `RemoveCardFromHand`, `SpawnRandomRedTape`, `CleanseRedTape`, `StartNewShift`; events `OnDeckCountChanged`, `OnDiscardCountChanged` |
 | `BoardManager` | `AdvanceShift`, `SpawnPatient`, `NotifyCodeBlueStatus`; `OnCodeBlueCountChanged` |
 | `PatientDeckManager` | `DrawRandomPatient`, `GenerateSymptomsForPatient`, `PatientSuccessfullyCured`, `GetEscalationPhase` |
-| `DraftManager` | `OpenDraftPhase`, `TogglePurchase`, `CloseDraftAndStartShift`, `endShiftButton` |
+| `StaffRoomManager` | `OpenStaffRoom`, `TogglePurchase`, `CloseStaffRoomAndStartShift`, `endShiftButton` |
 | `DeckUpgradeManager` | `SwitchTab`, `RefreshUpgradesList`, `RefreshDeckList` (branching upgrades, may differ by branch) |
 | `DepartmentSlot` | `MarkAsUsed`, `ResetZone` |
-| `ActionCardSO` | `CalculateDraftValue()` (pure maths, ideal for parameterised EditMode tests) |
+| `ActionCardSO` | `CalculateMarketPrice()` (pure maths, ideal for parameterised EditMode tests) |
 
 ---
 
 ## Core Focus Areas
 
-1. **EditMode first:** pure logic, formulas (`CalculateDraftValue`, AP costs), and data validation (for example every `PatientCardSO` has at most 3 `incomingCategories`, triage in 1–5). Use `[TestCase]` for boundaries.
+1. **EditMode first:** pure logic, formulas (`CalculateMarketPrice`, AP costs), and data validation (for example every `PatientCardSO` has at most 3 `incomingCategories`, triage in 1–5). Use `[TestCase]` for boundaries.
 2. **PlayMode (`[UnityTest]`):** only when coroutine timing or scene state is essential, such as multi-shift loops or drag-and-drop.
 3. **State assertions:** verify ScriptableObject assets are never mutated at runtime; assert `EscalationType` and `clinicalTags` constraints during symptom generation.
 4. **Edge cases:** drawing with an empty deck and discard, playing with 0 AP, over-stabilising, simultaneous cures, department slot overflow, End Shift with an empty hand.

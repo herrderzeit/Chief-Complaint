@@ -52,7 +52,7 @@ namespace ChiefComplaint.Sim.Data
             UnityDoc gameManager = FindComponent(scene, "GameManager");
             UnityDoc patientDeck = FindComponent(scene, "PatientDeckManager");
             UnityDoc deckManager = FindComponent(scene, "DeckManager");
-            UnityDoc draftManager = FindComponent(scene, "DraftManager");
+            UnityDoc staffRoomManager = FindComponent(scene, "StaffRoomManager");
             UnityDoc boardView = FindComponent(scene, "BoardView");
 
             GameConfig c = data.Config;
@@ -99,9 +99,9 @@ namespace ChiefComplaint.Sim.Data
             }
             else data.Warnings.Add("DeckManager not found in scene; empty starting deck.");
 
-            if (draftManager != null)
+            if (staffRoomManager != null)
             {
-                foreach (var map in draftManager.GetMapList("supplyPiles"))
+                foreach (var map in staffRoomManager.GetMapList("supplyPiles"))
                 {
                     if (!map.TryGetValue("card", out string cardRef) || !UnityRef.TryParse(cardRef, out UnityRef r)) continue;
                     CardDef card = LoadCard(r);
@@ -116,11 +116,11 @@ namespace ChiefComplaint.Sim.Data
                 if (data.SupplyPiles.Count == 0)
                 {
                     // Older scenes: the random-roll pool, treated as open piles of 3.
-                    foreach (CardDef card in draftManager.GetRefList("draftableCardsPool").Select(LoadCard).Where(x => x != null))
+                    foreach (CardDef card in staffRoomManager.GetRefList("draftableCardsPool").Select(LoadCard).Where(x => x != null))
                         data.SupplyPiles.Add(new SupplyPileDef { Card = card });
-                    if (data.SupplyPiles.Count > 0) data.Warnings.Add("DraftManager has no supplyPiles; using draftableCardsPool as open piles of 3.");
+                    if (data.SupplyPiles.Count > 0) data.Warnings.Add("StaffRoomManager has no supplyPiles; using draftableCardsPool as open piles of 3.");
                 }
-                data.DraftPool = data.SupplyPiles.Select(sp => sp.Card).ToList();
+                data.MarketPool = data.SupplyPiles.Select(sp => sp.Card).ToList();
             }
 
             if (boardView != null)
@@ -181,9 +181,12 @@ namespace ChiefComplaint.Sim.Data
 
         private string ScriptName(UnityDoc doc) => scriptByGuid.TryGetValue(doc.ScriptGuid, out string name) ? name : "";
 
-        private static UnityDoc FindComponent(List<UnityDoc> scene, string className) =>
-            scene.FirstOrDefault(d => d.ClassIdentifier.EndsWith("::" + className, StringComparison.Ordinal)
-                                   || d.ClassIdentifier.EndsWith("." + className, StringComparison.Ordinal));
+        // Matches on the script file (Unity requires it to share the class name) first: m_EditorClassIdentifier
+        // keeps a component's old class name after a rename until the component is re-added.
+        private UnityDoc FindComponent(List<UnityDoc> scene, string className) =>
+            scene.FirstOrDefault(d => ScriptName(d) == className)
+            ?? scene.FirstOrDefault(d => d.ClassIdentifier.EndsWith("::" + className, StringComparison.Ordinal)
+                                      || d.ClassIdentifier.EndsWith("." + className, StringComparison.Ordinal));
 
         private string AssetName(string guid) =>
             pathByGuid.TryGetValue(guid, out string path) ? Path.GetFileNameWithoutExtension(path) : guid;
@@ -216,7 +219,7 @@ namespace ChiefComplaint.Sim.Data
             card.PowerTier = doc.GetInt("powerTier", 1);
             card.ExhaustsOnUse = doc.GetBool("exhaustsOnUse");
             card.ExhaustsAtShiftEnd = doc.GetBool("exhaustsAtShiftEnd");
-            card.UpgradeCost = doc.GetInt("draftUpgradeCost", 5);
+            card.UpgradeCost = doc.GetInt("upgradeCost", 5);
             card.UpgradeTokenCost = doc.GetInt("upgradeTokenCost", 0);
             card.UpgradeTokenAnyColour = doc.GetBool("upgradeTokenAnyColour");
             card.UpgradeTokenColour = (SymptomCategory)doc.GetInt("upgradeTokenColour", 0);
@@ -227,7 +230,7 @@ namespace ChiefComplaint.Sim.Data
                 if (effect != null) card.Effects.Add(effect);
             }
 
-            UnityRef upgrade = doc.GetRef("directDraftUpgrade");
+            UnityRef upgrade = doc.GetRef("upgradesTo");
             if (!upgrade.IsNull) card.Upgrade = LoadCard(upgrade);
             return card;
         }

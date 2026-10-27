@@ -8,10 +8,10 @@ namespace ChiefComplaint.Sim.Tests
 {
     public class EngineTests
     {
-        private static void EndShiftAndSkipDraft(Game g)
+        private static void EndShiftAndSkipStaffRoom(Game g)
         {
             g.Apply(GameAction.EndShift);
-            if (g.Phase == Phase.Draft) g.Apply(GameAction.FinishDraft);
+            if (g.Phase == Phase.StaffRoom) g.Apply(GameAction.LeaveStaffRoom);
         }
 
         [Fact]
@@ -58,7 +58,7 @@ namespace ChiefComplaint.Sim.Tests
             Patient ward = g.Patients[0], triage = g.Patients[1];
             g.Apply(new GameAction { Kind = ActionKind.Admit, Patient = ward });
 
-            EndShiftAndSkipDraft(g);
+            EndShiftAndSkipStaffRoom(g);
             Assert.Equal(9 - 2, ward.Stability);
             Assert.Equal(9 - 3, triage.Stability);
         }
@@ -71,9 +71,9 @@ namespace ChiefComplaint.Sim.Tests
             g.PlayCard(g.Hand[0], p);
             Assert.True(p.ClockPaused);
 
-            EndShiftAndSkipDraft(g);
+            EndShiftAndSkipStaffRoom(g);
             Assert.Equal(10, p.Stability); // healed 1 (capped at max), no decay
-            EndShiftAndSkipDraft(g);
+            EndShiftAndSkipStaffRoom(g);
             Assert.Equal(8, p.Stability);
         }
 
@@ -84,7 +84,7 @@ namespace ChiefComplaint.Sim.Tests
             data.Config.StartingReputation = 20;
             var g = Start(data);
 
-            EndShiftAndSkipDraft(g);
+            EndShiftAndSkipStaffRoom(g);
             Assert.Empty(g.ActivePatients);
             Assert.Equal(20 - data.Config.DeathReputationPenalty, g.Reputation);
             Assert.Contains(g.OwnedCards, c => c.Type == CardType.RedTape);
@@ -100,7 +100,7 @@ namespace ChiefComplaint.Sim.Tests
             data.Config.DeathReputationPenalty = 5;
             var g = Start(data);
 
-            EndShiftAndSkipDraft(g);
+            EndShiftAndSkipStaffRoom(g);
             Assert.Empty(g.ActivePatients);
             Assert.False(def.HasOwnDeathPenalty);
             // An OnDeath trigger that doesn't take Reputation leaves the flat penalty in place.
@@ -117,7 +117,7 @@ namespace ChiefComplaint.Sim.Tests
             data.Config.DeathReputationPenalty = 5;
             var g = Start(data);
 
-            EndShiftAndSkipDraft(g);
+            EndShiftAndSkipStaffRoom(g);
             Assert.Empty(g.ActivePatients);
             Assert.True(def.HasOwnDeathPenalty);
             Assert.Equal(20 - 4, g.Reputation); // 4 from the trigger, not 4 + 5
@@ -133,7 +133,7 @@ namespace ChiefComplaint.Sim.Tests
             data.Config.DeathReputationPenalty = 5;
             var g = Start(data);
 
-            EndShiftAndSkipDraft(g);
+            EndShiftAndSkipStaffRoom(g);
             Assert.Empty(g.ActivePatients);
             // Mirrors PatientCardView: -3 clamps to 0, so the flat 5 applies and no Reputation is handed back.
             Assert.Equal(20 - 5, g.Reputation);
@@ -180,7 +180,7 @@ namespace ChiefComplaint.Sim.Tests
             var data = Content(new CardDef[0], Patient(stability: 1, decay: 1));
             data.Config.StartingReputation = 5;
             var g = Start(data);
-            EndShiftAndSkipDraft(g);
+            EndShiftAndSkipStaffRoom(g);
             Assert.Equal(Phase.Lost, g.Phase);
             Assert.Equal(0, g.Reputation);
         }
@@ -288,7 +288,7 @@ namespace ChiefComplaint.Sim.Tests
             var data = Content(new CardDef[0], Patient(stability: 50));
             data.Config.ShiftsToWin = 3;
             var g = Start(data);
-            for (int i = 0; i < 3; i++) EndShiftAndSkipDraft(g);
+            for (int i = 0; i < 3; i++) EndShiftAndSkipStaffRoom(g);
             Assert.Equal(Phase.Won, g.Phase);
             Assert.Equal(3, g.Shift);
         }
@@ -311,15 +311,15 @@ namespace ChiefComplaint.Sim.Tests
         }
 
         [Fact]
-        public void Market_prices_follow_CalculateDraftValue()
+        public void Market_prices_follow_CalculateMarketPrice()
         {
             var statLabs = new CardDef { Type = CardType.Diagnostic, PowerTier = 2, ApCost = 0 };
             var crashCart = new CardDef { Type = CardType.Utility, PowerTier = 3, ApCost = 2 };
             var licensed = new CardDef { Type = CardType.Staff, PowerTier = 2, ApCost = 0, CardsToDraw = 1 };
-            Assert.Equal(9, statLabs.DraftValue);
-            Assert.Equal(11, crashCart.DraftValue);
-            Assert.Equal(12, licensed.DraftValue);
-            Assert.Equal(0, new CardDef { Type = CardType.RedTape }.DraftValue);
+            Assert.Equal(9, statLabs.MarketPrice);
+            Assert.Equal(11, crashCart.MarketPrice);
+            Assert.Equal(12, licensed.MarketPrice);
+            Assert.Equal(0, new CardDef { Type = CardType.RedTape }.MarketPrice);
         }
 
         /// <summary>
@@ -343,15 +343,15 @@ namespace ChiefComplaint.Sim.Tests
             Assert.Equal(1, g.Shift);
             Assert.Single(g.Patients);
 
-            EndShiftAndSkipDraft(g); // shift 2: the usual one arrival
+            EndShiftAndSkipStaffRoom(g); // shift 2: the usual one arrival
             Assert.Equal(2, g.Shift);
             Assert.Equal(2, g.Patients.Count);
 
-            EndShiftAndSkipDraft(g); // shift 3: the usual arrival plus the extra one
+            EndShiftAndSkipStaffRoom(g); // shift 3: the usual arrival plus the extra one
             Assert.Equal(3, g.Shift);
             Assert.Equal(4, g.Patients.Count);
 
-            EndShiftAndSkipDraft(g); // shift 4: back to one
+            EndShiftAndSkipStaffRoom(g); // shift 4: back to one
             Assert.Equal(5, g.Patients.Count);
         }
 
@@ -362,7 +362,7 @@ namespace ChiefComplaint.Sim.Tests
             for (int shift = 2; shift <= 7; shift++)
             {
                 int before = g.Patients.Count;
-                EndShiftAndSkipDraft(g);
+                EndShiftAndSkipStaffRoom(g);
                 Assert.Equal(shift, g.Shift);
                 Assert.Equal(before + 1, g.Patients.Count);
             }

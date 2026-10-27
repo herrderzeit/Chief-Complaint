@@ -147,8 +147,8 @@ namespace ChiefComplaint.Sim.Data
 
         public bool HasTag(CardTag tag) => Tags.Contains(tag);
 
-        /// <summary>Market price. Mirrors <c>ActionCardSO.CalculateDraftValue</c>.</summary>
-        public int DraftValue
+        /// <summary>Market price. Mirrors <c>ActionCardSO.CalculateMarketPrice</c>.</summary>
+        public int MarketPrice
         {
             get
             {
@@ -226,7 +226,7 @@ namespace ChiefComplaint.Sim.Data
     {
         public List<CardDef> StartingDeck = new List<CardDef>();
         public List<CardDef> RedTapePool = new List<CardDef>();
-        public List<CardDef> DraftPool = new List<CardDef>();   // the supply piles' cards, in pile order
+        public List<CardDef> MarketPool = new List<CardDef>();   // the supply piles' cards, in pile order
         public List<SupplyPileDef> SupplyPiles = new List<SupplyPileDef>();
         public List<PatientDef> WalkInPool = new List<PatientDef>();
         public List<PatientDef> AmbulancePool = new List<PatientDef>();
@@ -246,7 +246,7 @@ namespace ChiefComplaint.Sim.Data
         };
     }
 
-    /// <summary>One supply-room pile (DraftManager.supplyPiles / SupplyPileConfig).</summary>
+    /// <summary>One supply-room pile (StaffRoomManager.supplyPiles / SupplyPileConfig).</summary>
     public sealed class SupplyPileDef
     {
         public CardDef Card;

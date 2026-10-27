@@ -18,10 +18,10 @@ namespace ChiefComplaint.Sim.Engine
         TeamAssess,
         SkipTeamAssess,
 
-        // Draft phase
+        // staff room
         Buy,
         Upgrade,
-        FinishDraft
+        LeaveStaffRoom
     }
 
     public sealed class GameAction
@@ -35,12 +35,12 @@ namespace ChiefComplaint.Sim.Engine
         /// <summary>Treat by paging the on-call team instead of playing a card.</summary>
         public bool Page;
         public int MarketSlot = -1;
-        /// <summary>AP (shift) or Funding (draft) the action costs up front.</summary>
+        /// <summary>AP (shift) or Funding (staff room) the action costs up front.</summary>
         public int Cost;
 
         public static readonly GameAction EndShift = new GameAction { Kind = ActionKind.EndShift };
         public static readonly GameAction SkipTeamAssess = new GameAction { Kind = ActionKind.SkipTeamAssess };
-        public static readonly GameAction FinishDraft = new GameAction { Kind = ActionKind.FinishDraft };
+        public static readonly GameAction LeaveStaffRoom = new GameAction { Kind = ActionKind.LeaveStaffRoom };
 
         public override string ToString() => Kind switch
         {

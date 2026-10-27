@@ -10,7 +10,7 @@ namespace ChiefComplaint.UI
     /// <summary>
     /// Shows how many upgrade tokens of each department colour the player holds: a coloured pip and a count per
     /// department, tinted to match the department plates (<see cref="DepartmentFallbackButton.DepartmentColour"/>).
-    /// Used in the HUD top bar and on the draft Upgrades tab; each instance listens to
+    /// Used in the HUD top bar and on the staff room Upgrades tab; each instance listens to
     /// <see cref="GameManager.OnUpgradeTokensChanged"/> and refreshes from <see cref="GameManager.UpgradeTokens"/>
     /// whenever it is enabled, so a hidden tab is never stale when it reopens.
     /// </summary>

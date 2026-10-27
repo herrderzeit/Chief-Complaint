@@ -137,23 +137,23 @@ namespace ChiefComplaint.Tests.EditMode
         }
 
         [Test]
-        public void EnterDraftPhase_OnFinalShift_WinsTheRun()
+        public void EnterStaffRoom_OnFinalShift_WinsTheRun()
         {
             gm.shiftsToWin = 1; // the run starts on shift 1
 
-            gm.EnterDraftPhase();
+            gm.EnterStaffRoom();
 
             Assert.AreEqual(GamePhase.GameOver, gm.CurrentPhase, "Ending the final shift should end the run as a win.");
         }
 
         [Test]
-        public void EnterDraftPhase_BeforeFinalShift_OpensDraft()
+        public void EnterStaffRoom_BeforeFinalShift_OpensStaffRoom()
         {
             gm.shiftsToWin = 15;
 
-            gm.EnterDraftPhase();
+            gm.EnterStaffRoom();
 
-            Assert.AreEqual(GamePhase.Draft, gm.CurrentPhase);
+            Assert.AreEqual(GamePhase.StaffRoom, gm.CurrentPhase);
         }
 
         [Test]

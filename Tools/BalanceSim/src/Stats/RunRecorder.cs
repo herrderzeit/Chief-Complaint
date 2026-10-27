@@ -5,7 +5,7 @@ using ChiefComplaint.Sim.Engine;
 
 namespace ChiefComplaint.Sim.Stats
 {
-    /// <summary>State at the end of one shift (after surgeries resolve, before the draft).</summary>
+    /// <summary>State at the end of one shift (after surgeries resolve, before the staff room).</summary>
     public struct ShiftSnapshot
     {
         public int Shift;

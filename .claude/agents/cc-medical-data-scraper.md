@@ -17,8 +17,8 @@ You are the **MedicalDataScraper** for **"Chief Complaint"**, a hospital-themed 
 
 - **`PatientCardSO`:** `patientName`, `chiefComplaint`, `age`, `clinicalTags`, `escalationPhase` (WalkIn / Ambulance / TraumaFlight), `triageLevel` (1–5; 1 = resuscitation, 5 = non-urgent), `incomingCategories` (list of `SymptomCategory`, **maximum 3**: `OnValidate` truncates extras and logs a warning), `startingStability`, `stabilityDecayPerTurn`, `reputationReward`, `triggers` (condition, effect, effectValue, optional cardReference), `portraitSprite`.
 - **`SymptomCardSO`:** `specialtyCategory` (Trauma / Cardiopulmonary / Infectious / Internal), `clinicalTags`, `tier1/2/3Name`, `tier1/2/3Description`.
-- **`ActionCardSO`:** `cardName`, `cardType` (Staff, Diagnostic, Treatment, Utility, RedTape, Administration, Supply), `tags` (`CardTag`), `rulesText`, `flavorText`, `isPlayable`, `successChance`, `apCost` (0–5), `cardsToDraw`, `powerTier` (1–3), `exhaustsOnUse`, `exhaustsAtShiftEnd`, `effects`, `directDraftUpgrade`, `draftUpgradeCost`, `cardArt`.
-- **Draft cost:** `ActionCardSO.CalculateDraftValue()` derives cost from type, `powerTier²`, AP cost and card draw (RedTape is always 0, everything else at least 2). Do not hard-code costs that contradict it.
+- **`ActionCardSO`:** `cardName`, `cardType` (Staff, Diagnostic, Treatment, Utility, RedTape, Administration, Supply), `tags` (`CardTag`), `rulesText`, `flavorText`, `isPlayable`, `successChance`, `apCost` (0–5), `cardsToDraw`, `powerTier` (1–3), `exhaustsOnUse`, `exhaustsAtShiftEnd`, `effects`, `upgradesTo`, `upgradeCost`, `cardArt`.
+- **Market price:** `ActionCardSO.CalculateMarketPrice()` derives cost from type, `powerTier²`, AP cost and card draw (RedTape is always 0, everything else at least 2). Do not hard-code costs that contradict it.
 - **Escalation pools (design intent):** Walk-In = easy, triage 3–5; Ambulance = moderate, triage 2–3; Trauma Flight = critical, triage 1–2.
 
 Asset locations: `Assets/Data/` (for example `Assets/Data/Actions/RedTape/`, `Assets/Data/Actions/Starter/`).

@@ -6,7 +6,7 @@ using ChiefComplaint.Sim.Engine;
 
 namespace ChiefComplaint.Sim.Bots
 {
-    /// <summary>How a bot spends Funding in the draft. Returns FinishDraft to stop buying.</summary>
+    /// <summary>How a bot spends Funding in the staff room. Returns LeaveStaffRoom to stop buying.</summary>
     public interface IPurchasePolicy
     {
         string Name { get; }
@@ -15,7 +15,7 @@ namespace ChiefComplaint.Sim.Bots
 
     public static class PurchaseItems
     {
-        /// <summary>Stable key for a draft action, e.g. "buy:Stat Labs" or "upgrade:Medical Student".</summary>
+        /// <summary>Stable key for a staff room action, e.g. "buy:Stat Labs" or "upgrade:Medical Student".</summary>
         public static string Key(GameAction a) => a.Kind switch
         {
             ActionKind.Buy => "buy:" + a.Card.Name,
@@ -30,9 +30,9 @@ namespace ChiefComplaint.Sim.Bots
         public static List<KeyValuePair<string, List<string>>> FocusGroups(GameData data)
         {
             var groups = new List<KeyValuePair<string, List<string>>>();
-            foreach (CardDef c in data.DraftPool.Distinct())
+            foreach (CardDef c in data.MarketPool.Distinct())
                 groups.Add(new KeyValuePair<string, List<string>>("buy " + c.Name, new List<string> { "buy:" + c.Name }));
-            foreach (CardDef root in data.StartingDeck.Concat(data.DraftPool).Distinct())
+            foreach (CardDef root in data.StartingDeck.Concat(data.MarketPool).Distinct())
             {
                 if (root.Upgrade == null) continue;
                 var chain = new List<string>();
@@ -52,7 +52,7 @@ namespace ChiefComplaint.Sim.Bots
     public sealed class NoPurchases : IPurchasePolicy
     {
         public string Name => "nobuy";
-        public GameAction Choose(Game game, List<GameAction> legal, Random rng) => GameAction.FinishDraft;
+        public GameAction Choose(Game game, List<GameAction> legal, Random rng) => GameAction.LeaveStaffRoom;
     }
 
     /// <summary>Buys a random affordable item, with a 1-in-3 chance each step of stopping and saving the rest.</summary>
@@ -61,8 +61,8 @@ namespace ChiefComplaint.Sim.Bots
         public string Name => "randombuy";
         public GameAction Choose(Game game, List<GameAction> legal, Random rng)
         {
-            var buys = legal.Where(a => a.Kind != ActionKind.FinishDraft).ToList();
-            if (buys.Count == 0 || rng.NextDouble() < 1 / 3.0) return GameAction.FinishDraft;
+            var buys = legal.Where(a => a.Kind != ActionKind.LeaveStaffRoom).ToList();
+            if (buys.Count == 0 || rng.NextDouble() < 1 / 3.0) return GameAction.LeaveStaffRoom;
             return buys[rng.Next(buys.Count)];
         }
     }
@@ -89,7 +89,7 @@ namespace ChiefComplaint.Sim.Bots
         {
             GameAction pick = legal.FirstOrDefault(a => keys.Contains(PurchaseItems.Key(a)) &&
                 (a.Kind != ActionKind.Buy || bought.GetValueOrDefault(PurchaseItems.Key(a)) < MaxCopiesPerCard));
-            if (pick == null) return GameAction.FinishDraft;
+            if (pick == null) return GameAction.LeaveStaffRoom;
             if (pick.Kind == ActionKind.Buy) bought[PurchaseItems.Key(pick)] = bought.GetValueOrDefault(PurchaseItems.Key(pick)) + 1;
             return pick;
         }
@@ -110,11 +110,11 @@ namespace ChiefComplaint.Sim.Bots
             double bestScore = 0;
             foreach (GameAction a in legal)
             {
-                if (a.Kind == ActionKind.FinishDraft) continue;
+                if (a.Kind == ActionKind.LeaveStaffRoom) continue;
                 double s = Priority(game, a);
                 if (s > bestScore) { bestScore = s; best = a; }
             }
-            return best ?? GameAction.FinishDraft;
+            return best ?? GameAction.LeaveStaffRoom;
         }
 
         private static double Priority(Game g, GameAction a)

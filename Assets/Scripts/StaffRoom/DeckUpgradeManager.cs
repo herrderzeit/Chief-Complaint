@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using TMPro;
@@ -8,15 +9,15 @@ using ChiefComplaint.Cards.Data;
 using ChiefComplaint.Cards.Interaction;
 using ChiefComplaint.Cards.Views;
 using ChiefComplaint.Core;
-using ChiefComplaint.Drafting;
+using ChiefComplaint.StaffRoom;
 using ChiefComplaint.UI;
 using ChiefComplaint.Utils;
 
-namespace ChiefComplaint.Drafting
+namespace ChiefComplaint.StaffRoom
 {
     /// <summary>
-    /// Manages the 3-tab UI during the Draft Phase:
-    /// 1. Draft Market (Buy new cards)
+    /// Manages the 3-tab UI during the staff room:
+    /// 1. Market (Buy new cards)
     /// 2. Upgrades (Upgrade starter cards)
     /// 3. Deck View (View all cards in your deck)
     /// </summary>
@@ -24,10 +25,10 @@ namespace ChiefComplaint.Drafting
     public class DeckUpgradeManager : MonoBehaviour
     {
     [UnityEngine.Scripting.APIUpdating.MovedFrom(true, null, null, null)]
-        public enum DraftTab { Market, Upgrades, DeckView }
+        public enum StaffRoomTab { Market, Upgrades, DeckView }
 
         [Header("Tab Containers")]
-        public GameObject draftMarketContainer;
+        [FormerlySerializedAs("draftMarketContainer")] public GameObject marketTabContainer;
         public GameObject upgradesContainer;
         public GameObject deckViewContainer;
 
@@ -37,7 +38,7 @@ namespace ChiefComplaint.Drafting
         public Image deckViewTabButton;
 
         [Header("Tab Styling")]
-        public Color activeTabColor = new Color(0.96f, 0.6f, 0.1f, 1f); // "Resource Allocation" Orange
+        public Color activeTabColor = new Color(0.96f, 0.6f, 0.1f, 1f); // "Research & Development" Orange
         public Color inactiveTabColor = new Color(0.12f, 0.12f, 0.12f, 0.8f); // Dark translucent matching the UI
 
         [Header("Prefabs & Parents")]
@@ -95,19 +96,19 @@ namespace ChiefComplaint.Drafting
 
         public void SwitchTab(int tabIndex)
         {
-            DraftTab tab = (DraftTab)tabIndex;
+            StaffRoomTab tab = (StaffRoomTab)tabIndex;
 
-            if (draftMarketContainer != null) draftMarketContainer.SetActive(tab == DraftTab.Market);
-            if (upgradesContainer != null) upgradesContainer.SetActive(tab == DraftTab.Upgrades);
-            if (deckViewContainer != null) deckViewContainer.SetActive(tab == DraftTab.DeckView);
+            if (marketTabContainer != null) marketTabContainer.SetActive(tab == StaffRoomTab.Market);
+            if (upgradesContainer != null) upgradesContainer.SetActive(tab == StaffRoomTab.Upgrades);
+            if (deckViewContainer != null) deckViewContainer.SetActive(tab == StaffRoomTab.DeckView);
 
             // Update button colors visually
-            if (marketTabButton != null) marketTabButton.color = (tab == DraftTab.Market) ? activeTabColor : inactiveTabColor;
-            if (upgradesTabButton != null) upgradesTabButton.color = (tab == DraftTab.Upgrades) ? activeTabColor : inactiveTabColor;
-            if (deckViewTabButton != null) deckViewTabButton.color = (tab == DraftTab.DeckView) ? activeTabColor : inactiveTabColor;
+            if (marketTabButton != null) marketTabButton.color = (tab == StaffRoomTab.Market) ? activeTabColor : inactiveTabColor;
+            if (upgradesTabButton != null) upgradesTabButton.color = (tab == StaffRoomTab.Upgrades) ? activeTabColor : inactiveTabColor;
+            if (deckViewTabButton != null) deckViewTabButton.color = (tab == StaffRoomTab.DeckView) ? activeTabColor : inactiveTabColor;
 
-            if (tab == DraftTab.Upgrades) RefreshUpgradesList();
-            else if (tab == DraftTab.DeckView) RefreshDeckList();
+            if (tab == StaffRoomTab.Upgrades) RefreshUpgradesList();
+            else if (tab == StaffRoomTab.DeckView) RefreshDeckList();
         }
 
         // Reused between refreshes so opening the panels doesn't allocate lists/LINQ iterators each time.
@@ -131,7 +132,7 @@ namespace ChiefComplaint.Drafting
             foreach (Transform child in upgradesContentTransform) Destroy(child.gameObject);
 
             FillAllCardsInDeck(cardBuffer);
-            cardBuffer.RemoveAll(c => c.directDraftUpgrade == null);
+            cardBuffer.RemoveAll(c => c.upgradesTo == null);
             
             cardCounts.Clear();
             uniqueCardBuffer.Clear();
@@ -276,15 +277,15 @@ namespace ChiefComplaint.Drafting
             Button upgradeBtn = rowObj.GetComponentInChildren<Button>();
             if (upgradeBtn != null)
             {
-                if (showUpgradeButton && card.directDraftUpgrade != null)
+                if (showUpgradeButton && card.upgradesTo != null)
                 {
                     upgradeBtn.gameObject.SetActive(true);
 
                     TextMeshProUGUI btnText = upgradeBtn.GetComponentInChildren<TextMeshProUGUI>();
-                    if (btnText != null) btnText.text = $"Upgrade to {card.directDraftUpgrade.cardName}";
+                    if (btnText != null) btnText.text = $"Upgrade to {card.upgradesTo.cardName}";
 
                     if (costGroup != null) costGroup.gameObject.SetActive(true);
-                    if (fundingText != null) fundingText.text = $"{card.draftUpgradeCost} Funding";
+                    if (fundingText != null) fundingText.text = $"{card.upgradeCost} Funding";
                     if (tokenText != null) tokenText.text = UpgradeTokenRichText(card);
 
                     bool canAfford = GameManager.Instance != null && GameManager.Instance.CanAffordUpgrade(card);
@@ -294,7 +295,7 @@ namespace ChiefComplaint.Drafting
                     HoverRelay btnHover = upgradeBtn.gameObject.GetComponent<HoverRelay>();
                     if (btnHover == null) btnHover = upgradeBtn.gameObject.AddComponent<HoverRelay>();
 
-                    btnHover.OnEnter = (data) => ShowPreview(card.directDraftUpgrade);
+                    btnHover.OnEnter = (data) => ShowPreview(card.upgradesTo);
                     btnHover.OnExit = (data) => HidePreview(); // Hide preview entirely when leaving button
 
                     upgradeBtn.onClick.AddListener(() => OnUpgradeClicked(card));
@@ -315,31 +316,31 @@ namespace ChiefComplaint.Drafting
 
         private void OnUpgradeClicked(ActionCardSO baseCard)
         {
-            if (baseCard.directDraftUpgrade == null) return;
+            if (baseCard.upgradesTo == null) return;
 
             if (GameManager.Instance == null || DeckManager.Instance == null) return;
 
-            int cost = baseCard.draftUpgradeCost;
+            int cost = baseCard.upgradeCost;
             if (GameManager.Instance.TryPayForUpgrade(baseCard))
             {
 
                 if (DeckManager.Instance.drawPile.Contains(baseCard))
                 {
                     DeckManager.Instance.drawPile.Remove(baseCard);
-                    DeckManager.Instance.drawPile.Add(baseCard.directDraftUpgrade);
+                    DeckManager.Instance.drawPile.Add(baseCard.upgradesTo);
                 }
                 else if (DeckManager.Instance.discardPile.Contains(baseCard))
                 {
                     DeckManager.Instance.discardPile.Remove(baseCard);
-                    DeckManager.Instance.discardPile.Add(baseCard.directDraftUpgrade);
+                    DeckManager.Instance.discardPile.Add(baseCard.upgradesTo);
                 }
                 else if (DeckManager.Instance.handData.Contains(baseCard))
                 {
                     DeckManager.Instance.handData.Remove(baseCard);
-                    DeckManager.Instance.handData.Add(baseCard.directDraftUpgrade);
+                    DeckManager.Instance.handData.Add(baseCard.upgradesTo);
                 }
 
-                Debug.Log($"Upgraded {baseCard.cardName} to {baseCard.directDraftUpgrade.cardName} for {cost} Funding!");
+                Debug.Log($"Upgraded {baseCard.cardName} to {baseCard.upgradesTo.cardName} for {cost} Funding!");
                 // The upgrade paid Funding and tokens, so the list rebuilds once in LateUpdate.
                 upgradesListDirty = true;
                 HidePreview();
@@ -349,7 +350,7 @@ namespace ChiefComplaint.Drafting
         /// <summary>Cost line for an upgrade, e.g. "3 Funding + 1 Trauma token" or "5 Funding + 2 tokens (any)".</summary>
         public static string UpgradeCostText(ActionCardSO card)
         {
-            string text = $"{card.draftUpgradeCost} Funding";
+            string text = $"{card.upgradeCost} Funding";
             if (card.upgradeTokenCost <= 0) return text;
             string plural = card.upgradeTokenCost == 1 ? "token" : "tokens";
             return card.upgradeTokenAnyColour

@@ -15,7 +15,7 @@ using ChiefComplaint.Cards.Data;
 using ChiefComplaint.Cards.Interaction;
 using ChiefComplaint.Cards.Views;
 using ChiefComplaint.Core;
-using ChiefComplaint.Drafting;
+using ChiefComplaint.StaffRoom;
 using ChiefComplaint.UI;
 using ChiefComplaint.Utils;
 using Object = UnityEngine.Object;
@@ -444,7 +444,7 @@ namespace ChiefComplaint.Editor.Tools
         private static GameManager Gm() => GameManager.Instance;
         private static BoardManager Bm() => GameManager.Instance.boardManager;
         private static BoardView Board() => BoardView.Instance;
-        private static DraftManager Draft() => Object.FindAnyObjectByType<DraftManager>(FindObjectsInactive.Include);
+        private static StaffRoomManager StaffRoom() => Object.FindAnyObjectByType<StaffRoomManager>(FindObjectsInactive.Include);
         private static DeckUpgradeManager Upgrades() => Object.FindAnyObjectByType<DeckUpgradeManager>(FindObjectsInactive.Include);
         private static PlayZoneView PlayZone() => Object.FindAnyObjectByType<PlayZoneView>();
         private static IReadOnlyList<PatientCardView> Patients() => Bm().ActivePatients;
@@ -507,8 +507,8 @@ namespace ChiefComplaint.Editor.Tools
             throw new InvalidOperationException($"{cardName} isn't in the hand.");
         }
 
-        private static DraftMarketCardView MarketCard(int index) =>
-            Draft().marketContainer.GetChild(index).GetComponent<DraftMarketCardView>();
+        private static MarketCardView MarketCard(int index) =>
+            StaffRoom().marketContainer.GetChild(index).GetComponent<MarketCardView>();
 
         private static SymptomSubCardView Symptom(PatientCardView patient)
         {

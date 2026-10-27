@@ -1,6 +1,53 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-511735784117989927
+--- !u!114 &-7801704429822405667
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39cce9e5a0feac84aad5fd12da2c3bd5, type: 3}
+  m_Name: Heal1
+  m_EditorClassIdentifier: GameScripts::ChiefComplaint.Cards.Effects.StabilisationHealEffectSO
+  healAmount: 1
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a19c702a9b380a64ba00656724a44857, type: 3}
+  m_Name: Card_AgencyNurse
+  m_EditorClassIdentifier: GameScripts::ChiefComplaint.Cards.Data.ActionCardSO
+  cardName: Agency Nurse
+  cardType: 0
+  tags: 
+  rulesText: Pause a patient's decay and restore 1 Stability.
+  flavorText: First shift on this ward, already knows where the good gloves are.
+  isPlayable: 1
+  successChance: 1
+  apCost: 1
+  reputationCost: 0
+  cardsToDraw: 0
+  powerTier: 1
+  exhaustsOnUse: 0
+  exhaustsAtShiftEnd: 0
+  effects:
+  - {fileID: 1223375474917560275}
+  - {fileID: -7801704429822405667}
+  upgradesTo: {fileID: 0}
+  upgradeCost: 0
+  upgradeTokenCost: 0
+  upgradeTokenAnyColour: 0
+  upgradeTokenColour: 0
+  cardArt: {fileID: 0}
+--- !u!114 &1223375474917560275
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -12,50 +59,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 543d84c2e991b1f4a88a90f4df143aac, type: 3}
   m_Name: Pause
   m_EditorClassIdentifier: GameScripts::ChiefComplaint.Cards.Effects.PauseStabilityEffectSO
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a19c702a9b380a64ba00656724a44857, type: 3}
-  m_Name: Card_DamageControlSurgery
-  m_EditorClassIdentifier: GameScripts::ChiefComplaint.Cards.Data.ActionCardSO
-  cardName: Damage Control Surgery
-  cardType: 2
-  tags: 0100000003000000i
-  rulesText: Pause the patient's decay, then cure 1 diagnosed symptom (up to Tier 3) in its department. Exhausts.
-  flavorText: Stop the bleeding now. Make it pretty tomorrow.
-  isPlayable: 1
-  successChance: 1
-  apCost: 1
-  reputationCost: 0
-  cardsToDraw: 0
-  powerTier: 3
-  exhaustsOnUse: 1
-  exhaustsAtShiftEnd: 0
-  effects:
-  - {fileID: -511735784117989927}
-  - {fileID: 4888337391528538798}
-  directDraftUpgrade: {fileID: 0}
-  draftUpgradeCost: 0
-  upgradeTokenCost: 0
-  upgradeTokenAnyColour: 0
-  upgradeTokenColour: 0
-  cardArt: {fileID: 0}
---- !u!114 &4888337391528538798
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 285d06662b2183f41aad8562cf290cd5, type: 3}
-  m_Name: CureSymptomEffect
-  m_EditorClassIdentifier: GameScripts::ChiefComplaint.Cards.Effects.CureSymptomEffectSO
-  curesSymptomTier: 3

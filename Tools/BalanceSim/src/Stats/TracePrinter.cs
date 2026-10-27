@@ -24,7 +24,7 @@ namespace ChiefComplaint.Sim.Stats
                 foreach (Patient p in g.ActivePatients)
                     w.WriteLine($"  {p}  symptoms: {string.Join("; ", p.Symptoms.Select((s, i) => (i < p.DiagnosedCount ? "" : "?") + s))}");
             }
-            if (a.Kind == ActionKind.FinishDraft) return;
+            if (a.Kind == ActionKind.LeaveStaffRoom) return;
             w.WriteLine($"  > {a}   (AP {g.AP})");
         }
 

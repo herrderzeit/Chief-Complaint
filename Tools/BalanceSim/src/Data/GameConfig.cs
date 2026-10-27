@@ -45,7 +45,7 @@ namespace ChiefComplaint.Sim.Data
         public int TriageSlots = 5;
         public int WardSlots = 4;
 
-        // DraftManager (const MARKET_SIZE)
+        // StaffRoomManager (const MARKET_SIZE)
         public int MarketSize = 5;
 
         // DepartmentFallbackButton ("Page the on-call team" cost by symptom tier)

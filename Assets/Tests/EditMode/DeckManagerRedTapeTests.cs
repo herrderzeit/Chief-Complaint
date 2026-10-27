@@ -197,7 +197,7 @@ namespace ChiefComplaint.Tests.EditMode
                     ActionCardSO card = sceneDeck.redTapePool[i];
                     Assert.IsNotNull(card, $"redTapePool[{i}] is empty (missing reference).");
                     Assert.AreEqual(ActionCardType.RedTape, card.cardType, $"redTapePool[{i}] '{card.cardName}' should be cardType RedTape.");
-                    Assert.AreEqual(0, card.CalculateDraftValue(), $"redTapePool[{i}] '{card.cardName}' should have a draft value of 0.");
+                    Assert.AreEqual(0, card.CalculateMarketPrice(), $"redTapePool[{i}] '{card.cardName}' should have a market price of 0.");
                 }
             }
             finally

@@ -41,14 +41,14 @@ namespace ChiefComplaint.Sim.Tests
             return (t1, t2);
         }
 
-        /// <summary>Starts a run owning two copies of <paramref name="t1"/> and ends the first shift into the draft.</summary>
-        private static Game StartInDraft(CardDef t1, int startingFunding)
+        /// <summary>Starts a run owning two copies of <paramref name="t1"/> and ends the first shift into the staff room.</summary>
+        private static Game StartInStaffRoom(CardDef t1, int startingFunding)
         {
             var data = Content(new[] { t1, t1 }, Patient(stability: 50));
             data.Config.StartingFunding = startingFunding;
             var g = Start(data);
             g.Apply(GameAction.EndShift);
-            Assert.Equal(Phase.Draft, g.Phase);
+            Assert.Equal(Phase.StaffRoom, g.Phase);
             return g;
         }
 
@@ -100,7 +100,7 @@ namespace ChiefComplaint.Sim.Tests
         public void Upgrade_with_a_token_cost_is_not_offered_without_tokens()
         {
             var (t1, _) = UpgradeLine(funding: 3, tokens: 1, colour: SymptomCategory.Trauma);
-            var g = StartInDraft(t1, startingFunding: 10);
+            var g = StartInStaffRoom(t1, startingFunding: 10);
             g.UpgradeTokens[Cardio] = 5; // plenty of the wrong colour
 
             Assert.Null(Find(g, ActionKind.Upgrade));
@@ -110,7 +110,7 @@ namespace ChiefComplaint.Sim.Tests
         public void Upgrade_with_a_token_cost_is_refused_without_tokens_and_charges_nothing()
         {
             var (t1, t2) = UpgradeLine(funding: 3, tokens: 1, colour: SymptomCategory.Trauma);
-            var g = StartInDraft(t1, startingFunding: 10);
+            var g = StartInStaffRoom(t1, startingFunding: 10);
             int funding = g.Funding;
 
             g.Apply(new GameAction { Kind = ActionKind.Upgrade, Card = t1 });
@@ -124,7 +124,7 @@ namespace ChiefComplaint.Sim.Tests
         public void Upgrade_with_tokens_but_short_on_Funding_is_not_offered_and_keeps_the_tokens()
         {
             var (t1, _) = UpgradeLine(funding: 5, tokens: 2, colour: SymptomCategory.Internal);
-            var g = StartInDraft(t1, startingFunding: 4);
+            var g = StartInStaffRoom(t1, startingFunding: 4);
             g.UpgradeTokens[Internal] = 2;
 
             Assert.Null(Find(g, ActionKind.Upgrade));
@@ -138,7 +138,7 @@ namespace ChiefComplaint.Sim.Tests
         public void Upgrade_with_matching_tokens_pays_tokens_and_Funding()
         {
             var (t1, t2) = UpgradeLine(funding: 5, tokens: 2, colour: SymptomCategory.Internal);
-            var g = StartInDraft(t1, startingFunding: 6);
+            var g = StartInStaffRoom(t1, startingFunding: 6);
             g.UpgradeTokens[Internal] = 3;
             g.UpgradeTokens[Trauma] = 4;
 
@@ -157,7 +157,7 @@ namespace ChiefComplaint.Sim.Tests
         public void Any_colour_cost_is_paid_from_the_most_plentiful_colour()
         {
             var (t1, _) = UpgradeLine(funding: 3, tokens: 2, anyColour: true);
-            var g = StartInDraft(t1, startingFunding: 6);
+            var g = StartInStaffRoom(t1, startingFunding: 6);
             g.UpgradeTokens[Trauma] = 1;
             g.UpgradeTokens[Cardio] = 4;
             g.UpgradeTokens[Infectious] = 0;
@@ -173,7 +173,7 @@ namespace ChiefComplaint.Sim.Tests
         public void Any_colour_cost_spreads_across_colours_as_the_largest_pile_shrinks()
         {
             var (t1, _) = UpgradeLine(funding: 0, tokens: 2, anyColour: true);
-            var g = StartInDraft(t1, startingFunding: 0);
+            var g = StartInStaffRoom(t1, startingFunding: 0);
             g.UpgradeTokens[Trauma] = 1;
             g.UpgradeTokens[Internal] = 2;
 
@@ -187,7 +187,7 @@ namespace ChiefComplaint.Sim.Tests
         public void A_card_with_no_token_cost_upgrades_on_Funding_alone()
         {
             var (t1, t2) = UpgradeLine(funding: 3, tokens: 0);
-            var g = StartInDraft(t1, startingFunding: 3);
+            var g = StartInStaffRoom(t1, startingFunding: 3);
             Assert.Equal(0, g.UpgradeTokens.Sum());
 
             GameAction upgrade = Find(g, ActionKind.Upgrade);

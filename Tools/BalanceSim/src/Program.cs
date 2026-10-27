@@ -191,11 +191,11 @@ Options:
                     Console.WriteLine($"  {c.Name,-26} {c.Type,-14} T{c.PowerTier} {c.ApCost}AP draw{c.CardsToDraw} p{c.SuccessChance:0.##} " +
                                       $"{(c.IsPlayable ? "" : "UNPLAYABLE ")}{(c.ExhaustsOnUse ? "exhaust " : "")}{(c.ExhaustsAtShiftEnd ? "exhaust@end " : "")}" +
                                       $"tags[{string.Join(",", c.Tags)}] effects[{string.Join(", ", c.Effects.Select(Describe))}] " +
-                                      $"{(c.Upgrade != null ? $"-> {c.Upgrade.Name} ({c.UpgradeCost}F)" : "")} market {c.DraftValue}F");
+                                      $"{(c.Upgrade != null ? $"-> {c.Upgrade.Name} ({c.UpgradeCost}F)" : "")} market {c.MarketPrice}F");
                 Console.WriteLine();
             }
             Cards("Starting deck", data.StartingDeck);
-            Cards("Draft pool", data.DraftPool);
+            Cards("Market pool", data.MarketPool);
             Cards("Red Tape", data.RedTapePool);
             Cards("All cards", data.AllCards.Values.OrderBy(c => c.Id));
             foreach (var pool in new[] { data.WalkInPool, data.AmbulancePool, data.TraumaFlightPool })

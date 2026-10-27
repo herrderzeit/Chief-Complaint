@@ -223,23 +223,23 @@ namespace ChiefComplaint.Tests
 
         // ------------------------------------------------------------------ action cards
 
-        /// <summary>Upgrade price rule: round-half-away-from-zero(0.6 × the target's draft price).</summary>
+        /// <summary>Upgrade price rule: round-half-away-from-zero(0.6 × the target's market price).</summary>
         private static int ExpectedUpgradeCost(ActionCardSO target) =>
-            (int)System.Math.Round(0.6m * target.CalculateDraftValue(), System.MidpointRounding.AwayFromZero);
+            (int)System.Math.Round(0.6m * target.CalculateMarketPrice(), System.MidpointRounding.AwayFromZero);
 
         [Test]
         public void Upgrades_CostSixtyPercentOfTargetAndSourceTierInTokens()
         {
             var sources = FindAssetPaths<ActionCardSO>()
                 .Select(p => AssetDatabase.LoadAssetAtPath<ActionCardSO>(p))
-                .Where(c => c.directDraftUpgrade != null)
+                .Where(c => c.upgradesTo != null)
                 .ToArray();
-            Assert.IsNotEmpty(sources, "No cards with a directDraftUpgrade found.");
+            Assert.IsNotEmpty(sources, "No cards with a upgradesTo found.");
 
             foreach (var card in sources)
             {
-                Assert.AreEqual(ExpectedUpgradeCost(card.directDraftUpgrade), card.draftUpgradeCost,
-                    $"{card.name}: draftUpgradeCost should be round(0.6 × {card.directDraftUpgrade.name} price {card.directDraftUpgrade.CalculateDraftValue()}).");
+                Assert.AreEqual(ExpectedUpgradeCost(card.upgradesTo), card.upgradeCost,
+                    $"{card.name}: upgradeCost should be round(0.6 × {card.upgradesTo.name} price {card.upgradesTo.CalculateMarketPrice()}).");
                 Assert.AreEqual(card.powerTier, card.upgradeTokenCost, $"{card.name}: upgradeTokenCost should equal its power tier.");
             }
         }
@@ -259,7 +259,7 @@ namespace ChiefComplaint.Tests
         // card, heal amount, heal and pause are Ward-wide
         [TestCase("Upgrade/Starter/Card_T2_RegisteredNurse", 2, false)]
         [TestCase("Upgrade/Starter/Card_T3_ChiefNurse", 1, true)]
-        [TestCase("Draft/Card_AgencyNurse", 1, false)]
+        [TestCase("Market/Card_AgencyNurse", 1, false)]
         public void NurseCards_HealAndPause_NoChoice(string path, int heal, bool wardWide)
         {
             var card = LoadCard(path);
@@ -282,18 +282,18 @@ namespace ChiefComplaint.Tests
         [Test]
         public void AgencyNurse_DecidedStats()
         {
-            var card = LoadCard("Draft/Card_AgencyNurse");
+            var card = LoadCard("Market/Card_AgencyNurse");
             Assert.AreEqual(1, card.apCost, "Agency Nurse costs 1 AP.");
             Assert.AreEqual(1, card.powerTier);
             Assert.IsFalse(card.exhaustsOnUse, "Agency Nurse no longer exhausts.");
             StringAssert.DoesNotContain("Exhaust", card.rulesText, "Agency Nurse rules text should not mention exhausting.");
-            Assert.AreEqual(5, card.CalculateDraftValue(), "Agency Nurse price.");
+            Assert.AreEqual(5, card.CalculateMarketPrice(), "Agency Nurse price.");
         }
 
         [Test]
         public void DoubleShift_DecidedStats()
         {
-            var card = LoadCard("Draft/Card_DoubleShift");
+            var card = LoadCard("Market/Card_DoubleShift");
             Assert.AreEqual(0, card.apCost);
             Assert.AreEqual(1, card.powerTier);
             Assert.AreEqual(ActionCardType.Staff, card.cardType);
@@ -303,13 +303,13 @@ namespace ChiefComplaint.Tests
             Assert.AreEqual(1, card.effects.Count);
             Assert.AreEqual(3, ((ChiefComplaint.Cards.Effects.GainAPEffectSO)card.effects[0]).apGenerated, "Double Shift gains 3 AP.");
             Assert.AreEqual("Gain 3 AP. Draw 2 cards. Exhausts.", card.rulesText);
-            Assert.AreEqual(9, card.CalculateDraftValue(), "Double Shift price.");
+            Assert.AreEqual(9, card.CalculateMarketPrice(), "Double Shift price.");
         }
 
         [Test]
         public void SharpsBin_DecidedStats()
         {
-            var card = LoadCard("Draft/Card_SharpsBin");
+            var card = LoadCard("Market/Card_SharpsBin");
             Assert.AreEqual(ActionCardType.Supply, card.cardType);
             Assert.AreEqual(1, card.powerTier);
             Assert.AreEqual(0, card.apCost, "Sharps Bin is free to play.");
@@ -321,16 +321,16 @@ namespace ChiefComplaint.Tests
             Assert.IsTrue(trash[0].redTapeOnly, "Sharps Bin may only dispose of Red Tape.");
             StringAssert.Contains("Red Tape", card.rulesText, "Sharps Bin rules text should mention Red Tape.");
             StringAssert.Contains("Draw 1", card.rulesText, "Sharps Bin rules text should mention drawing 1 card.");
-            Assert.AreEqual(5, card.CalculateDraftValue(), "Sharps Bin price.");
+            Assert.AreEqual(5, card.CalculateMarketPrice(), "Sharps Bin price.");
         }
 
         [Test]
         public void WardRound_DecidedStats()
         {
-            var card = LoadCard("Draft/Card_WardRound");
+            var card = LoadCard("Market/Card_WardRound");
             Assert.AreEqual(0, card.apCost, "Ward Round is free to play.");
             Assert.AreEqual(1, card.powerTier);
-            Assert.AreEqual(6, card.CalculateDraftValue(), "Ward Round price.");
+            Assert.AreEqual(6, card.CalculateMarketPrice(), "Ward Round price.");
         }
 
         // card, upgrade token cost
@@ -346,7 +346,7 @@ namespace ChiefComplaint.Tests
         [Test]
         public void ComplianceAudit_DecidedStats()
         {
-            var card = LoadCard("Draft/Card_ComplianceAudit");
+            var card = LoadCard("Market/Card_ComplianceAudit");
             Assert.AreEqual(1, card.powerTier);
             Assert.AreEqual(1, card.apCost);
             Assert.IsTrue(card.exhaustsOnUse, "Compliance Audit exhausts on use.");
@@ -357,7 +357,7 @@ namespace ChiefComplaint.Tests
         [Test]
         public void ShiftHandover_DecidedStats()
         {
-            var card = LoadCard("Draft/Card_ShiftHandover");
+            var card = LoadCard("Market/Card_ShiftHandover");
             Assert.AreEqual(0, card.apCost, "Shift Handover is free to play.");
             Assert.AreEqual(2, card.cardsToDraw);
         }
@@ -365,7 +365,7 @@ namespace ChiefComplaint.Tests
         [Test]
         public void DamageControlSurgery_PausesThenCuresUpToTierThree()
         {
-            var card = LoadCard("Draft/Card_DamageControlSurgery");
+            var card = LoadCard("Market/Card_DamageControlSurgery");
             Assert.AreEqual(2, card.effects.Count, "Damage Control Surgery: a pause and a cure.");
             Assert.IsInstanceOf<ChiefComplaint.Cards.Effects.PauseStabilityEffectSO>(card.effects[0], "The pause comes first.");
             var cure = card.effects[1] as ChiefComplaint.Cards.Effects.CureSymptomEffectSO;
@@ -375,32 +375,32 @@ namespace ChiefComplaint.Tests
         }
 
         // Supply Room and upgrade-only prices after the exhaust / Reputation cost / failure-chance discounts.
-        [TestCase("Draft/Card_AgencyNurse", 5)]
-        [TestCase("Draft/Card_DoubleShift", 9)]
-        [TestCase("Draft/Card_SharpsBin", 5)]
-        [TestCase("Draft/Card_ComplianceAudit", 2)]
-        [TestCase("Draft/Card_BloodBank", 4)]
-        [TestCase("Draft/Card_GratefulPatient", 6)]
-        [TestCase("Draft/Card_TraumaTeam", 10)]
-        [TestCase("Draft/Card_DamageControlSurgery", 10)]
-        [TestCase("Draft/Card_StatLabs", 7)]
-        [TestCase("Draft/Card_ShiftHandover", 10)]
-        [TestCase("Draft/Card_WardRound", 6)]
-        [TestCase("Draft/Card_CrashCart", 11)]
-        [TestCase("Upgrade/Draft/Card_Philanthropist", 11)]
+        [TestCase("Market/Card_AgencyNurse", 5)]
+        [TestCase("Market/Card_DoubleShift", 9)]
+        [TestCase("Market/Card_SharpsBin", 5)]
+        [TestCase("Market/Card_ComplianceAudit", 2)]
+        [TestCase("Market/Card_BloodBank", 4)]
+        [TestCase("Market/Card_GratefulPatient", 6)]
+        [TestCase("Market/Card_TraumaTeam", 10)]
+        [TestCase("Market/Card_DamageControlSurgery", 10)]
+        [TestCase("Market/Card_StatLabs", 7)]
+        [TestCase("Market/Card_ShiftHandover", 10)]
+        [TestCase("Market/Card_WardRound", 6)]
+        [TestCase("Market/Card_CrashCart", 11)]
+        [TestCase("Upgrade/Market/Card_Philanthropist", 11)]
         public void DecidedPrices(string path, int price)
         {
             var card = LoadCard(path);
-            Assert.AreEqual(price, card.CalculateDraftValue(), $"{card.cardName}: price.");
+            Assert.AreEqual(price, card.CalculateMarketPrice(), $"{card.cardName}: price.");
         }
 
         [Test]
         public void GratefulPatient_UpgradesToPhilanthropistForSeven()
         {
-            var card = LoadCard("Draft/Card_GratefulPatient");
-            Assert.IsNotNull(card.directDraftUpgrade);
-            Assert.AreEqual("Philanthropist", card.directDraftUpgrade.cardName);
-            Assert.AreEqual(7, card.draftUpgradeCost);
+            var card = LoadCard("Market/Card_GratefulPatient");
+            Assert.IsNotNull(card.upgradesTo);
+            Assert.AreEqual("Philanthropist", card.upgradesTo.cardName);
+            Assert.AreEqual(7, card.upgradeCost);
         }
 
         [Test]
@@ -408,10 +408,10 @@ namespace ChiefComplaint.Tests
         {
             var offenders = FindAssetPaths<ActionCardSO>()
                 .Select(p => (path: p, card: AssetDatabase.LoadAssetAtPath<ActionCardSO>(p)))
-                .Where(x => x.card.directDraftUpgrade == null && x.card.draftUpgradeCost != 0)
-                .Select(x => $"{x.path} ({x.card.draftUpgradeCost})")
+                .Where(x => x.card.upgradesTo == null && x.card.upgradeCost != 0)
+                .Select(x => $"{x.path} ({x.card.upgradeCost})")
                 .ToArray();
-            Assert.IsEmpty(offenders, "Cards without a directDraftUpgrade must have draftUpgradeCost 0:\n" + string.Join("\n", offenders));
+            Assert.IsEmpty(offenders, "Cards without a upgradesTo must have upgradeCost 0:\n" + string.Join("\n", offenders));
         }
 
         [TestCase("RedTape/Card_HIPAAViolation", 3)]
@@ -433,30 +433,30 @@ namespace ChiefComplaint.Tests
         {
             var card = LoadCard(path);
             Assert.AreEqual(apCost, card.apCost, $"{card.cardName}: AP cost.");
-            Assert.AreEqual(price, card.CalculateDraftValue(), $"{card.cardName}: price.");
+            Assert.AreEqual(price, card.CalculateMarketPrice(), $"{card.cardName}: price.");
         }
 
         [Test]
         public void SpecialisedCare_StillCostsSevenToUpgrade()
         {
-            Assert.AreEqual(7, LoadCard("Upgrade/Starter/Card_T2_SpecialisedCare").draftUpgradeCost);
+            Assert.AreEqual(7, LoadCard("Upgrade/Starter/Card_T2_SpecialisedCare").upgradeCost);
         }
 
         // ------------------------------------------------------------------ supply room (MainBoard scene)
 
         private const string ScenePath = "Assets/Scenes/MainBoard.unity";
 
-        private static List<ChiefComplaint.Drafting.SupplyPileConfig> SceneSupplyPiles()
+        private static List<ChiefComplaint.StaffRoom.SupplyPileConfig> SceneSupplyPiles()
         {
             Scene scene = SceneManager.GetSceneByPath(ScenePath);
             bool openedHere = !scene.isLoaded;
             if (openedHere) scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Additive);
             try
             {
-                var draft = scene.GetRootGameObjects()
-                                 .SelectMany(g => g.GetComponentsInChildren<ChiefComplaint.Drafting.DraftManager>(true))
+                var staffRoom = scene.GetRootGameObjects()
+                                 .SelectMany(g => g.GetComponentsInChildren<ChiefComplaint.StaffRoom.StaffRoomManager>(true))
                                  .First();
-                return new List<ChiefComplaint.Drafting.SupplyPileConfig>(draft.supplyPiles);
+                return new List<ChiefComplaint.StaffRoom.SupplyPileConfig>(staffRoom.supplyPiles);
             }
             finally
             {

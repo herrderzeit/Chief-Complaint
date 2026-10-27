@@ -5,7 +5,7 @@ using ChiefComplaint.Cards.Data;
 using ChiefComplaint.Cards.Interaction;
 using ChiefComplaint.Cards.Views;
 using ChiefComplaint.Core;
-using ChiefComplaint.Drafting;
+using ChiefComplaint.StaffRoom;
 using ChiefComplaint.UI;
 using ChiefComplaint.Utils;
 
@@ -44,7 +44,7 @@ namespace ChiefComplaint.Board
 
         /// <summary>
         /// Ends every surgery stay: fully treated patients are discharged (paying their rewards) and the
-        /// rest return to their beds. Called when End Shift is pressed, before the draft opens.
+        /// rest return to their beds. Called when End Shift is pressed, before the staff room opens.
         /// </summary>
         public void ResolveSurgeries()
         {

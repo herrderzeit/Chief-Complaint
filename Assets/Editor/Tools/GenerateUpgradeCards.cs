@@ -5,7 +5,7 @@ using ChiefComplaint.Cards.Data;
 using ChiefComplaint.Cards.Interaction;
 using ChiefComplaint.Cards.Views;
 using ChiefComplaint.Core;
-using ChiefComplaint.Drafting;
+using ChiefComplaint.StaffRoom;
 using ChiefComplaint.UI;
 using ChiefComplaint.Utils;
 
@@ -43,8 +43,8 @@ namespace ChiefComplaint.Editor.Tools
             iv2.cardType = ActionCardType.Treatment;
             iv2.apCost = 1;
             iv2.powerTier = 2;
-            iv2.directDraftUpgrade = iv3;
-            iv2.draftUpgradeCost = 10;
+            iv2.upgradesTo = iv3;
+            iv2.upgradeCost = 10;
             AssetDatabase.CreateAsset(iv2, "Assets/Data/Actions/Upgrade/Card_IVSaline_T2.asset");
 
             var iv2Pause = ScriptableObject.CreateInstance<ChiefComplaint.Cards.Effects.PauseStabilityEffectSO>();
@@ -62,8 +62,8 @@ namespace ChiefComplaint.Editor.Tools
             var iv1 = AssetDatabase.LoadAssetAtPath<ActionCardSO>("Assets/Data/Actions/Starting/Card_IVSaline.asset");
             if (iv1 != null)
             {
-                iv1.directDraftUpgrade = iv2;
-                iv1.draftUpgradeCost = 5;
+                iv1.upgradesTo = iv2;
+                iv1.upgradeCost = 5;
                 EditorUtility.SetDirty(iv1);
             }
 
@@ -87,8 +87,8 @@ namespace ChiefComplaint.Editor.Tools
             bm2.cardType = ActionCardType.Staff;
             bm2.apCost = 0;
             bm2.powerTier = 2;
-            bm2.directDraftUpgrade = bm3;
-            bm2.draftUpgradeCost = 8;
+            bm2.upgradesTo = bm3;
+            bm2.upgradeCost = 8;
             AssetDatabase.CreateAsset(bm2, "Assets/Data/Actions/Upgrade/Card_BedsideManner_T2.asset");
 
             var bm2Rep = ScriptableObject.CreateInstance<ChiefComplaint.Cards.Effects.GainReputationEffectSO>();
@@ -101,8 +101,8 @@ namespace ChiefComplaint.Editor.Tools
             var bm1 = AssetDatabase.LoadAssetAtPath<ActionCardSO>("Assets/Data/Actions/Starting/Card_BedsideManner.asset");
             if (bm1 != null)
             {
-                bm1.directDraftUpgrade = bm2;
-                bm1.draftUpgradeCost = 4;
+                bm1.upgradesTo = bm2;
+                bm1.upgradeCost = 4;
                 EditorUtility.SetDirty(bm1);
             }
 

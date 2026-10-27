@@ -5,14 +5,14 @@ using TMPro;
 using ChiefComplaint.Cards.Data;
 using ChiefComplaint.Cards.Views;
 
-namespace ChiefComplaint.Drafting
+namespace ChiefComplaint.StaffRoom
 {
     /// <summary>
-    /// One pile in the draft supply room: the card (drawn with the shared UI action card), its Funding price,
+    /// One pile in the staff room's supply room: the card (drawn with the shared UI action card), its Funding price,
     /// how many copies are left and how many are in the cart. Clicking the card buys a copy; the undo button
     /// returns one. A locked pile shows the escalation stage that opens it.
     /// </summary>
-    public class DraftMarketCardView : MonoBehaviour
+    public class MarketCardView : MonoBehaviour
     {
         [Header("References")]
         public UI_ActionCardView card;

@@ -5,14 +5,14 @@ using ChiefComplaint.Cards.Data;
 using ChiefComplaint.Cards.Interaction;
 using ChiefComplaint.Cards.Views;
 using ChiefComplaint.Core;
-using ChiefComplaint.Drafting;
+using ChiefComplaint.StaffRoom;
 using ChiefComplaint.UI;
 using ChiefComplaint.Utils;
 
 namespace ChiefComplaint.Cards.Views
 {
     /// <summary>
-    /// Presentation layer for a single action card in the UI Canvas (e.g. Draft Panel).
+    /// Presentation layer for a single action card in the UI Canvas (e.g. the Staff Room panel).
     /// Uses TextMeshProUGUI instead of World Space TextMeshPro.
     /// </summary>
     [UnityEngine.Scripting.APIUpdating.MovedFrom(true, null, null, null)]

@@ -25,7 +25,7 @@ Importing works the same for all three: see `docs/audio/import-guide.md`.
 | `Music_Menu` | Title and tutorial | Calm, curious, a little ironic | 90–100 BPM | 1:30–2:30, seamless loop |
 | `Music_Shift_Calm` | Shift phase, board under control | Focused, steady, busy-but-fine | 100–110 BPM | 2:00–3:00, seamless loop |
 | `Music_Shift_Tense` | Shift phase, a patient at low stability or Code Blue | Same key and tempo as Calm, more urgent layers | Same as Calm | Same length, so it can crossfade |
-| `Music_Draft` | Draft and upgrade screens | Reflective, planning, lighter | 80–90 BPM | 1:30–2:00, seamless loop |
+| `Music_StaffRoom` | Staff room market and upgrade screens | Reflective, planning, lighter | 80–90 BPM | 1:30–2:00, seamless loop |
 
 Calm and Tense are a pair: generate them in the same key and BPM so the game can crossfade between them.
 

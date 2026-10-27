@@ -72,7 +72,7 @@ namespace ChiefComplaint.Tests.EditMode
             Assert.AreEqual(1, card.powerTier);
             Assert.IsTrue(card.isPlayable);
             Assert.That(card.effects, Is.Not.Empty.And.All.Not.Null, "Every starter card needs at least one working effect.");
-            Assert.IsNotNull(card.directDraftUpgrade, "Every starter card should have an upgrade path.");
+            Assert.IsNotNull(card.upgradesTo, "Every starter card should have an upgrade path.");
         }
 
         [Test]

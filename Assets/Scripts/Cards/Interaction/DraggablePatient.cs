@@ -5,7 +5,7 @@ using ChiefComplaint.Cards.Data;
 using ChiefComplaint.Cards.Interaction;
 using ChiefComplaint.Cards.Views;
 using ChiefComplaint.Core;
-using ChiefComplaint.Drafting;
+using ChiefComplaint.StaffRoom;
 using ChiefComplaint.UI;
 using ChiefComplaint.Utils;
 
@@ -93,7 +93,7 @@ namespace ChiefComplaint.Cards.Interaction
             // While a patient is being picked (e.g. Team Assessment), a click selects instead of dragging.
             if (PatientPicker.IsPicking) { PatientPicker.TryPick(patientView); return; }
 
-            // The board is locked during the draft phase and after Game Over.
+            // The board is locked during the staff room and after Game Over.
             if (GameManager.Instance != null && !GameManager.Instance.CanInteract) return;
 
             // A treated patient stays in surgery until the next shift.

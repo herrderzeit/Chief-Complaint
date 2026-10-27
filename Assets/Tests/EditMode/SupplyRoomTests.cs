@@ -1,17 +1,17 @@
 using System.Collections.Generic;
 using ChiefComplaint.Cards.Data;
-using ChiefComplaint.Drafting;
+using ChiefComplaint.StaffRoom;
 using NUnit.Framework;
 using UnityEngine;
 
 namespace ChiefComplaint.Tests
 {
     /// <summary>
-    /// Rules of the draft supply room (<see cref="SupplyRoom"/>): staged unlocks, restocking, the cart and committing purchases.
+    /// Rules of the staff room's supply room (<see cref="SupplyRoom"/>): staged unlocks, restocking, the cart and committing purchases.
     /// Pile layout used by every test: 0 = Walk-In (max 3), 1 = Walk-In (max 2), 2 = Ambulance (max 3), 3 = Trauma (max 2).
     /// </summary>
     [TestFixture]
-    [Category("Drafting")]
+    [Category("StaffRoom")]
     public class SupplyRoomTests
     {
         private const int WalkInA = 0, WalkInB = 1, Ambulance = 2, Trauma = 3;
@@ -57,15 +57,15 @@ namespace ChiefComplaint.Tests
             Assert.AreEqual(4, _room.Piles.Count);
             foreach (var pile in _room.Piles)
             {
-                Assert.IsFalse(pile.Unlocked, $"{pile.Card.name} should be locked before the first draft");
-                Assert.AreEqual(0, pile.Stock, $"{pile.Card.name} should hold no stock before the first draft");
+                Assert.IsFalse(pile.Unlocked, $"{pile.Card.name} should be locked before the first staff room visit");
+                Assert.AreEqual(0, pile.Stock, $"{pile.Card.name} should hold no stock before the first staff room visit");
             }
         }
 
         [Test]
-        public void FirstDraft_WalkInPilesUnlockFull_LaterStagesStayLocked()
+        public void FirstStaffRoom_WalkInPilesUnlockFull_LaterStagesStayLocked()
         {
-            _room.OpenDraft(EscalationType.WalkIn);
+            _room.Restock(EscalationType.WalkIn);
 
             Assert.IsTrue(_room.Piles[WalkInA].Unlocked);
             Assert.AreEqual(3, _room.Piles[WalkInA].Stock, "Walk-In pile A should start full");
@@ -81,8 +81,8 @@ namespace ChiefComplaint.Tests
         [Test]
         public void ReachingAmbulance_UnlocksAmbulancePilesFull_TraumaStaysLocked()
         {
-            _room.OpenDraft(EscalationType.WalkIn);
-            _room.OpenDraft(EscalationType.Ambulance);
+            _room.Restock(EscalationType.WalkIn);
+            _room.Restock(EscalationType.Ambulance);
 
             Assert.IsTrue(_room.Piles[Ambulance].Unlocked);
             Assert.AreEqual(3, _room.Piles[Ambulance].Stock, "A newly unlocked pile should start full, not at +1");
@@ -92,7 +92,7 @@ namespace ChiefComplaint.Tests
         [Test]
         public void ReachingTrauma_DirectlyUnlocksEveryStage()
         {
-            _room.OpenDraft(EscalationType.TraumaFlight);
+            _room.Restock(EscalationType.TraumaFlight);
 
             foreach (var pile in _room.Piles)
             {
@@ -103,42 +103,42 @@ namespace ChiefComplaint.Tests
 
         // ---------------------------------------------------------------- restocking
 
-        // reserved before the next draft, expected stock after it (pile A, max 3)
+        // reserved before the next visit, expected stock after it (pile A, max 3)
         [TestCase(0, 3, Description = "Full pile stays at max")]
         [TestCase(1, 3, Description = "One short restocks to max")]
         [TestCase(2, 2, Description = "Two short restocks by only 1")]
         [TestCase(3, 1, Description = "Empty pile restocks by 1")]
-        public void OpenDraft_RestocksOpenPilesByOne_CappedAtMax(int bought, int expectedStock)
+        public void Restock_RestocksOpenPilesByOne_CappedAtMax(int bought, int expectedStock)
         {
-            _room.OpenDraft(EscalationType.WalkIn);
+            _room.Restock(EscalationType.WalkIn);
             for (int i = 0; i < bought; i++) Assert.IsTrue(_room.TryReserve(WalkInA));
             var purchases = new List<ActionCardSO>();
             _room.CommitCart(purchases);
 
-            _room.OpenDraft(EscalationType.WalkIn);
+            _room.Restock(EscalationType.WalkIn);
 
             Assert.AreEqual(expectedStock, _room.Piles[WalkInA].Stock);
         }
 
         [Test]
-        public void OpenDraft_RepeatedRestocksNeverExceedMax()
+        public void Restock_RepeatedRestocksNeverExceedMax()
         {
-            _room.OpenDraft(EscalationType.WalkIn);
+            _room.Restock(EscalationType.WalkIn);
             for (int i = 0; i < 3; i++) _room.TryReserve(WalkInA);
             _room.CommitCart(new List<ActionCardSO>());
 
-            for (int draft = 1; draft <= 5; draft++)
+            for (int visit = 1; visit <= 5; visit++)
             {
-                _room.OpenDraft(EscalationType.WalkIn);
-                Assert.AreEqual(Mathf.Min(3, draft), _room.Piles[WalkInA].Stock, $"Stock after restock #{draft}");
+                _room.Restock(EscalationType.WalkIn);
+                Assert.AreEqual(Mathf.Min(3, visit), _room.Piles[WalkInA].Stock, $"Stock after restock #{visit}");
             }
         }
 
         [Test]
-        public void OpenDraft_LockedPilesDoNotRestock()
+        public void Restock_LockedPilesDoNotRestock()
         {
-            _room.OpenDraft(EscalationType.WalkIn);
-            _room.OpenDraft(EscalationType.WalkIn);
+            _room.Restock(EscalationType.WalkIn);
+            _room.Restock(EscalationType.WalkIn);
 
             Assert.AreEqual(0, _room.Piles[Ambulance].Stock);
             Assert.AreEqual(0, _room.Piles[Trauma].Stock);
@@ -149,7 +149,7 @@ namespace ChiefComplaint.Tests
         [Test]
         public void TryReserve_OpenPile_DecrementsStockAndIncrementsCart()
         {
-            _room.OpenDraft(EscalationType.WalkIn);
+            _room.Restock(EscalationType.WalkIn);
 
             Assert.IsTrue(_room.TryReserve(WalkInA));
 
@@ -163,7 +163,7 @@ namespace ChiefComplaint.Tests
         [TestCase(Trauma)]
         public void TryReserve_LockedPile_Fails(int index)
         {
-            _room.OpenDraft(EscalationType.WalkIn);
+            _room.Restock(EscalationType.WalkIn);
 
             Assert.IsFalse(_room.TryReserve(index));
             Assert.AreEqual(0, _room.Piles[index].InCart);
@@ -173,7 +173,7 @@ namespace ChiefComplaint.Tests
         [Test]
         public void TryReserve_EmptyPile_Fails()
         {
-            _room.OpenDraft(EscalationType.WalkIn);
+            _room.Restock(EscalationType.WalkIn);
             Assert.IsTrue(_room.TryReserve(WalkInB));
             Assert.IsTrue(_room.TryReserve(WalkInB));
 
@@ -186,7 +186,7 @@ namespace ChiefComplaint.Tests
         [TestCase(4)]
         public void TryReserveAndUnreserve_OutOfRangeIndex_Fail(int index)
         {
-            _room.OpenDraft(EscalationType.TraumaFlight);
+            _room.Restock(EscalationType.TraumaFlight);
 
             Assert.IsFalse(_room.TryReserve(index));
             Assert.IsFalse(_room.TryUnreserve(index));
@@ -195,7 +195,7 @@ namespace ChiefComplaint.Tests
         [Test]
         public void TryUnreserve_ReturnsCopyToPile()
         {
-            _room.OpenDraft(EscalationType.WalkIn);
+            _room.Restock(EscalationType.WalkIn);
             _room.TryReserve(WalkInA);
             _room.TryReserve(WalkInA);
 
@@ -208,7 +208,7 @@ namespace ChiefComplaint.Tests
         [Test]
         public void TryUnreserve_EmptyCart_Fails()
         {
-            _room.OpenDraft(EscalationType.WalkIn);
+            _room.Restock(EscalationType.WalkIn);
 
             Assert.IsFalse(_room.TryUnreserve(WalkInA));
             Assert.AreEqual(3, _room.Piles[WalkInA].Stock, "A failed unreserve must not add stock above max");
@@ -218,7 +218,7 @@ namespace ChiefComplaint.Tests
         [Test]
         public void CommitCart_ReturnsOneEntryPerCopy_AndEmptiesCart()
         {
-            _room.OpenDraft(EscalationType.Ambulance);
+            _room.Restock(EscalationType.Ambulance);
             _room.TryReserve(WalkInA);
             _room.TryReserve(WalkInA);
             _room.TryReserve(Ambulance);
@@ -238,7 +238,7 @@ namespace ChiefComplaint.Tests
         [Test]
         public void CommitCart_AfterCommit_CannotUnreserve()
         {
-            _room.OpenDraft(EscalationType.WalkIn);
+            _room.Restock(EscalationType.WalkIn);
             _room.TryReserve(WalkInA);
             _room.CommitCart(new List<ActionCardSO>());
 
@@ -247,30 +247,30 @@ namespace ChiefComplaint.Tests
         }
 
         [Test]
-        public void OpenDraft_ClearsLeftoverCart()
+        public void Restock_ClearsLeftoverCart()
         {
-            _room.OpenDraft(EscalationType.WalkIn);
+            _room.Restock(EscalationType.WalkIn);
             _room.TryReserve(WalkInA);
             _room.TryReserve(WalkInB);
 
-            _room.OpenDraft(EscalationType.WalkIn);
+            _room.Restock(EscalationType.WalkIn);
 
             foreach (var pile in _room.Piles)
-                Assert.AreEqual(0, pile.InCart, $"{pile.Card.name} cart should be cleared by OpenDraft");
+                Assert.AreEqual(0, pile.InCart, $"{pile.Card.name} cart should be cleared by Restock");
             var bought = new List<ActionCardSO>();
             _room.CommitCart(bought);
             Assert.IsEmpty(bought, "A cleared cart commits nothing");
         }
 
         [Test]
-        public void Pile_Price_MatchesCalculateDraftValue()
+        public void Pile_Price_MatchesCalculateMarketPrice()
         {
             var pile = _room.Piles[WalkInA];
             pile.Card.cardType = ActionCardType.Staff;
             pile.Card.powerTier = 2;
             pile.Card.apCost = 1;
 
-            Assert.AreEqual(pile.Card.CalculateDraftValue(), pile.Price);
+            Assert.AreEqual(pile.Card.CalculateMarketPrice(), pile.Price);
         }
 
         // ---------------------------------------------------------------- construction
@@ -280,7 +280,7 @@ namespace ChiefComplaint.Tests
         {
             var room = new SupplyRoom(null);
             Assert.AreEqual(0, room.Piles.Count);
-            Assert.DoesNotThrow(() => room.OpenDraft(EscalationType.TraumaFlight));
+            Assert.DoesNotThrow(() => room.Restock(EscalationType.TraumaFlight));
         }
 
         [Test]

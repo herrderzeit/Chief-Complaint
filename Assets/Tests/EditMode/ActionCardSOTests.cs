@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace ChiefComplaint.Tests
 {
-    /// <summary>Pure-maths tests for <see cref="ActionCardSO.CalculateDraftValue"/>.</summary>
+    /// <summary>Pure-maths tests for <see cref="ActionCardSO.CalculateMarketPrice"/>.</summary>
     [TestFixture]
     [Category("Economy")]
     public class ActionCardSOTests
@@ -26,14 +26,14 @@ namespace ChiefComplaint.Tests
         [TestCase(ActionCardType.Administration, 1, 1, 0, 4,  Description = "Base 3 + tier 1")]
         [TestCase(ActionCardType.Supply,         1, 1, 0, 3,  Description = "Base 2 + tier 1")]
         [TestCase(ActionCardType.Supply,         1, 2, 0, 2,  Description = "Clamped to the minimum of 2")]
-        public void CalculateDraftValue_MatchesFormula(ActionCardType type, int tier, int ap, int draw, int expected)
+        public void CalculateMarketPrice_MatchesFormula(ActionCardType type, int tier, int ap, int draw, int expected)
         {
             _card.cardType = type;
             _card.powerTier = tier;
             _card.apCost = ap;
             _card.cardsToDraw = draw;
 
-            Assert.AreEqual(expected, _card.CalculateDraftValue());
+            Assert.AreEqual(expected, _card.CalculateMarketPrice());
         }
 
         // type, tier, AP, draw, exhausts, Reputation cost, success chance, expected
@@ -51,7 +51,7 @@ namespace ChiefComplaint.Tests
         [TestCase(ActionCardType.Supply,     1, 1, 0, true,  0, 1f,    2,  Description = "2 + 1 - 2 = 1, clamped to 2")]
         [TestCase(ActionCardType.Utility,    1, 2, 0, true,  3, 0.5f,  2,  Description = "Every discount at once still floors at 2")]
         [TestCase(ActionCardType.RedTape,    1, 0, 0, true,  3, 0.5f,  0,  Description = "Red Tape is always free")]
-        public void CalculateDraftValue_DiscountsExhaustReputationCostAndFailureChance(
+        public void CalculateMarketPrice_DiscountsExhaustReputationCostAndFailureChance(
             ActionCardType type, int tier, int ap, int draw, bool exhausts, int reputationCost, float success, int expected)
         {
             _card.cardType = type;
@@ -62,24 +62,24 @@ namespace ChiefComplaint.Tests
             _card.reputationCost = reputationCost;
             _card.successChance = success;
 
-            Assert.AreEqual(expected, _card.CalculateDraftValue());
+            Assert.AreEqual(expected, _card.CalculateMarketPrice());
         }
 
         [TestCase(1, 0, 0)]
         [TestCase(3, 0, 2)]
         [TestCase(2, 5, 1)]
-        public void CalculateDraftValue_RedTapeIsAlwaysFree(int tier, int ap, int draw)
+        public void CalculateMarketPrice_RedTapeIsAlwaysFree(int tier, int ap, int draw)
         {
             _card.cardType = ActionCardType.RedTape;
             _card.powerTier = tier;
             _card.apCost = ap;
             _card.cardsToDraw = draw;
 
-            Assert.AreEqual(0, _card.CalculateDraftValue());
+            Assert.AreEqual(0, _card.CalculateMarketPrice());
         }
 
         [Test]
-        public void CalculateDraftValue_NeverBelowTwoForPurchasableCards()
+        public void CalculateMarketPrice_NeverBelowTwoForPurchasableCards()
         {
             foreach (ActionCardType type in System.Enum.GetValues(typeof(ActionCardType)))
             {
@@ -89,7 +89,7 @@ namespace ChiefComplaint.Tests
                 _card.apCost = 5;
                 _card.cardsToDraw = 0;
 
-                Assert.GreaterOrEqual(_card.CalculateDraftValue(), 2, $"{type} fell below the minimum cost.");
+                Assert.GreaterOrEqual(_card.CalculateMarketPrice(), 2, $"{type} fell below the minimum cost.");
             }
         }
     }

@@ -143,8 +143,8 @@ namespace ChiefComplaint.Sim.Tests
             while (g.Shift < 10)
             {
                 g.Apply(GameAction.EndShift);
-                Assert.Equal(Phase.Draft, g.Phase);
-                g.Apply(GameAction.FinishDraft);
+                Assert.Equal(Phase.StaffRoom, g.Phase);
+                g.Apply(GameAction.LeaveStaffRoom);
             }
 
             RunRecord record = recorder.Record;

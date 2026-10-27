@@ -104,7 +104,7 @@ namespace ChiefComplaint.Sim.Tests
             Game g = Start(data);
 
             g.Apply(GameAction.EndShift);
-            if (g.Phase == Phase.Draft) g.Apply(GameAction.FinishDraft);
+            if (g.Phase == Phase.StaffRoom) g.Apply(GameAction.LeaveStaffRoom);
 
             Assert.Empty(g.ActivePatients);
             Assert.Equal(20 - 5, g.Reputation);

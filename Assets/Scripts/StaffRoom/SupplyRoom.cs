@@ -3,23 +3,23 @@ using System.Collections.Generic;
 using UnityEngine;
 using ChiefComplaint.Cards.Data;
 
-namespace ChiefComplaint.Drafting
+namespace ChiefComplaint.StaffRoom
 {
     /// <summary>Inspector setup for one supply-room pile: which card, when it unlocks and how many copies it holds.</summary>
     [Serializable]
     public class SupplyPileConfig
     {
         public ActionCardSO card;
-        [Tooltip("Escalation stage that unlocks this pile. Walk-In piles are open from the first draft.")]
+        [Tooltip("Escalation stage that unlocks this pile. Walk-In piles are open from the first staff room visit.")]
         public EscalationType unlockAt = EscalationType.WalkIn;
         [Min(1)] public int maxStock = 3;
     }
 
     /// <summary>
-    /// Rules of the draft "supply room": every draftable card has its own pile with limited stock.
-    /// Piles unlock (full) as the run escalates, and every unlocked pile restocks +1 at each later draft,
+    /// Rules of the staff room's "supply room": every purchasable card has its own pile with limited stock.
+    /// Piles unlock (full) as the run escalates, and every unlocked pile restocks +1 at each later visit,
     /// up to its maximum. Buying reserves a copy into the cart; undoing returns it. Plain C# so it can be
-    /// tested without a scene; <see cref="DraftManager"/> handles Funding and the UI.
+    /// tested without a scene; <see cref="StaffRoomManager"/> handles Funding and the UI.
     /// </summary>
     public class SupplyRoom
     {
@@ -31,7 +31,7 @@ namespace ChiefComplaint.Drafting
             public bool Unlocked { get; internal set; }
             public int Stock { get; internal set; }
             public int InCart { get; internal set; }
-            public int Price => Card != null ? Card.CalculateDraftValue() : 0;
+            public int Price => Card != null ? Card.CalculateMarketPrice() : 0;
 
             internal Pile(SupplyPileConfig config) { Config = config; }
         }
@@ -47,10 +47,10 @@ namespace ChiefComplaint.Drafting
         }
 
         /// <summary>
-        /// Starts a draft: unlocks piles whose stage has been reached (they start full) and restocks
+        /// Opens the supply room for a visit: unlocks piles whose stage has been reached (they start full) and restocks
         /// every pile that was already open by 1, up to its maximum. Clears the previous cart.
         /// </summary>
-        public void OpenDraft(EscalationType reached)
+        public void Restock(EscalationType reached)
         {
             foreach (var pile in piles)
             {
