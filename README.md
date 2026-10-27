@@ -6,7 +6,7 @@ Here is a quick primer on how the game works and how the codebase is structured 
 
 ## 🎮 The Core Game Loop
 
-Chief Complaint is a hospital-themed roguelike deck-builder.
+Chief Complaint is a hospital-themed deck-builder.
 
 - **The Board:** Patients arrive in the Triage river. Every patient has a Stability stat (which decays at the end of every turn/shift) and 1-3 Symptoms attached to them.
 - **The Economy:** The player has a base economy of 3 AP (Action Points) per shift.
